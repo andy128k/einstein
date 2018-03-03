@@ -8,6 +8,7 @@ use std::env::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};
+use sdl::wm::set_caption;
 use error::*;
 
 extern "C" {
@@ -27,6 +28,7 @@ fn real_main() -> Result<()> {
     if !init(&[InitFlag::Video, InitFlag::Audio]) {
         return Err(err_msg(get_error()));
     }
+    set_caption("Einstein 3.0", "");
 
     unsafe {
         initAudio();

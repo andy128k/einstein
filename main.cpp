@@ -19,8 +19,6 @@ void initScreen(Screen *screen)
 
     screen->setMode(VideoMode(800, 600, 24, 
                 getStorage()->get(L"fullscreen", 1) != 0));
-    
-    SDL_WM_SetCaption("Einstein", NULL);
 }
 
 extern "C" void initAudio()
