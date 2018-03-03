@@ -7,17 +7,12 @@
 Screen::Screen()
 {
     screen = NULL;
-    mouseImage = NULL;
-    mouseSave = NULL;
-    mouseVisible = false;
     regionsList = NULL;
     maxRegionsList = 0;
 }
 
 Screen::~Screen()
 {
-    if (mouseImage) SDL_FreeSurface(mouseImage);
-    if (mouseSave) SDL_FreeSurface(mouseSave);
     if (regionsList) free(regionsList);
 }
 

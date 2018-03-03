@@ -37,13 +37,9 @@ class Screen
     private:
         SDL_Surface *screen;
         bool fullScreen;
-        SDL_Surface *mouseImage;
-        SDL_Surface *mouseSave;
         std::list<SDL_Rect> regions;
-        bool mouseVisible;
         SDL_Rect *regionsList;
         int maxRegionsList;
-        int saveX, saveY;
 
     public:
         Screen();
