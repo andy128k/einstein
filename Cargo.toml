@@ -5,6 +5,7 @@ authors = ["Andrey Kutejko <andy128k@gmail.com>"]
 
 [dependencies]
 libc = "*"
+failure = "*"
 
 [build-dependencies]
 cc = "*"

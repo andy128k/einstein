@@ -90,10 +90,6 @@ static void loadResources(const std::wstring &selfPath)
 
 extern "C" int mainpp(char *argv0)
 {
-#ifndef WIN32
-    ensureDirExists(fromMbcs(getenv("HOME")) + std::wstring(L"/.einstein"));
-#endif
-    
     try {
         loadResources(fromUtf8(argv0));
         initScreen();
