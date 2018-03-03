@@ -37,5 +37,6 @@ class Random
 };
 
 
-#endif
+extern Random rndGen;
 
+#endif

@@ -1,4 +1,3 @@
-#include "main.h"
 #include "utils.h"
 #include "widgets.h"
 #include "puzzle.h"
@@ -19,6 +18,7 @@
 class GameBackground: public Widget
 {
     public:
+        GameBackground(Screen *screen): Widget(screen) {}
         virtual void draw();
 };
 
@@ -26,18 +26,18 @@ class GameBackground: public Widget
 void GameBackground::draw()
 {
     // draw background
-    drawWallpaper(L"rain.bmp");
+    drawWallpaper(screen, L"rain.bmp");
 
     // draw title
     SDL_Surface *tile = loadImage(L"title.bmp");
-    screen.draw(8, 10, tile);
+    screen->draw(8, 10, tile);
     SDL_FreeSurface(tile);
     
     Font titleFont(L"nova.ttf", 28);
-    titleFont.draw(screen.getSurface(), 20, 20, 255,255,0, true, 
+    titleFont.draw(screen->getSurface(), 20, 20, 255,255,0, true, 
             msg(L"einsteinPuzzle"));
     
-    screen.addRegionToUpdate(0, 0, screen.getWidth(), screen.getHeight());
+    screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
 }
 
 
@@ -70,8 +70,8 @@ class Watch: public TimerHandler, public Widget
         Font *font;
     
     public:
-        Watch();
-        Watch(std::istream &stream);
+        Watch(Screen *screen);
+        Watch(Screen *screen, std::istream &stream);
         virtual ~Watch();
 
     public:
@@ -85,14 +85,16 @@ class Watch: public TimerHandler, public Widget
 };
 
 
-Watch::Watch()
+Watch::Watch(Screen *screen)
+    : Widget(screen)
 {
     lastRun = elapsed = lastUpdate = 0;
     stop();
     font = new Font(L"luximb.ttf", 16);
 }
 
-Watch::Watch(std::istream &stream)
+Watch::Watch(Screen *screen, std::istream &stream)
+    : Widget(screen)
 {
     elapsed = readInt(stream);
     lastUpdate = 0;
@@ -140,10 +142,10 @@ void Watch::draw()
     int w, h;
     font->getSize(s, w, h);
     SDL_Rect rect = { x-2, y-2, w+4, h+4 };
-    SDL_FillRect(screen.getSurface(), &rect, 
-            SDL_MapRGB(screen.getSurface()->format, 0, 0, 255));
-    font->draw(x, y, 255,255,255, true, s);
-    screen.addRegionToUpdate(x-2, y-2, w+4, h+4);
+    SDL_FillRect(screen->getSurface(), &rect, 
+            SDL_MapRGB(screen->getSurface()->format, 0, 0, 255));
+    font->draw(screen->getSurface(), x, y, 255,255,255, true, s);
+    screen->addRegionToUpdate(x-2, y-2, w+4, h+4);
     
     lastUpdate = time;
 }
@@ -176,13 +178,14 @@ class PauseGameCommand: public Command
         
         virtual void doAction() {
             watch->stop();
-            Area area;
+            Screen *screen = gameArea->screen;
+            Area area(screen);
             area.add(background, false);
             Font font(L"laudcn2.ttf", 16);
-            area.add(new Window(280, 275, 240, 50, L"greenpattern.bmp", 6));
-            area.add(new Label(&font, 280, 275, 240, 50, Label::ALIGN_CENTER,
+            area.add(new Window(screen, 280, 275, 240, 50, L"greenpattern.bmp", 6));
+            area.add(new Label(screen, &font, 280, 275, 240, 50, Label::ALIGN_CENTER,
                 Label::ALIGN_MIDDLE, 255,255,0, msg(L"paused")));
-            area.add(new AnyKeyAccel());
+            area.add(new AnyKeyAccel(screen));
             area.run();
             sound->play(L"click.wav");
             gameArea->updateMouse();
@@ -210,7 +213,7 @@ class WinCommand: public Command
             sound->play(L"applause.wav");
             watch->stop();
             Font font(L"laudcn2.ttf", 20);
-            showMessageWindow(gameArea, L"marble1.bmp", 
+            showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 
                     500, 70, &font, 255,0,0, msg(L"won"));
             gameArea->draw();
             TopScores scores;
@@ -259,19 +262,20 @@ class FailCommand: public Command
             bool newGame = false;
             Font font(L"laudcn2.ttf", 24);
             Font btnFont(L"laudcn2.ttf", 14);
-            Area area;
+            Screen *screen = gameArea->screen;
+            Area area = Area(screen);
             area.add(gameArea);
-            area.add(new Window(220, 240, 360, 140, L"redpattern.bmp", 6));
-            area.add(new Label(&font, 250, 230, 300, 100, Label::ALIGN_CENTER,
+            area.add(new Window(screen, 220, 240, 360, 140, L"redpattern.bmp", 6));
+            area.add(new Label(screen, &font, 250, 230, 300, 100, Label::ALIGN_CENTER,
                         Label::ALIGN_MIDDLE, 255,255,0, msg(L"loose")));
             OkDlgCommand newGameCmd(&area, newGame);
-            area.add(new Button(250, 340, 90, 25, &btnFont, 255,255,0, 
+            area.add(new Button(screen, 250, 340, 90, 25, &btnFont, 255,255,0, 
                         L"redpattern.bmp", msg(L"startNew"), &newGameCmd));
             OkDlgCommand restartCmd(&area, restart);
-            area.add(new Button(350, 340, 90, 25, &btnFont, 255,255,0, 
+            area.add(new Button(screen, 350, 340, 90, 25, &btnFont, 255,255,0, 
                         L"redpattern.bmp", msg(L"tryAgain"), &restartCmd));
             ExitCommand exitCmd(area);
-            area.add(new Button(450, 340, 90, 25, &btnFont, 255,255,0, 
+            area.add(new Button(screen, 450, 340, 90, 25, &btnFont, 255,255,0, 
                         L"redpattern.bmp", msg(L"exit"), &exitCmd));
             area.run();
             if (restart || newGame) {
@@ -295,7 +299,7 @@ class CheatAccel: public Widget
         std::wstring cheat;
 
     public:
-        CheatAccel(const std::wstring s, Command *cmd): cheat(s) {
+        CheatAccel(Screen *screen, const std::wstring s, Command *cmd): Widget(screen), cheat(s) {
             command = cmd;
         };
 
@@ -330,7 +334,7 @@ class CheatCommand: public Command
         
         virtual void doAction() {
             Font font(L"nova.ttf", 30);
-            showMessageWindow(gameArea, L"darkpattern.bmp", 
+            showMessageWindow(gameArea->screen, gameArea, L"darkpattern.bmp", 
                     500, 100, &font, 255,255,255, 
                     msg(L"iddqd"));
             gameArea->draw();
@@ -357,7 +361,7 @@ class SaveGameCommand: public Command
         virtual void doAction() {
             watch->stop();
 
-            Area area;
+            Area area(gameArea->screen);
             area.add(background, false);
             saveGame(&area, game);
             
@@ -402,7 +406,7 @@ class HelpCommand: public Command
         
         virtual void doAction() {
             watch->stop();
-            Area area;
+            Area area(gameArea->screen);
             area.add(background, false);
             area.draw();
             showDescription(&area);
@@ -414,20 +418,22 @@ class HelpCommand: public Command
 
 
 
-Game::Game()
+Game::Game(Screen *screen)
+    : screen(screen)
 {
     genPuzzle();
 
     possibilities = new Possibilities();
     openInitial(*possibilities, rules);
     
-    puzzle = new Puzzle(iconSet, solvedPuzzle, possibilities);
-    verHints = new VertHints(iconSet, rules);
-    horHints = new HorHints(iconSet, rules);
-    watch = new Watch();
+    puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
+    verHints = new VertHints(screen, iconSet, rules);
+    horHints = new HorHints(screen, iconSet, rules);
+    watch = new Watch(screen);
 }
 
-Game::Game(std::istream &stream)
+Game::Game(Screen *screen, std::istream &stream)
+    : screen(screen)
 {
     pleaseWait();
 
@@ -436,10 +442,10 @@ Game::Game(std::istream &stream)
     memcpy(savedSolvedPuzzle, solvedPuzzle, sizeof(solvedPuzzle));
     savedRules = rules;
     possibilities = new Possibilities(stream);
-    puzzle = new Puzzle(iconSet, solvedPuzzle, possibilities);
-    verHints = new VertHints(iconSet, rules, stream);
-    horHints = new HorHints(iconSet, rules, stream);
-    watch = new Watch(stream);
+    puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
+    verHints = new VertHints(screen, iconSet, rules, stream);
+    horHints = new HorHints(screen, iconSet, rules, stream);
+    watch = new Watch(screen, stream);
     hinted = true;
 }
 
@@ -472,15 +478,15 @@ void Game::deleteRules()
 
 void Game::pleaseWait()
 {
-    drawWallpaper(L"rain.bmp");
-    Window window(230, 260, 340, 80, L"greenpattern.bmp", 6);
+    drawWallpaper(screen, L"rain.bmp");
+    Window window(screen, 230, 260, 340, 80, L"greenpattern.bmp", 6);
     window.draw();
     Font font(L"laudcn2.ttf", 16);
-    Label label(&font, 280, 275, 240, 50, Label::ALIGN_CENTER,
+    Label label(screen, &font, 280, 275, 240, 50, Label::ALIGN_CENTER,
                 Label::ALIGN_MIDDLE, 255,255,0, msg(L"loading"));
     label.draw();
-    screen.addRegionToUpdate(0, 0, screen.getWidth(), screen.getHeight());
-    screen.flush();
+    screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
+    screen->flush();
 }
 
 void Game::genPuzzle()
@@ -526,21 +532,21 @@ void Game::restart()
     hinted = true;
 }
 
-#define BUTTON(x, y, text, cmd) \
-    area.add(new Button(x, y, 94, 30, &btnFont, 255,255,0, \
+#define BUTTON(screen, x, y, text, cmd) \
+    area.add(new Button(screen, x, y, 94, 30, &btnFont, 255,255,0, \
                 L"btn.bmp", msg(text), false, cmd));
 
 void Game::run()
 {
-    Area area;
+    Area area = Area(screen);
     Font btnFont(L"laudcn2.ttf", 14);
     
     area.setTimer(300, watch);
 
-    GameBackground *background = new GameBackground();
+    GameBackground *background = new GameBackground(screen);
     area.add(background);
     CheatCommand cheatCmd(&area);
-    area.add(new CheatAccel(L"iddqd", &cheatCmd));
+    area.add(new CheatAccel(screen, L"iddqd", &cheatCmd));
     WinCommand winCmd(&area, watch, this);
     FailCommand failCmd(&area, this);
     puzzle->setCommands(&winCmd, &failCmd);
@@ -549,18 +555,18 @@ void Game::run()
     area.add(horHints, false);
     
     PauseGameCommand pauseGameCmd(&area, watch, background);
-    BUTTON(12, 400, L"pause", &pauseGameCmd)
+    BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
     ToggleHintCommand toggleHintsCmd(verHints, horHints);
-    BUTTON(119, 400, L"switch", &toggleHintsCmd)
+    BUTTON(screen, 119, 400, L"switch", &toggleHintsCmd)
     SaveGameCommand saveCmd(&area, watch, background, this);
-    BUTTON(12, 440, L"save", &saveCmd)
+    BUTTON(screen, 12, 440, L"save", &saveCmd)
     GameOptionsCommand optionsCmd(&area);
-    BUTTON(119, 440, L"options", &optionsCmd)
+    BUTTON(screen, 119, 440, L"options", &optionsCmd)
     ExitCommand exitGameCmd(area);
-    BUTTON(226, 400, L"exit", &exitGameCmd)
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitGameCmd));
+    BUTTON(screen, 226, 400, L"exit", &exitGameCmd)
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitGameCmd));
     HelpCommand helpCmd(&area, watch, background);
-    BUTTON(226, 440, L"help", &helpCmd)
+    BUTTON(screen, 226, 440, L"help", &helpCmd)
     area.add(watch, false);
 
     watch->start();

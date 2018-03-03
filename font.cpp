@@ -1,7 +1,7 @@
 #include "font.h"
-#include "main.h"
 #include "utils.h"
 #include "unicode.h"
+#include "exceptions.h"
 
 
 static Uint16 *convBuf = NULL;
@@ -56,8 +56,7 @@ Font::~Font()
 }
 
 
-void Font::draw(SDL_Surface *s, int x, int y, int r, int g, int b, 
-        bool shadow, const std::wstring &text)
+void Font::draw(SDL_Surface *s, int x, int y, int r, int g, int b, bool shadow, const std::wstring &text)
 {
     if (text.length() < 1)
         return;
@@ -78,12 +77,6 @@ void Font::draw(SDL_Surface *s, int x, int y, int r, int g, int b,
     SDL_Rect dst = { x, y, surface->w, surface->h };
     SDL_BlitSurface(surface, &src, s, &dst);
     SDL_FreeSurface(surface);
-}
-
-void Font::draw(int x, int y, int r, int g, int b, bool shadow, 
-        const std::wstring &text)
-{
-    draw(screen.getSurface(), x, y, r,g,b, shadow, text);
 }
 
 int Font::getWidth(const std::wstring &text)

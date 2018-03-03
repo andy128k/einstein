@@ -1,5 +1,4 @@
 #include "puzzle.h"
-#include "main.h"
 #include "utils.h"
 #include "sound.h"
 
@@ -12,8 +11,8 @@
 #define FIELD_TILE_HEIGHT 48
 
 
-Puzzle::Puzzle(IconSet &is, SolvedPuzzle &s, Possibilities *p):
-                        iconSet(is), solved(s)
+Puzzle::Puzzle(Screen *screen, IconSet &is, SolvedPuzzle &s, Possibilities *p)
+    : Widget(screen), iconSet(is), solved(s)
 {
     possib = p;
  
@@ -50,15 +49,15 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
     if (possib->isDefined(col, row)) {
         int element = possib->getDefined(col, row);
         if (element > 0)
-            screen.draw(posX, posY, iconSet.getLargeIcon(row, element, 
+            screen->draw(posX, posY, iconSet.getLargeIcon(row, element, 
                         (hCol == col) && (hRow == row)));
     } else {
-        screen.draw(posX, posY, iconSet.getEmptyFieldIcon());
+        screen->draw(posX, posY, iconSet.getEmptyFieldIcon());
         int x = posX;
         int y = posY + (FIELD_TILE_HEIGHT / 6);
         for (int i = 0; i < 6; i++) {
             if (possib->isPossible(col, row, i + 1))
-                screen.draw(x, y, iconSet.getSmallIcon(row, i + 1, 
+                screen->draw(x, y, iconSet.getSmallIcon(row, i + 1, 
                             (hCol == col) && (hRow == row) && (i + 1 == subHNo)));
             if (i == 2) {
                 x = posX;
@@ -68,7 +67,7 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
         }
     }
     if (addToUpdate)
-        screen.addRegionToUpdate(posX, posY, FIELD_TILE_WIDTH, 
+        screen->addRegionToUpdate(posX, posY, FIELD_TILE_WIDTH, 
                 FIELD_TILE_HEIGHT);
 }
 

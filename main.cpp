@@ -3,24 +3,21 @@
 #include <SDL.h>
 #include <SDL_main.h>
 #include <SDL_ttf.h>
-#include "main.h"
+#include "exceptions.h"
 #include "utils.h"
 #include "storage.h"
 #include "unicode.h"
 #include "messages.h"
 #include "sound.h"
 
+void menu(Screen *screen);
 
-Screen screen;
-Random rndGen;
-
-
-extern "C" void initScreen()
+void initScreen(Screen *screen)
 {
     if (TTF_Init())
         throw Exception(L"Error initializing font engine");
 
-    screen.setMode(VideoMode(800, 600, 24, 
+    screen->setMode(VideoMode(800, 600, 24, 
                 getStorage()->get(L"fullscreen", 1) != 0));
     
     SDL_WM_SetCaption("Einstein", NULL);
@@ -47,6 +44,8 @@ extern "C" void loadResources()
 
 extern "C" void mainpp()
 {
-    menu();
+    Screen screen;
+    initScreen(&screen);
+    menu(&screen);
     getStorage()->flush();
 }

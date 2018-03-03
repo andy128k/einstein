@@ -1,6 +1,5 @@
 #include "options.h"
 #include "storage.h"
-#include "main.h"
 #include "messages.h"
 #include "sound.h"
 
@@ -19,11 +18,13 @@ class OptionsChangedCommand: public Command
         };
 
         virtual void doAction() {
+            Screen *screen = area->screen;
+
             bool oldFullscreen = (getStorage()->get(L"fullscreen", 1) != 0);
             float oldVolume = (float)getStorage()->get(L"volume", 20) / 100.0f;
             if (fullscreen != oldFullscreen) {
                 getStorage()->set(L"fullscreen", fullscreen);
-                screen.setMode(VideoMode(800, 600, 24, fullscreen));
+                screen->setMode(VideoMode(800, 600, 24, fullscreen));
             }
 
             if (volume != oldVolume) {
@@ -37,10 +38,10 @@ class OptionsChangedCommand: public Command
 
 
 #define LABEL(y, s) \
-    area.add(new Label(&font, 300, y, 300, 20, Label::ALIGN_LEFT, \
+    area.add(new Label(screen, &font, 300, y, 300, 20, Label::ALIGN_LEFT, \
                 Label::ALIGN_MIDDLE, 255,255,255, msg(s)));
 #define CHECKBOX(y, var) \
-    area.add(new Checkbox(265, y, 20, 20, &font, 255,255,255, L"blue.bmp", \
+    area.add(new Checkbox(screen, 265, y, 20, 20, &font, 255,255,255, L"blue.bmp", \
                 var));
 #define OPTION(y, s, var) LABEL(y, s) CHECKBOX(y, var)
 
@@ -52,25 +53,27 @@ void showOptionsWindow(Area *parentArea)
     bool fullscreen = (getStorage()->get(L"fullscreen", 1) != 0);
     float volume = ((float)getStorage()->get(L"volume", 20)) / 100.0f;
     
-    Area area;
+    Screen *screen = parentArea->screen;
+
+    Area area(screen);
 
     area.add(parentArea);
-    area.add(new Window(250, 170, 300, 260, L"blue.bmp"));
-    area.add(new Label(&titleFont, 250, 175, 300, 40, Label::ALIGN_CENTER,
+    area.add(new Window(screen, 250, 170, 300, 260, L"blue.bmp"));
+    area.add(new Label(screen, &titleFont, 250, 175, 300, 40, Label::ALIGN_CENTER,
                 Label::ALIGN_MIDDLE, 255,255,0, msg(L"options")));
     OPTION(260, L"fullscreen", fullscreen);
     
-    area.add(new Label(&font, 265, 330, 300, 20, Label::ALIGN_LEFT,
+    area.add(new Label(screen, &font, 265, 330, 300, 20, Label::ALIGN_LEFT,
                 Label::ALIGN_MIDDLE, 255,255,255, msg(L"volume")));
-    area.add(new Slider(360, 332, 160, 16, volume));
+    area.add(new Slider(screen, 360, 332, 160, 16, volume));
     
     ExitCommand exitCmd(area);
     OptionsChangedCommand okCmd(&area, fullscreen, volume);
-    area.add(new Button(315, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 
+    area.add(new Button(screen, 315, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 
                 msg(L"ok"), &okCmd));
-    area.add(new Button(405, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 
+    area.add(new Button(screen, 405, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 
                 msg(L"cancel"), &exitCmd));
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd));
-    area.add(new KeyAccel(SDLK_RETURN, &okCmd));
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
+    area.add(new KeyAccel(screen, SDLK_RETURN, &okCmd));
     area.run();
 }

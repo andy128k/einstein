@@ -6,6 +6,7 @@
 #include <list>
 #include <iostream>
 #include "iconset.h"
+#include "screen.h"
 
 
 #define PUZZLE_SIZE 6
@@ -57,7 +58,7 @@ class Rule
         virtual bool apply(Possibilities &pos) = 0;
         virtual bool applyOnStart() { return false; };
         virtual ShowOptions getShowOpts() { return SHOW_NOTHING; };
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlight) = 0;
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlight) = 0;
         virtual void save(std::ostream &stream) = 0;
 };
 

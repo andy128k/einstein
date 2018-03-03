@@ -1,8 +1,9 @@
 #include "puzgen.h"
 #include "utils.h"
-#include "main.h"
 #include "convert.h"
 #include "unicode.h"
+#include "screen.h"
+#include "random.h"
 
 
 static std::wstring getThingName(int row, int thing)
@@ -30,7 +31,7 @@ class NearRule: public Rule
     private:
         bool applyToCol(Possibilities &pos, int col, int nearRow, int nearNum,
             int thisRow, int thisNum);
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlighted);
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlighted);
         virtual ShowOptions getShowOpts() { return SHOW_HORIZ; };
         virtual void save(std::ostream &stream);
 };
@@ -113,12 +114,12 @@ std::wstring NearRule::getAsText()
         L" is near to " + getThingName(thing2[0], thing2[1]);
 }
 
-void NearRule::draw(int x, int y, IconSet &iconSet, bool h)
+void NearRule::draw(Screen *screen, int x, int y, IconSet &iconSet, bool h)
 {
     SDL_Surface *icon = iconSet.getLargeIcon(thing1[0], thing1[1], h);
-    screen.draw(x, y, icon);
-    screen.draw(x + icon->h, y, iconSet.getNearHintIcon(h));
-    screen.draw(x + icon->h*2, y, iconSet.getLargeIcon(thing2[0], thing2[1], h));
+    screen->draw(x, y, icon);
+    screen->draw(x + icon->h, y, iconSet.getNearHintIcon(h));
+    screen->draw(x + icon->h*2, y, iconSet.getLargeIcon(thing2[0], thing2[1], h));
 }
 
 void NearRule::save(std::ostream &stream)
@@ -144,7 +145,7 @@ class DirectionRule: public Rule
         virtual std::wstring getAsText();
 
     private:
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlighted);
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlighted);
         virtual ShowOptions getShowOpts() { return SHOW_HORIZ; };
         virtual void save(std::ostream &stream);
 };
@@ -199,12 +200,12 @@ std::wstring DirectionRule::getAsText()
         L" is from the left of " + getThingName(row2, thing2);
 }
 
-void DirectionRule::draw(int x, int y, IconSet &iconSet, bool h)
+void DirectionRule::draw(Screen *screen, int x, int y, IconSet &iconSet, bool h)
 {
     SDL_Surface *icon = iconSet.getLargeIcon(row1, thing1, h);
-    screen.draw(x, y, icon);
-    screen.draw(x + icon->h, y, iconSet.getSideHintIcon(h));
-    screen.draw(x + icon->h*2, y, iconSet.getLargeIcon(row2, thing2, h));
+    screen->draw(x, y, icon);
+    screen->draw(x + icon->h, y, iconSet.getSideHintIcon(h));
+    screen->draw(x + icon->h*2, y, iconSet.getLargeIcon(row2, thing2, h));
 }
 
 void DirectionRule::save(std::ostream &stream)
@@ -228,7 +229,7 @@ class OpenRule: public Rule
         virtual bool apply(Possibilities &pos);
         virtual std::wstring getAsText();
         virtual bool applyOnStart() { return true; };
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlighted) { };
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlighted) { };
         virtual ShowOptions getShowOpts() { return SHOW_NOTHING; };
         virtual void save(std::ostream &stream);
 };
@@ -281,7 +282,7 @@ class UnderRule: public Rule
         UnderRule(std::istream &stream);
         virtual bool apply(Possibilities &pos);
         virtual std::wstring getAsText();
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlighted);
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlighted);
         virtual ShowOptions getShowOpts() { return SHOW_VERT; };
         virtual void save(std::ostream &stream);
 };
@@ -335,11 +336,11 @@ std::wstring UnderRule::getAsText()
         getThingName(row2, thing2);
 }
 
-void UnderRule::draw(int x, int y, IconSet &iconSet, bool h)
+void UnderRule::draw(Screen *screen, int x, int y, IconSet &iconSet, bool h)
 {
     SDL_Surface *icon = iconSet.getLargeIcon(row1, thing1, h);
-    screen.draw(x, y, icon);
-    screen.draw(x, y + icon->h, iconSet.getLargeIcon(row2, thing2, h));
+    screen->draw(x, y, icon);
+    screen->draw(x, y + icon->h, iconSet.getLargeIcon(row2, thing2, h));
 }
 
 void UnderRule::save(std::ostream &stream)
@@ -367,7 +368,7 @@ class BetweenRule: public Rule
         virtual std::wstring getAsText();
 
     private:
-        virtual void draw(int x, int y, IconSet &iconSet, bool highlighted);
+        virtual void draw(Screen *screen, int x, int y, IconSet &iconSet, bool highlighted);
         virtual ShowOptions getShowOpts() { return SHOW_HORIZ; };
         virtual void save(std::ostream &stream);
 };
@@ -483,14 +484,14 @@ std::wstring BetweenRule::getAsText()
         getThingName(row2, thing2);
 }
 
-void BetweenRule::draw(int x, int y, IconSet &iconSet, bool h)
+void BetweenRule::draw(Screen *screen, int x, int y, IconSet &iconSet, bool h)
 {
     SDL_Surface *icon = iconSet.getLargeIcon(row1, thing1, h);
-    screen.draw(x, y, icon);
-    screen.draw(x + icon->w, y, iconSet.getLargeIcon(centerRow, centerThing, h));
-    screen.draw(x + icon->w*2, y, iconSet.getLargeIcon(row2, thing2, h));
+    screen->draw(x, y, icon);
+    screen->draw(x + icon->w, y, iconSet.getLargeIcon(centerRow, centerThing, h));
+    screen->draw(x + icon->w*2, y, iconSet.getLargeIcon(row2, thing2, h));
     SDL_Surface *arrow = iconSet.getBetweenArrow(h);
-    screen.draw(x + icon->w - (arrow->w - icon->w) / 2, y + 0, arrow);
+    screen->draw(x + icon->w - (arrow->w - icon->w) / 2, y + 0, arrow);
 }
 
 void BetweenRule::save(std::ostream &stream)
@@ -559,5 +560,3 @@ void loadRules(Rules &rules, std::istream &stream)
         rules.push_back(r);
     }
 }
-
-

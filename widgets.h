@@ -6,6 +6,7 @@
 #include <set>
 #include <SDL.h>
 #include "font.h"
+#include "screen.h"
 
 
 class Command
@@ -25,6 +26,9 @@ class Widget
         Area *area;
     
     public:
+        Screen *screen;
+
+        Widget(Screen* screen): screen(screen) { };
         virtual ~Widget() { };
 
     public:
@@ -47,15 +51,15 @@ class Button: public Widget
         Command *command;
         
     public:
-        Button(int x, int y, const std::wstring &name, Command *cmd=NULL, 
+        Button(Screen *screen, int x, int y, const std::wstring &name, Command *cmd=NULL, 
                 bool transparent=true);
-        Button(int x, int y, int width, int height, Font *font, 
+        Button(Screen *screen, int x, int y, int width, int height, Font *font, 
                 int fR, int fG, int fB, int hR, int hG, int hB, 
                 const std::wstring &text, Command *cmd=NULL);
-        Button(int x, int y, int width, int height, Font *font, 
+        Button(Screen *screen, int x, int y, int width, int height, Font *font, 
                 int r, int g, int b, const std::wstring &background, 
                 const std::wstring &text, Command *cmd=NULL);
-        Button(int x, int y, int width, int height, Font *font, 
+        Button(Screen *screen, int x, int y, int width, int height, Font *font, 
                 int r, int g, int b, const std::wstring &background, 
                 const std::wstring &text, bool bevel, Command *cmd=NULL);
         virtual ~Button();
@@ -81,7 +85,7 @@ class KeyAccel: public Widget
         Command *command;
 
     public:
-        KeyAccel(SDLKey key, Command *command);
+        KeyAccel(Screen *screen, SDLKey key, Command *command);
         virtual bool onKeyDown(SDLKey key, unsigned char ch);
 };
 
@@ -105,7 +109,7 @@ class Area: public Widget
         TimerHandler *timer;
 
     public:
-        Area();
+        Area(Screen *screen);
         virtual ~Area();
 
     public:
@@ -141,8 +145,8 @@ class AnyKeyAccel: public Widget
         Command *command;
 
     public:
-        AnyKeyAccel();                  // use exit command by default
-        AnyKeyAccel(Command *command);
+        AnyKeyAccel(Screen *screen);                  // use exit command by default
+        AnyKeyAccel(Screen *screen, Command *command);
         virtual ~AnyKeyAccel();
 
     public:
@@ -158,7 +162,7 @@ class Window: public Widget
         SDL_Surface *background;
     
     public:
-        Window(int x, int y, int w, int h, const std::wstring &background, 
+        Window(Screen *screen, int x, int y, int w, int h, const std::wstring &background, 
                 bool frameWidth=4, bool raised=true);
         virtual ~Window();
 
@@ -192,9 +196,9 @@ class Label: public Widget
         bool shadow;
 
     public:
-        Label(Font *font, int x, int y, int r, int g, int b, 
+        Label(Screen *screen, Font *font, int x, int y, int r, int g, int b, 
                 std::wstring text, bool shadow=true);
-        Label(Font *font, int x, int y, int width, int height,
+        Label(Screen *screen, Font *font, int x, int y, int width, int height,
                 HorAlign hAlign, VerAlign vAlign, int r, int g, int b, 
                 const std::wstring &text);
 
@@ -217,7 +221,7 @@ class InputField: public Window, public TimerHandler
         Uint32 lastKeyUpdate;
     
     public:
-        InputField(int x, int y, int w, int h, const std::wstring &background, 
+        InputField(Screen *screen, int x, int y, int w, int h, const std::wstring &background, 
                 std::wstring &name, int maxLength, int r, int g, int b, Font *font);
         ~InputField();
         
@@ -244,7 +248,7 @@ class Checkbox: public Widget
         bool mouseInside;
         
     public:
-        Checkbox(int x, int y, int width, int height, Font *font, 
+        Checkbox(Screen *screen, int x, int y, int width, int height, Font *font, 
                 int r, int g, int b, const std::wstring &background,
                 bool &checked);
         virtual ~Checkbox();
@@ -272,8 +276,8 @@ class Picture: public Widget
         bool managed;
         
     public:
-        Picture(int x, int y, const std::wstring &name, bool transparent=true);
-        Picture(int x, int y, SDL_Surface *image);
+        Picture(Screen *screen, int x, int y, const std::wstring &name, bool transparent=true);
+        Picture(Screen *screen, int x, int y, SDL_Surface *image);
         virtual ~Picture();
 
     public:
@@ -301,7 +305,7 @@ class Slider: public Widget
         int dragOffsetX;
 
     public:
-        Slider(int x, int y, int width, int height, float &value);
+        Slider(Screen *screen, int x, int y, int width, int height, float &value);
         virtual ~Slider();
 
     public:
@@ -319,4 +323,3 @@ class Slider: public Widget
 
 
 #endif
-

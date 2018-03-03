@@ -96,12 +96,12 @@ int TopScores::getMaxScore()
 class ScoresWindow: public Window
 {
     public:
-        ScoresWindow(int x, int y, TopScores *scores, int highlight);
+        ScoresWindow(Screen *screen, int x, int y, TopScores *scores, int highlight);
 };
 
 
-ScoresWindow::ScoresWindow(int x, int y, TopScores *scores, int highlight): 
-                Window(x, y, 320, 350, L"blue.bmp")
+ScoresWindow::ScoresWindow(Screen *screen, int x, int y, TopScores *scores, int highlight)
+    : Window(screen, x, y, 320, 350, L"blue.bmp")
 {
     Font titleFont(L"nova.ttf", 26);
     Font entryFont(L"laudcn2.ttf", 14);
@@ -137,36 +137,40 @@ ScoresWindow::ScoresWindow(int x, int y, TopScores *scores, int highlight):
 
 void showScoresWindow(Area *parentArea, TopScores *scores, int highlight)
 {
-    Area area;
+    Screen *screen = parentArea->screen;
+
+    Area area(screen);
 
     Font font(L"laudcn2.ttf", 16);
     area.add(parentArea);
-    area.add(new ScoresWindow(240, 125, scores, highlight));
+    area.add(new ScoresWindow(screen, 240, 125, scores, highlight));
     ExitCommand exitCmd(area);
-    area.add(new Button(348, 430, 90, 25, &font, 255,255,0, L"blue.bmp", 
+    area.add(new Button(screen, 348, 430, 90, 25, &font, 255,255,0, L"blue.bmp", 
                 msg(L"ok"), &exitCmd));
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd));
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
     area.run();
 }
 
 
 std::wstring enterNameDialog(Area *parentArea)
 {
-    Area area;
+    Screen *screen = parentArea->screen;
+
+    Area area(screen);
     
     Font font(L"laudcn2.ttf", 16);
     area.add(parentArea);
-    area.add(new Window(170, 280, 460, 100, L"blue.bmp"));
+    area.add(new Window(screen, 170, 280, 460, 100, L"blue.bmp"));
     Storage *storage = getStorage();
     std::wstring name = storage->get(L"lastName", msg(L"anonymous"));
-    area.add(new Label(&font, 180, 300, 255,255,0, msg(L"enterName")));
-    area.add(new InputField(350, 300, 270, 26, L"blue.bmp", name, 20,  
+    area.add(new Label(screen, &font, 180, 300, 255,255,0, msg(L"enterName")));
+    area.add(new InputField(screen, 350, 300, 270, 26, L"blue.bmp", name, 20,  
                 255,255,0,  &font));
     ExitCommand exitCmd(area);
-    area.add(new Button(348, 340, 90, 25, &font, 255,255,0, L"blue.bmp", 
+    area.add(new Button(screen, 348, 340, 90, 25, &font, 255,255,0, L"blue.bmp", 
                 msg(L"ok"), &exitCmd));
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd));
-    area.add(new KeyAccel(SDLK_RETURN, &exitCmd));
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
+    area.add(new KeyAccel(screen, SDLK_RETURN, &exitCmd));
     area.run();
     storage->set(L"lastName", name);
     return name;

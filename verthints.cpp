@@ -1,5 +1,4 @@
 #include "verthints.h"
-#include "main.h"
 #include "utils.h"
 #include "puzgen.h"
 #include "sound.h"
@@ -13,13 +12,15 @@
 #define TILE_HEIGHT  48
 
 
-VertHints::VertHints(IconSet &is, Rules &r): iconSet(is)
+VertHints::VertHints(Screen *screen, IconSet &is, Rules &r)
+    : Widget(screen), iconSet(is)
 {
     reset(r);
 }
 
 
-VertHints::VertHints(IconSet &is, Rules &rl, std::istream &stream): iconSet(is)
+VertHints::VertHints(Screen *screen, IconSet &is, Rules &rl, std::istream &stream)
+    : Widget(screen), iconSet(is)
 {
     int qty = readInt(stream);
 
@@ -88,14 +89,14 @@ void VertHints::drawCell(int col, bool addToUpdate)
             r = rules[col];
     }
     if (r)
-        r->draw(x, y, iconSet, highlighted == col);
+        r->draw(screen, x, y, iconSet, highlighted == col);
     else {
-        screen.draw(x, y, iconSet.getEmptyHintIcon());
-        screen.draw(x, y + TILE_HEIGHT, iconSet.getEmptyHintIcon());
+        screen->draw(x, y, iconSet.getEmptyHintIcon());
+        screen->draw(x, y + TILE_HEIGHT, iconSet.getEmptyHintIcon());
     }
     
     if (addToUpdate)
-        screen.addRegionToUpdate(x, y, TILE_WIDTH, TILE_HEIGHT*2);
+        screen->addRegionToUpdate(x, y, TILE_WIDTH, TILE_HEIGHT*2);
 }
 
 

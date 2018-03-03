@@ -12,8 +12,8 @@
 
 #include <fstream>
 
+#include "exceptions.h"
 #include "utils.h"
-#include "main.h"
 #include "unicode.h"
 #include "sound.h"
 
@@ -98,16 +98,16 @@ int gettimeofday(struct timeval* tp)
 #endif
 }
 
-void drawWallpaper(const std::wstring &name)
+void drawWallpaper(Screen *screen, const std::wstring &name)
 {
     SDL_Surface *tile = loadImage(name);
     SDL_Rect src = { 0, 0, tile->w, tile->h };
     SDL_Rect dst = { 0, 0, tile->w, tile->h };
-    for (int y = 0; y < screen.getHeight(); y += tile->h)
-        for (int x = 0; x < screen.getWidth(); x += tile->w) {
+    for (int y = 0; y < screen->getHeight(); y += tile->h)
+        for (int x = 0; x < screen->getWidth(); x += tile->w) {
             dst.x = x;
             dst.y = y;
-            SDL_BlitSurface(tile, &src, screen.getSurface(), &dst);
+            SDL_BlitSurface(tile, &src, screen->getSurface(), &dst);
         }
     SDL_FreeSurface(tile);
 }
@@ -230,10 +230,12 @@ class CenteredBitmap: public Widget
         int x, y;
         
     public:
-        CenteredBitmap(const std::wstring &fileName) {
+        CenteredBitmap(Screen *screen, const std::wstring &fileName)
+            : Widget(screen)
+        {
             tile = loadImage(fileName);
-            x = (screen.getWidth() - tile->w) / 2;
-            y = (screen.getHeight() - tile->h) / 2;
+            x = (screen->getWidth() - tile->w) / 2;
+            y = (screen->getHeight() - tile->h) / 2;
         };
 
         virtual ~CenteredBitmap() {
@@ -241,19 +243,19 @@ class CenteredBitmap: public Widget
         };
 
         virtual void draw() {
-            screen.draw(x, y, tile);
-            screen.addRegionToUpdate(x, y, tile->w, tile->h);
+            screen->draw(x, y, tile);
+            screen->addRegionToUpdate(x, y, tile->w, tile->h);
         };
 };
 
 
-void showWindow(Area *parentArea, const std::wstring &fileName)
+void showWindow(Screen *screen, Area *parentArea, const std::wstring &fileName)
 {
-    Area area;
+    Area area = Area(screen);
 
     area.add(parentArea);
-    area.add(new CenteredBitmap(fileName));
-    area.add(new AnyKeyAccel());
+    area.add(new CenteredBitmap(screen, fileName));
+    area.add(new AnyKeyAccel(screen));
     area.run();
     sound->play(L"click.wav");
 }
@@ -282,20 +284,20 @@ std::wstring secToStr(int time)
 }
 
 
-void showMessageWindow(Area *parentArea, const std::wstring &pattern, 
+void showMessageWindow(Screen *screen, Area *parentArea, const std::wstring &pattern, 
         int width, int height, Font *font, int r, int g, int b,
         const std::wstring &msg)
 {
-    Area area;
+    Area area = Area(screen);
 
-    int x = (screen.getWidth() - width) / 2;
-    int y = (screen.getHeight() - height) / 2;
+    int x = (screen->getWidth() - width) / 2;
+    int y = (screen->getHeight() - height) / 2;
     
     area.add(parentArea);
-    area.add(new Window(x, y, width, height, pattern, 6));
-    area.add(new Label(font, x, y, width, height, Label::ALIGN_CENTER,
+    area.add(new Window(screen, x, y, width, height, pattern, 6));
+    area.add(new Label(screen, font, x, y, width, height, Label::ALIGN_CENTER,
                 Label::ALIGN_MIDDLE, r, g, b, msg));
-    area.add(new AnyKeyAccel());
+    area.add(new AnyKeyAccel(screen));
     area.run();
     sound->play(L"click.wav");
 }

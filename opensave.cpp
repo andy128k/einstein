@@ -90,25 +90,27 @@ class SaveCommand: public Command
         
     public:
         virtual void doAction() {
-            Area area;
+            Screen *screen = parentArea->screen;
+
+            Area area(screen);
             area.add(parentArea, false);
-            area.add(new Window(170, 280, 460, 100, L"blue.bmp"));
+            area.add(new Window(screen, 170, 280, 460, 100, L"blue.bmp"));
             std::wstring name;
             if (savedGame.isExists())
                 name = savedGame.getName();
             else
                 name = defaultName;
-            area.add(new Label(font, 180, 300, 255,255,0, msg(L"enterGame")));
-            area.add(new InputField(340, 300, 280, 26, L"blue.bmp", name, 20,  
+            area.add(new Label(screen, font, 180, 300, 255,255,0, msg(L"enterGame")));
+            area.add(new InputField(screen, 340, 300, 280, 26, L"blue.bmp", name, 20,  
                         255,255,0,  font));
             ExitCommand exitCmd(area);
             OkCommand okCmd(area, saved);
-            area.add(new Button(310, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
+            area.add(new Button(screen, 310, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
                         msg(L"ok"), &okCmd));
-            area.add(new Button(400, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
+            area.add(new Button(screen, 400, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
                         msg(L"cancel"), &exitCmd));
-            area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd));
-            area.add(new KeyAccel(SDLK_RETURN, &okCmd));
+            area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
+            area.add(new KeyAccel(screen, SDLK_RETURN, &okCmd));
             area.run();
 
             if (*saved) {
@@ -125,7 +127,7 @@ class SaveCommand: public Command
                     stream.close();
                     *saved = true;
                 } catch (...) { 
-                    showMessageWindow(&area, L"redpattern.bmp", 300, 80, font,
+                    showMessageWindow(screen, &area, L"redpattern.bmp", 300, 80, font,
                             255,255,255, msg(L"saveError"));
                 }
                 parentArea->finishEventLoop();
@@ -160,21 +162,23 @@ typedef std::list<SavedGame> SavesList;
 static void showListWindow(SavesList &list, Command **commands,
         const std::wstring &title, Area &area, Font *font)
 {
+    Screen *screen = area.screen;
+
     Font titleFont(L"nova.ttf", 26);
 
-    area.add(new Window(250, 90, 300, 420, L"blue.bmp"));
-    area.add(new Label(&titleFont, 250, 95, 300, 40, Label::ALIGN_CENTER,
+    area.add(new Window(screen, 250, 90, 300, 420, L"blue.bmp"));
+    area.add(new Label(screen, &titleFont, 250, 95, 300, 40, Label::ALIGN_CENTER,
                 Label::ALIGN_MIDDLE, 255,255,0, title));
     ExitCommand exitCmd(area);
-    area.add(new Button(360, 470, 80, 25, font, 255,255,0, L"blue.bmp", 
+    area.add(new Button(screen, 360, 470, 80, 25, font, 255,255,0, L"blue.bmp", 
                 msg(L"close"), &exitCmd));
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd)); 
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd)); 
 
     int pos = 150;
     int no = 0;
     for (SavesList::iterator i = list.begin(); i != list.end(); i++) {
         SavedGame &game = *i;
-        area.add(new Button(260, pos, 280, 25, font, 255,255,255, L"blue.bmp", 
+        area.add(new Button(screen, 260, pos, 280, 25, font, 255,255,255, L"blue.bmp", 
                     game.getName(), commands[no++]));
         pos += 30;
     }
@@ -186,8 +190,10 @@ static void showListWindow(SavesList &list, Command **commands,
 bool saveGame(Area *parentArea, Game *game)
 {
     std::wstring path = getSavesPath();
-    
-    Area area;
+
+    Screen *screen = parentArea->screen;
+
+    Area area(screen);
     area.add(parentArea, false);
     Font font(L"laudcn2.ttf", 14);
     bool saved = false;
@@ -238,13 +244,13 @@ class LoadCommand: public Command
                 if (stream.fail())
                     throw Exception(L"Error opening save file");
                 readString(stream);
-                Game *g = new Game(stream);
+                Game *g = new Game(parentArea->screen, stream);
                 if (stream.fail())
                     throw Exception(L"Error loading game");
                 stream.close();
                 *game = g;
             } catch (...) { 
-                showMessageWindow(parentArea, L"redpattern.bmp", 300, 80, font,
+                showMessageWindow(parentArea->screen, parentArea, L"redpattern.bmp", 300, 80, font,
                         255,255,255, L"Error loadng game");
             }
             parentArea->finishEventLoop();
@@ -254,9 +260,11 @@ class LoadCommand: public Command
 
 Game* loadGame(Area *parentArea)
 {
+    Screen *screen = parentArea->screen;
+
     std::wstring path = getSavesPath();
     
-    Area area;
+    Area area(screen);
     area.add(parentArea, false);
     Font font(L"laudcn2.ttf", 14);
     

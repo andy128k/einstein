@@ -157,3 +157,5 @@ if (v == range) printf("ooops!\n");
     return v;
 }
 
+
+Random rndGen;

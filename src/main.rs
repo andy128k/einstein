@@ -12,7 +12,6 @@ use error::*;
 
 extern "C" {
     fn loadResources() -> ::libc::c_void;
-    fn initScreen() -> ::libc::c_void;
     fn initAudio() -> ::libc::c_void;
     fn mainpp() -> *const ::libc::c_void;
 }
@@ -30,7 +29,6 @@ fn real_main() -> Result<()> {
     }
 
     unsafe {
-        initScreen();
         initAudio();
         mainpp();
     }

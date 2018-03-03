@@ -21,8 +21,8 @@ class HorHints: public Widget
         int highlighted;
     
     public:
-        HorHints(IconSet &is, Rules &rules);
-        HorHints(IconSet &is, Rules &rules, std::istream &stream);
+        HorHints(Screen *screen, IconSet &is, Rules &rules);
+        HorHints(Screen *screen, IconSet &is, Rules &rules, std::istream &stream);
 
     public:
         virtual void draw();

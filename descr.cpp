@@ -25,9 +25,10 @@ class TextPage
 {
     private:
         std::vector<Widget*> widgets;
+        Screen *screen;
 
     public:
-        TextPage() { };
+        TextPage(Screen *screen): screen(screen) { };
         ~TextPage();
 
     public:
@@ -51,9 +52,10 @@ class TextParser
         int offsetY;
         int pageWidth;
         int pageHeight;
+        Screen *screen;
 
     public:
-        TextParser(const std::wstring &text, Font &font,
+        TextParser(Screen *screen, const std::wstring &text, Font &font,
                 int x, int y, int width, int height);
         ~TextParser();
 
@@ -136,6 +138,7 @@ void showDescription(Area *parentArea)
 
 
 Description::Description(Area *parentArea)
+    : area(parentArea->screen)
 {
     currentPage = 0;
     //area.add(parentArea, false);
@@ -143,7 +146,7 @@ Description::Description(Area *parentArea)
     buttonFont = new Font(L"laudcn2.ttf", 14);
     textFont = new Font(L"laudcn2.ttf", 16);
     textHeight = (int)(textFont->getHeight(L"A") * 1.0);
-    text = new TextParser(msg(L"rulesText"), *textFont, START_X, START_Y, 
+    text = new TextParser(parentArea->screen, msg(L"rulesText"), *textFont, START_X, START_Y, 
                 CLIENT_WIDTH, CLIENT_HEIGHT);
     prevCmd = new CursorCommand(-1, *this, &currentPage);
     nextCmd = new CursorCommand(1, *this, &currentPage);
@@ -177,13 +180,15 @@ void Description::updateInfo()
 
 void Description::run()
 {
-    area.add(new Window(100, 50, WIDTH, HEIGHT, L"blue.bmp"));
-    area.add(new Label(titleFont, 250, 60, 300, 40, Label::ALIGN_CENTER, Label::ALIGN_MIDDLE, 255, 255, 0, msg(L"rules")));
-    area.add(new Button(110, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"prev"), prevCmd));
-    area.add(new Button(200, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"next"), nextCmd));
+    Screen *screen = area.screen;
+
+    area.add(new Window(screen, 100, 50, WIDTH, HEIGHT, L"blue.bmp"));
+    area.add(new Label(screen, titleFont, 250, 60, 300, 40, Label::ALIGN_CENTER, Label::ALIGN_MIDDLE, 255, 255, 0, msg(L"rules")));
+    area.add(new Button(screen, 110, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"prev"), prevCmd));
+    area.add(new Button(screen, 200, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"next"), nextCmd));
     ExitCommand exitCmd(area);
-    area.add(new Button(610, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"close"), &exitCmd));
-    area.add(new KeyAccel(SDLK_ESCAPE, &exitCmd));
+    area.add(new Button(screen, 610, 515, 80, 25, buttonFont, 255, 255, 0, L"blue.bmp", msg(L"close"), &exitCmd));
+    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
     printPage();
     area.run();
 }
@@ -231,8 +236,9 @@ TextPage::~TextPage()
 }
 
 
-TextParser::TextParser(const std::wstring &text, Font &font,
-        int x, int y, int width, int height): tokenizer(text), font(font)
+TextParser::TextParser(Screen *screen, const std::wstring &text, Font &font,
+        int x, int y, int width, int height)
+    : screen(screen), tokenizer(text), font(font)
 {
     spaceWidth = font.getWidth(L' ');
     charHeight = font.getWidth(L'A');
@@ -258,7 +264,7 @@ void TextParser::addLine(TextPage *page, std::wstring &line, int &curPosY,
         int &lineWidth)
 {
     if (0 < line.length()) {
-        page->add(new Label(&font, offsetX, offsetY + curPosY,
+        page->add(new Label(screen, &font, offsetX, offsetY + curPosY,
                     255,255,255, line, false));
         line.clear();
         curPosY += 10 + charHeight;
@@ -294,7 +300,7 @@ void TextParser::parseNextPage()
     
     int curPosY = 0;
     int lineWidth = 0;
-    TextPage *page = new TextPage();
+    TextPage *page = new TextPage(screen);
     std::wstring line;
 
     while (true) {
@@ -313,7 +319,7 @@ void TextParser::parseNextPage()
                 SDL_Surface *image = getImage(keywordToImage(word));
                 if ((image->h + curPosY < pageHeight) || page->isEmpty()) {
                     int x = offsetX + (pageWidth - image->w) / 2;
-                    page->add(new Picture(x, offsetY + curPosY, image));
+                    page->add(new Picture(screen, x, offsetY + curPosY, image));
                     curPosY += image->h;
                 } else {
                     tokenizer.unget(t);
@@ -364,4 +370,3 @@ TextPage* TextParser::getPage(unsigned int no)
     else
         return pages[no];
 }
-

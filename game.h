@@ -7,6 +7,7 @@
 #include "verthints.h"
 #include "horhints.h"
 #include "puzzle.h"
+#include "screen.h"
 
 
 
@@ -28,10 +29,11 @@ class Game
         bool hinted;
         SolvedPuzzle savedSolvedPuzzle;
         Rules savedRules;
+        Screen *screen;
 
     public:
-        Game();
-        Game(std::istream &stream);
+        Game(Screen *screen);
+        Game(Screen *screen, std::istream &stream);
         ~Game();
 
     public:
@@ -55,4 +57,3 @@ class Game
 };
 
 #endif
-

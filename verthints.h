@@ -21,8 +21,8 @@ class VertHints: public Widget
         int highlighted;
     
     public:
-        VertHints(IconSet &is, Rules &rules);
-        VertHints(IconSet &is, Rules &rules, std::istream &stream);
+        VertHints(Screen *screen, IconSet &is, Rules &rules);
+        VertHints(Screen *screen, IconSet &is, Rules &rules, std::istream &stream);
 
     public:
         virtual void draw();
