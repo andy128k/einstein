@@ -1,16 +1,20 @@
 extern crate libc;
 #[macro_use] extern crate failure;
+extern crate sdl;
 
 mod error;
 
-use std::ffi::CString;
 use std::env::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
+use sdl::sdl::{init, InitFlag, get_error, quit};
 use error::*;
 
 extern "C" {
-    fn mainpp(argv0: *const ::libc::c_char) -> *const ::libc::c_int;
+    fn loadResources() -> ::libc::c_void;
+    fn initScreen() -> ::libc::c_void;
+    fn initAudio() -> ::libc::c_void;
+    fn mainpp() -> *const ::libc::c_void;
 }
 
 fn real_main() -> Result<()> {
@@ -18,9 +22,21 @@ fn real_main() -> Result<()> {
     create_dir_all(home.join(".einstein"))?;
 
     unsafe {
-        let argv0 = CString::new("./").unwrap();
-        mainpp(argv0.as_ptr());
+        loadResources();
     }
+
+    if !init(&[InitFlag::Video, InitFlag::Audio]) {
+        return Err(err_msg(get_error()));
+    }
+
+    unsafe {
+        initScreen();
+        initAudio();
+        mainpp();
+    }
+
+    quit();
+
     Ok(())
 }
 

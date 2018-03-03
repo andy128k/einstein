@@ -299,7 +299,6 @@ void Area::run()
     
     Uint32 lastTimer = 0;
     draw();
-    screen.showMouse();
     
     bool runTimer = timer ? true : false;
     bool dispetchEvent;
@@ -321,7 +320,6 @@ void Area::run()
                     dispetchEvent = false;
             }
         }
-        screen.hideMouse();
         if (runTimer) {
             if (timer)
                 timer->onTimer();
@@ -330,7 +328,6 @@ void Area::run()
         if (dispetchEvent)
             handleEvent(event);
         if (! terminate) {
-            screen.showMouse();
             screen.flush();
         }
     }
