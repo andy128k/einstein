@@ -1,0 +1,10 @@
+[package]
+name = "einstein"
+version = "0.1.0"
+authors = ["Andrey Kutejko <andy128k@gmail.com>"]
+
+[dependencies]
+libc = "*"
+
+[build-dependencies]
+cc = "*"
