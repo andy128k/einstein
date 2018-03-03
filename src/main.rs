@@ -1,8 +1,11 @@
 extern crate libc;
 #[macro_use] extern crate failure;
+extern crate itertools;
+extern crate rand;
 extern crate sdl;
 
 mod error;
+mod rules;
 
 use std::env::home_dir;
 use std::fs::create_dir_all;

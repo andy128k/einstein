@@ -6,7 +6,9 @@ authors = ["Andrey Kutejko <andy128k@gmail.com>"]
 [dependencies]
 libc = "*"
 failure = "*"
+itertools = "*"
 sdl = "0.3.6"
+rand = "*"
 
 [build-dependencies]
 cc = "*"
