@@ -1,5 +1,6 @@
 use itertools::all;
 use rand::{thread_rng, Rng};
+use converge::converge;
 
 fn only<T>(values: &[T]) -> Option<&T> {
     if values.len() == 1 {
@@ -10,22 +11,11 @@ fn only<T>(values: &[T]) -> Option<&T> {
 }
 
 
-fn converge<T: Clone + PartialEq, F: Fn(T) -> T>(initial: T, step: F) -> T {
-    let previous = initial;
-    loop {
-        let next = step(previous.clone());
-        if next == previous {
-            return next;
-        }
-    }
-}
-
-
-
 const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 
+#[derive(PartialEq, Clone)]
 pub struct Thing { row: u8, value: Value }
 
 impl Thing {
@@ -206,18 +196,19 @@ impl Possibilities {
         all(&self.0, |s| s.is_solved())
     }
 
-    /*
-    bool isValid(SolvedPuzzle &puzzle)
-    {
-        for (int row = 0; row < PUZZLE_SIZE; row++)
-            for (int col = 0; col < PUZZLE_SIZE; col++)
-                if (! isPossible(col, row, puzzle[row][col]))
+    pub fn is_valid(&self, puzzle: &SolvedPuzzle) -> bool {
+        for row in 0..PUZZLE_SIZE {
+            for col in 0..PUZZLE_SIZE {
+                if !self.0[row as usize].0[col as usize].contains(puzzle.0[row][col]) {
                     return false;
-        return true;
+                }
+            }
+        }
+        true
     }
-    */
 }
 
+#[derive(PartialEq, Clone)]
 pub enum Rule {
     Near(Thing, Thing),
     Direction(Thing, Thing),
@@ -292,7 +283,7 @@ fn generate_between_rule(puzzle: &SolvedPuzzle) -> Rule {
     }
 }
 
-fn generate_rule(puzzle: &SolvedPuzzle) -> Rule {
+pub fn generate_rule(puzzle: &SolvedPuzzle) -> Rule {
     match thread_rng().gen_range(0, 14) {
         0 | 1 | 2 | 3 => generate_near_rule(puzzle),
         4 => generate_open_rule(puzzle),

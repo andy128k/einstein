@@ -5,7 +5,9 @@ extern crate rand;
 extern crate sdl;
 
 mod error;
+mod converge;
 mod rules;
+mod puzzle_gen;
 
 use std::env::home_dir;
 use std::fs::create_dir_all;
