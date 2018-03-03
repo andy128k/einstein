@@ -1,5 +1,7 @@
 *.o
 einstein
+mkres/mkres
+res/einstein.res
 
 /target/
 **/*.rs.bk

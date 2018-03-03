@@ -1,3 +1,4 @@
+#include <string.h>
 #include <wchar.h>
 #include <stdlib.h>
 #ifdef WIN32

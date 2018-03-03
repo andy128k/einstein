@@ -1,3 +1,4 @@
+#include <string.h>
 #include "compressor.h"
 #include <zlib.h>
 #include "convert.h"
