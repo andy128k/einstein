@@ -50,8 +50,8 @@ pub fn generate_puzzle() -> Result<(SolvedPuzzle, Vec<Rule>)> {
 
         let mut horizontal = 0;
         let mut vertical = 0;
-        for rule in reduced_rules {
-            match rule {
+        for rule in &reduced_rules {
+            match *rule {
                 Rule::Near(..) |
                 Rule::Between(..) |
                 Rule::Direction(..) => horizontal += 1,
@@ -61,7 +61,18 @@ pub fn generate_puzzle() -> Result<(SolvedPuzzle, Vec<Rule>)> {
         }
 
         if horizontal <= 24 && vertical <= 15 {
-            return Ok((puzzle, rules));
+            return Ok((puzzle, reduced_rules));
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_eq_generate_puzzle() {
+        let (_puzzle, rules) = generate_puzzle().unwrap();
+        assert!(rules.len() > 0);
     }
 }

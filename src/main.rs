@@ -8,7 +8,6 @@ mod error;
 mod converge;
 mod rules;
 mod puzzle_gen;
-mod thing;
 mod iconset;
 mod ui;
 
@@ -105,20 +104,20 @@ pub extern fn ein_possibilities_open_initials(p: * const Possibilities, rules: *
 #[no_mangle]
 pub extern fn ein_possibilities_is_possible(p: *const Possibilities, col: ::libc::c_int, row: ::libc::c_int, value: ::libc::c_int) -> ::libc::c_int {
     let pos: &Possibilities = unsafe { &*p };
-    pos.is_possible(col as u8, &Thing { row: row as u8, value: value as u8 }) as i32
+    pos.is_possible(col as u8, &Thing { row: row as u8, value: value as u8 - 1 }) as i32
 }
 
 #[no_mangle]
 pub extern fn ein_possibilities_set(p: *mut Possibilities, x: ::libc::c_int, y: ::libc::c_int, v: ::libc::c_int) -> * const Possibilities {
     let pos: Box<Possibilities> = unsafe { transmute(p) };
-    let new_pos = pos.set(x as u8, y as u8, v as u8);
+    let new_pos = pos.set(x as u8, y as u8, v as u8 - 1);
     unsafe { transmute(Box::new(new_pos)) }
 }
 
 #[no_mangle]
 pub extern fn ein_possibilities_exclude(p: *mut Possibilities, x: ::libc::c_int, y: ::libc::c_int, v: ::libc::c_int) -> * const Possibilities {
     let pos: Box<Possibilities> = unsafe { transmute(p) };
-    let new_pos = pos.exclude(x as u8, y as u8, v as u8);
+    let new_pos = pos.exclude(x as u8, y as u8, v as u8 - 1);
     unsafe { transmute(Box::new(new_pos)) }
 }
 
@@ -131,7 +130,7 @@ pub extern fn ein_possibilities_is_defined(p: *const Possibilities, x: ::libc::c
 #[no_mangle]
 pub extern fn ein_possibilities_get_defined(p: *const Possibilities, x: ::libc::c_int, y: ::libc::c_int) -> ::libc::c_int {
     let pos: &Possibilities = unsafe { &*p };
-    pos.get_defined(x as u8, y as u8).unwrap_or(0u8) as i32
+    pos.get_defined(x as u8, y as u8).unwrap_or(0u8) as i32 + 1
 }
 
 #[no_mangle]

@@ -15,7 +15,7 @@ const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Thing { pub row: u8, pub value: Value }
 
 impl Thing {
@@ -53,7 +53,7 @@ impl SolvedPuzzle {
 }
 
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct ValueSet([bool; PUZZLE_SIZE]);
 
 impl ValueSet {
@@ -109,7 +109,7 @@ impl ValueSet {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct PossibilitiesRow([ValueSet; PUZZLE_SIZE]);
 
 impl PossibilitiesRow {
@@ -171,7 +171,7 @@ impl PossibilitiesRow {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Possibilities([PossibilitiesRow; PUZZLE_SIZE]);
 
 impl Possibilities {
@@ -219,7 +219,7 @@ impl Possibilities {
     }
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub enum Rule {
     Near(Thing, Thing),
     Direction(Thing, Thing),
@@ -381,24 +381,25 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
             new_pos
         },
         Rule::Between(ref thing1, ref thing2, ref thing3) => {
-            fn check_middle_thing(new_pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
+            fn check_middle_thing(pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
                 col > 0 && col < PUZZLE_SIZE as u8 - 1 &&
-                new_pos.is_possible(col as u8, thing2) &&
-                (!new_pos.is_possible(col as u8 - 1, thing1) || !new_pos.is_possible(col as u8  + 1, thing3)) &&
-                (!new_pos.is_possible(col as u8 - 1, thing3) || !new_pos.is_possible(col as u8  + 1, thing1))
+                pos.is_possible(col as u8, thing2) && (
+                    (pos.is_possible(col as u8 - 1, thing1) && pos.is_possible(col as u8 + 1, thing3)) ||
+                    (pos.is_possible(col as u8 - 1, thing3) && pos.is_possible(col as u8 + 1, thing1))
+                )
             }
 
-            fn check_side_thing(new_pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
-                if new_pos.is_possible(col as u8, thing3) {
+            fn check_side_thing(pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
+                if pos.is_possible(col as u8, thing3) {
                     let left_possible = if col < 2 {
                         false
                     } else {
-                        new_pos.is_possible(col as u8 - 1, thing2) && new_pos.is_possible(col as u8 - 2, thing1)
+                        pos.is_possible(col as u8 - 1, thing2) && pos.is_possible(col as u8 - 2, thing1)
                     };
                     let right_possible = if col >= PUZZLE_SIZE as u8 - 2 {
                         false
                     } else {
-                        new_pos.is_possible(col as u8 + 1, thing2) && new_pos.is_possible(col as u8 + 2, thing1)
+                        pos.is_possible(col as u8 + 1, thing2) && pos.is_possible(col as u8 + 2, thing1)
                     };
                     left_possible || right_possible
                 } else {
@@ -412,14 +413,26 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                         pos = pos.exclude(col as u8, thing2.row, thing2.value);
                     }
                     if !check_side_thing(&pos, col as u8, thing1, thing2, thing3) {
-                        pos = pos.exclude(col as u8, thing2.row, thing2.value);
+                        pos = pos.exclude(col as u8, thing3.row, thing3.value);
                     }
                     if !check_side_thing(&pos, col as u8, thing3, thing2, thing1) {
-                        pos = pos.exclude(col as u8, thing2.row, thing2.value);
+                        pos = pos.exclude(col as u8, thing1.row, thing1.value);
                     }
                 }
                 pos
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_eq_possibilities() {
+        let p1 = Possibilities::new().exclude(0, 0, 0);
+        let p2 = Possibilities::new().exclude(0, 0, 0);
+        assert_eq!(p1, p2);
     }
 }
