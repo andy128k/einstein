@@ -5,26 +5,18 @@
 #include <SDL_ttf.h>
 #include "exceptions.h"
 #include "utils.h"
-#include "storage.h"
 #include "unicode.h"
 #include "messages.h"
 #include "sound.h"
+#include "topscores.h"
+#include "config.h"
 
-void menu(Screen *screen);
+void menu(Screen *screen, Config *config, TopScores* top_scores);
 
-void initScreen(Screen *screen)
-{
-    if (TTF_Init())
-        throw Exception(L"Error initializing font engine");
-
-    screen->setMode(VideoMode(800, 600, 24, 
-                getStorage()->get(L"fullscreen", 1) != 0));
-}
-
-extern "C" void initAudio()
+extern "C" void initAudio(int volume)
 {
     sound = new Sound();
-    sound->setVolume((float)getStorage()->get(L"volume", 20) / 100.0f);
+    sound->setVolume(volume / 100.0f);
 }
 
 extern "C" void loadResources()
@@ -40,10 +32,12 @@ extern "C" void loadResources()
     msg.load();
 }
 
-extern "C" void mainpp()
+extern "C" void mainpp(int fullscreen, Config *config, TopScores* top_scores)
 {
-    Screen screen;
-    initScreen(&screen);
-    menu(&screen);
-    getStorage()->flush();
+    if (TTF_Init())
+        throw Exception(L"Error initializing font engine");
+
+    Screen screen(fullscreen);
+
+    menu(&screen, config, top_scores);
 }

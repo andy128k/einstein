@@ -8,6 +8,8 @@
 #include "puzzle.h"
 #include "screen.h"
 #include "rules.h"
+#include "config.h"
+#include "topscores.h"
 
 
 
@@ -43,7 +45,7 @@ class Game
         VertHints* getVerHints() { return verHints; };
         HorHints* getHorHints() { return horHints; };
         void save(std::ostream &stream);
-        void run();
+        void run(Config* config, TopScores *top_scores);
         bool isHinted() { return hinted; };
         void setHinted() { hinted = true; };
         void restart();

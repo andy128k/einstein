@@ -43,7 +43,7 @@ class Screen
         int maxRegionsList;
 
     public:
-        Screen();
+        Screen(bool fullScreen);
         ~Screen();
 
     public:
@@ -51,8 +51,6 @@ class Screen
         int getWidth() const;
         int getHeight() const;
         void setMode(const VideoMode& mode);
-        std::vector<VideoMode> getFullScreenModes() const;
-        void centerMouse();
         void flush();
         void addRegionToUpdate(int x, int y, int w, int h);
         void setPixel(int x, int y, int r, int g, int b);

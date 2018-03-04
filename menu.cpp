@@ -7,6 +7,7 @@
 #include "descr.h"
 #include "options.h"
 #include "messages.h"
+#include "config.h"
 
 
 
@@ -40,15 +41,17 @@ class NewGameCommand: public Command
 {
     private:
         Area *area;
+        Config *config;
+        TopScores* top_scores;
     
     public:
-        NewGameCommand(Area *a) { area = a; };
+        NewGameCommand(Area *a, Config *config, TopScores* top_scores) { area = a; this->config = config; this->top_scores = top_scores; };
 
         virtual void doAction() {
             Screen *screen = area->screen;
 
             Game game(screen);
-            game.run();
+            game.run(config, top_scores);
             area->updateMouse();
             area->draw();
         };
@@ -59,14 +62,16 @@ class LoadGameCommand: public Command
 {
     private:
         Area *area;
+        Config *config;
+        TopScores* top_scores;
     
     public:
-        LoadGameCommand(Area *a) { area = a; };
+        LoadGameCommand(Area *a, Config *config, TopScores* top_scores) { area = a; this->config = config; this->top_scores = top_scores; };
 
         virtual void doAction() {
             Game *game = loadGame(area);
             if (game) {
-                game->run();
+                game->run(config, top_scores);
                 delete game;
             }
             area->updateMouse();
@@ -80,13 +85,13 @@ class TopScoresCommand: public Command
 {
     private:
         Area *area;
+        TopScores* top_scores;
     
     public:
-        TopScoresCommand(Area *a) { area = a; };
+        TopScoresCommand(Area *a, TopScores* top_scores) { area = a; this->top_scores = top_scores; };
 
         virtual void doAction() {
-            TopScores scores;
-            showScoresWindow(area, &scores);
+            showScoresWindow(area, top_scores);
             area->updateMouse();
             area->draw();
         };
@@ -113,12 +118,13 @@ class OptionsCommand: public Command
 {
     private:
         Area *area;
+        Config *config;
     
     public:
-        OptionsCommand(Area *a) { area = a; };
+        OptionsCommand(Area *a, Config *config) { area = a; this->config = config; };
 
         virtual void doAction() {
-            showOptionsWindow(area);
+            showOptionsWindow(area, config);
             area->updateMouse();
             area->draw();
         };
@@ -172,7 +178,7 @@ static Button* menuButton(Screen *screen, int y, Font *font, const std::wstring 
 }
 
 
-void menu(Screen *screen)
+void menu(Screen *screen, Config *config, TopScores* top_scores)
 {
     Area area(screen);
     Font font(L"laudcn2.ttf", 20);
@@ -180,15 +186,15 @@ void menu(Screen *screen)
     area.add(new MenuBackground(screen));
     area.draw();
         
-    NewGameCommand newGameCmd(&area);
+    NewGameCommand newGameCmd(&area, config, top_scores);
     area.add(menuButton(screen, 340, &font, msg(L"newGame"), &newGameCmd));
-    LoadGameCommand loadGameCmd(&area);
+    LoadGameCommand loadGameCmd(&area, config, top_scores);
     area.add(menuButton(screen, 370, &font, msg(L"loadGame"), &loadGameCmd));
-    TopScoresCommand topScoresCmd(&area);
+    TopScoresCommand topScoresCmd(&area, top_scores);
     area.add(menuButton(screen, 400, &font, msg(L"topScores"), &topScoresCmd));
     RulesCommand rulesCmd(&area);
     area.add(menuButton(screen, 430, &font, msg(L"rules"), &rulesCmd));
-    OptionsCommand optionsCmd(&area);
+    OptionsCommand optionsCmd(&area, config);
     area.add(menuButton(screen, 460, &font, msg(L"options"), &optionsCmd));
     AboutCommand aboutCmd(&area);
     area.add(menuButton(screen, 490, &font, msg(L"about"), &aboutCmd));

@@ -1,5 +1,4 @@
 #include "options.h"
-#include "storage.h"
 #include "messages.h"
 #include "sound.h"
 
@@ -10,28 +9,30 @@ class OptionsChangedCommand: public Command
         bool &fullscreen;
         float &volume;
         Area *area;
+        Config *config;
     
     public:
-        OptionsChangedCommand(Area *a, bool &fs, float &v): 
+        OptionsChangedCommand(Area *a, Config *config, bool &fs, float &v): 
             fullscreen(fs), volume(v) {
             area = a;
+            this->config = config;
         };
 
         virtual void doAction() {
             Screen *screen = area->screen;
 
-            bool oldFullscreen = (getStorage()->get(L"fullscreen", 1) != 0);
-            float oldVolume = (float)getStorage()->get(L"volume", 20) / 100.0f;
+            bool oldFullscreen = ein_config_get_fullscreen(config) != 0;
+            float oldVolume = ((float)ein_config_get_volume(config)) / 100.0f;
+
             if (fullscreen != oldFullscreen) {
-                getStorage()->set(L"fullscreen", fullscreen);
+                ein_config_set_fullscreen(config, fullscreen);
                 screen->setMode(VideoMode(800, 600, 24, fullscreen));
             }
 
             if (volume != oldVolume) {
-                getStorage()->set(L"volume", (int)(volume * 100.0f));
+                ein_config_set_volume(config, (int)(volume * 100.0f));
                 sound->setVolume(volume);
             }
-            getStorage()->flush();
             area->finishEventLoop();
         };
 };
@@ -45,13 +46,13 @@ class OptionsChangedCommand: public Command
                 var));
 #define OPTION(y, s, var) LABEL(y, s) CHECKBOX(y, var)
 
-void showOptionsWindow(Area *parentArea)
+void showOptionsWindow(Area *parentArea, Config *config)
 {
     Font titleFont(L"nova.ttf", 26);
     Font font(L"laudcn2.ttf", 14);
 
-    bool fullscreen = (getStorage()->get(L"fullscreen", 1) != 0);
-    float volume = ((float)getStorage()->get(L"volume", 20)) / 100.0f;
+    bool fullscreen = ein_config_get_fullscreen(config) != 0;
+    float volume = ((float)ein_config_get_volume(config)) / 100.0f;
     
     Screen *screen = parentArea->screen;
 
@@ -68,7 +69,7 @@ void showOptionsWindow(Area *parentArea)
     area.add(new Slider(screen, 360, 332, 160, 16, volume));
     
     ExitCommand exitCmd(area);
-    OptionsChangedCommand okCmd(&area, fullscreen, volume);
+    OptionsChangedCommand okCmd(&area, config, fullscreen, volume);
     area.add(new Button(screen, 315, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 
                 msg(L"ok"), &okCmd));
     area.add(new Button(screen, 405, 390, 85, 25, &font, 255,255,0, L"blue.bmp", 

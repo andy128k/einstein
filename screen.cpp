@@ -4,11 +4,13 @@
 #include "unicode.h"
 
 
-Screen::Screen()
+Screen::Screen(bool fullscreen)
 {
     screen = NULL;
     regionsList = NULL;
     maxRegionsList = 0;
+
+    setMode(VideoMode(800, 600, 24, fullscreen));
 }
 
 Screen::~Screen()
@@ -31,13 +33,6 @@ void Screen::setMode(const VideoMode& mode)
 }
 
 
-std::vector<VideoMode> Screen::getFullScreenModes() const
-{
-    std::vector<VideoMode> modes;
-    return modes;
-}
-
-        
 int Screen::getWidth() const
 {
     if (screen) 
@@ -51,14 +46,6 @@ int Screen::getHeight() const
 {
     if (screen) 
         return screen->h;
-    else 
-        throw Exception(L"No video mode selected");
-}
-
-void Screen::centerMouse()
-{
-    if (screen) 
-        SDL_WarpMouse(screen->w / 2, screen->h / 2);
     else 
         throw Exception(L"No video mode selected");
 }

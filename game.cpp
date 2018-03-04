@@ -12,6 +12,7 @@
 #include "messages.h"
 #include "sound.h"
 #include "descr.h"
+#include "unicode.h"
 
 
 
@@ -210,14 +211,18 @@ class WinCommand: public Command
         Area *gameArea;
         Watch *watch;
         Game *game;
+        TopScores* top_scores;
+        Config* config;
 
     public:
-        WinCommand(Area *a, Watch *w, Game *g) { 
+        WinCommand(Area *a, Watch *w, Game *g, Config* config, TopScores* top_scores) { 
             gameArea = a; 
             watch = w;
             game = g;
+            this->config = config;
+            this->top_scores = top_scores;
         };
-        
+
         virtual void doAction() {
             sound->play(L"applause.wav");
             watch->stop();
@@ -225,16 +230,23 @@ class WinCommand: public Command
             showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 
                     500, 70, &font, 255,0,0, msg(L"won"));
             gameArea->draw();
-            TopScores scores;
+
             int score = watch->getElapsed() / 1000;
             int pos = -1;
             if (! game->isHinted()) {
-                if ((! scores.isFull()) || (score < scores.getMaxScore())) {
-                    std::wstring name = enterNameDialog(gameArea);
-                    pos = scores.add(name, score);
+                if (ein_topscores_is_deserving(top_scores, score)) {
+                    const char* lastname = ein_config_get_last_name(config);
+                    if (lastname == NULL) {
+                        lastname = "anonymous";
+                    }
+                    auto wlastname = fromUtf8(lastname);
+                    std::string name = toUtf8(enterNameDialog(gameArea, wlastname));
+
+                    ein_config_set_last_name(config, name.c_str());
+                    pos = ein_topscores_add(top_scores, name.c_str(), score);
                 }
             }
-            showScoresWindow(gameArea, &scores, pos);
+            showScoresWindow(gameArea, top_scores, pos);
             gameArea->finishEventLoop();
         };
 };
@@ -385,14 +397,16 @@ class GameOptionsCommand: public Command
 {
     private:
         Area *gameArea;
+        Config *config;
 
     public:
-        GameOptionsCommand(Area *a) { 
+        GameOptionsCommand(Area *a, Config *config) { 
             gameArea = a; 
+            this->config = config;
         };
         
         virtual void doAction() {
-            showOptionsWindow(gameArea);
+            showOptionsWindow(gameArea, config);
             gameArea->updateMouse();
             gameArea->draw();
         };
@@ -554,7 +568,7 @@ void Game::restart()
     area.add(new Button(screen, x, y, 94, 30, &btnFont, 255,255,0, \
                 L"btn.bmp", msg(text), false, cmd));
 
-void Game::run()
+void Game::run(Config* config, TopScores *top_scores)
 {
     Area area = Area(screen);
     Font btnFont(L"laudcn2.ttf", 14);
@@ -565,7 +579,7 @@ void Game::run()
     area.add(background);
     CheatCommand cheatCmd(&area);
     area.add(new CheatAccel(screen, L"iddqd", &cheatCmd));
-    WinCommand winCmd(&area, watch, this);
+    WinCommand winCmd(&area, watch, this, config, top_scores);
     FailCommand failCmd(&area, this);
     puzzle->setCommands(&winCmd, &failCmd);
     area.add(puzzle, false);
@@ -578,7 +592,7 @@ void Game::run()
     BUTTON(screen, 119, 400, L"switch", &toggleHintsCmd)
     SaveGameCommand saveCmd(&area, watch, background, this);
     BUTTON(screen, 12, 440, L"save", &saveCmd)
-    GameOptionsCommand optionsCmd(&area);
+    GameOptionsCommand optionsCmd(&area, config);
     BUTTON(screen, 119, 440, L"options", &optionsCmd)
     ExitCommand exitGameCmd(area);
     BUTTON(screen, 226, 400, L"exit", &exitGameCmd)
@@ -590,4 +604,3 @@ void Game::run()
     watch->start();
     area.run();
 }
-

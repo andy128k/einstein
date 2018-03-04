@@ -3,7 +3,6 @@
 #include "exceptions.h"
 #include "utils.h"
 #include "widgets.h"
-#include "storage.h"
 #include "opensave.h"
 #include "unicode.h"
 #include "convert.h"
@@ -141,17 +140,8 @@ class SaveCommand: public Command
 
 static std::wstring getSavesPath()
 {
-#ifndef WIN32
-    std::wstring path(fromMbcs(getenv("HOME")) + 
-            std::wstring(L"/.einstein/save"));
-#else
-    std::wstring path(getStorage()->get(L"path", L""));
-    if (path.length() > 0)
-        path += L"\\";
-    path += L"save";
-#endif
+    std::wstring path(fromMbcs(getenv("HOME")) + std::wstring(L"/.einstein/save"));
     ensureDirExists(path);
-
     return path;
 }
 

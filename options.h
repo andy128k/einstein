@@ -3,10 +3,11 @@
 
 
 #include "widgets.h"
+#include "config.h"
 
 
 
-void showOptionsWindow(Area *area);
+void showOptionsWindow(Area *area, Config *config);
 
 
 #endif

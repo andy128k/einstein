@@ -9,6 +9,9 @@ failure = "*"
 itertools = "*"
 sdl = { path = "../rust-sdl" }
 rand = "*"
+serde = "*"
+serde_derive = "*"
+toml = "*"
 
 [build-dependencies]
 cc = "*"
