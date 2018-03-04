@@ -51,17 +51,17 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
 
     if (ein_possibilities_is_defined(possib, col, row)) {
         int element = ein_possibilities_get_defined(possib, col, row);
-        if (element > 0)
-            screen->draw(posX, posY, iconSet.getLargeIcon(row, element, 
-                        (hCol == col) && (hRow == row)));
+        if (element > 0) {
+            ein_draw_thing(row, element, screen->screen, posX, posY, (hCol == col) && (hRow == row));
+        }
     } else {
         screen->draw(posX, posY, iconSet.getEmptyFieldIcon());
         int x = posX;
         int y = posY + (FIELD_TILE_HEIGHT / 6);
         for (int i = 0; i < 6; i++) {
             if (ein_possibilities_is_possible(possib, col, row, i + 1))
-                screen->draw(x, y, iconSet.getSmallIcon(row, i + 1, 
-                            (hCol == col) && (hRow == row) && (i + 1 == subHNo)));
+                ein_draw_small_thing(row, i + 1, screen->screen, x, y, 
+                            (hCol == col) && (hRow == row) && (i + 1 == subHNo));
             if (i == 2) {
                 x = posX;
                 y += (FIELD_TILE_HEIGHT / 3);

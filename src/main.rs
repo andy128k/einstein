@@ -151,6 +151,18 @@ pub extern fn ein_possibilities_free(p: * const Possibilities) {
     let _: Box<Possibilities> = unsafe { transmute(p) };
 }
 
+#[no_mangle]
+pub extern fn ein_draw_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
+    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
+    ui::rule::draw_thing(&Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0);
+}
+
+#[no_mangle]
+pub extern fn ein_draw_small_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
+    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
+    ui::rule::draw_small_thing(&Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0);
+}
+
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
     create_dir_all(home.join(".einstein"))?;
