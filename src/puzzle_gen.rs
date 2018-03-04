@@ -1,6 +1,6 @@
 use rules::*;
 use error::*;
-use converge::{converge, converge_result};
+use converge::converge_result;
 
 fn can_solve(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<bool> {
     let pos = converge_result(Possibilities::new(), |mut pos| {
@@ -42,26 +42,26 @@ fn generate_rules(puzzle: &SolvedPuzzle) -> Result<Vec<Rule>> {
     Ok(rules)
 }
 
-/*
-void genPuzzle(SolvedPuzzle &puzzle, Rules &rules)
-{
-    for (int i = 0; i < PUZZLE_SIZE; i++) {
-        for (int j = 0; j < PUZZLE_SIZE; j++) 
-            puzzle[i][j] = j + 1;
-        shuffle(puzzle[i]);
+pub fn generate_puzzle() -> Result<(SolvedPuzzle, Vec<Rule>)> {
+    loop {
+        let puzzle = SolvedPuzzle::random();
+        let rules = generate_rules(&puzzle)?;
+        let reduced_rules = remove_rules(&puzzle, &rules)?;
+
+        let mut horizontal = 0;
+        let mut vertical = 0;
+        for rule in reduced_rules {
+            match rule {
+                Rule::Near(..) |
+                Rule::Between(..) |
+                Rule::Direction(..) => horizontal += 1,
+                Rule::Under(..) => vertical += 1,
+                Rule::Open(..) => {},
+            }
+        }
+
+        if horizontal <= 24 && vertical <= 15 {
+            return Ok((puzzle, rules));
+        }
     }
-
-    genRules(puzzle, rules);
-    removeRules(puzzle, rules);
 }
-
-
-void openInitial(Possibilities &possib, Rules &rules)
-{
-    for (Rules::iterator i = rules.begin(); i != rules.end(); i++) {
-        Rule *r = *i;
-        if (r->applyOnStart())
-            r->apply(possib);
-    }
-}
-*/

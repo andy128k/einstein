@@ -15,6 +15,15 @@
 
 
 
+//////////////////////////////////////////////////////////////////////////
+// DUMMY
+static void savePuzzle(SolvedPuzzle *puzzle, std::ostream &stream) {}
+static void loadPuzzle(SolvedPuzzle *puzzle, std::istream &stream) {}
+static void saveRules(RulesArr &rules, std::ostream &stream){}
+static void loadRules(RulesArr &rules, std::istream &stream){}
+//////////////////////////////////////////////////////////////////////////
+
+
 class GameBackground: public Widget
 {
     public:
@@ -423,8 +432,8 @@ Game::Game(Screen *screen)
 {
     genPuzzle();
 
-    possibilities = new Possibilities();
-    openInitial(*possibilities, rules);
+    possibilities = ein_possibilities_new();
+    possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
     
     puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
     verHints = new VertHints(screen, iconSet, rules);
@@ -439,9 +448,12 @@ Game::Game(Screen *screen, std::istream &stream)
 
     loadPuzzle(solvedPuzzle, stream);
     loadRules(rules, stream);
-    memcpy(savedSolvedPuzzle, solvedPuzzle, sizeof(solvedPuzzle));
+
+    ein_solved_puzzle_free(solvedPuzzle);
+    solvedPuzzle = ein_solved_puzzle_clone(savedSolvedPuzzle);
+
     savedRules = rules;
-    possibilities = new Possibilities(stream);
+    possibilities = ein_possibilities_new(/*stream*/);
     puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
     verHints = new VertHints(screen, iconSet, rules, stream);
     horHints = new HorHints(screen, iconSet, rules, stream);
@@ -452,7 +464,7 @@ Game::Game(Screen *screen, std::istream &stream)
 Game::~Game()
 {
     delete watch;
-    delete possibilities;
+    ein_possibilities_free(possibilities);
     delete verHints;
     delete horHints;
     delete puzzle;
@@ -463,7 +475,7 @@ void Game::save(std::ostream &stream)
 {
     savePuzzle(solvedPuzzle, stream);
     saveRules(rules, stream);
-    possibilities->save(stream);
+    // possibilities->save(stream);
     verHints->save(stream);
     horHints->save(stream);
     watch->save(stream);
@@ -471,8 +483,9 @@ void Game::save(std::ostream &stream)
 
 void Game::deleteRules()
 {
-    for (Rules::iterator i = rules.begin(); i != rules.end(); i++)
-        delete *i;
+    for (RulesArr::iterator i = rules.begin(); i != rules.end(); i++) {
+        ein_rule_free(*i);
+    }
     rules.clear();
 }
 
@@ -493,15 +506,15 @@ void Game::genPuzzle()
 {
     pleaseWait();
     
-    int horRules, verRules;
-    do {
-        if (rules.size() > 0)
-            deleteRules();
-        ::genPuzzle(solvedPuzzle, rules);
-        getHintsQty(rules, verRules, horRules);
-    } while ((horRules > 24) || (verRules > 15));
+    if (rules.size() > 0)
+        deleteRules();
 
-    memcpy(savedSolvedPuzzle, solvedPuzzle, sizeof(solvedPuzzle));
+    rules.resize(500);
+    size_t rules_arr_size;
+    ein_generate_puzzle(&solvedPuzzle, &rules[0], &rules_arr_size);
+    rules.resize(rules_arr_size);
+
+    savedSolvedPuzzle = ein_solved_puzzle_clone(solvedPuzzle);
     savedRules = rules;
     
     hinted = false;
@@ -509,8 +522,11 @@ void Game::genPuzzle()
 
 void Game::resetVisuals()
 {
-    possibilities->reset();
-    openInitial(*possibilities, rules);
+    ein_possibilities_free(possibilities);
+
+    possibilities = ein_possibilities_new();
+    possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
+
     puzzle->reset();
     verHints->reset(rules);
     horHints->reset(rules);
@@ -525,7 +541,9 @@ void Game::newGame()
 
 void Game::restart()
 {
-    memcpy(solvedPuzzle, savedSolvedPuzzle, sizeof(solvedPuzzle));
+    ein_solved_puzzle_free(solvedPuzzle);
+    solvedPuzzle = ein_solved_puzzle_clone(savedSolvedPuzzle);
+
     rules = savedRules;
     
     resetVisuals();

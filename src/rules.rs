@@ -16,7 +16,7 @@ const PUZZLE_SIZE: usize = 6;
 pub type Value = u8;
 
 #[derive(PartialEq, Clone)]
-pub struct Thing { row: u8, value: Value }
+pub struct Thing { pub row: u8, pub value: Value }
 
 impl Thing {
     pub fn display_name(&self) -> String {
@@ -36,6 +36,17 @@ impl Thing {
 pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
 
 impl SolvedPuzzle {
+    pub fn random() -> Self {
+        let mut values = [[0u8; PUZZLE_SIZE]; PUZZLE_SIZE];
+        for r in 0..PUZZLE_SIZE {
+            for c in 0..PUZZLE_SIZE {
+                values[r][c] = c as u8;
+            }
+            thread_rng().shuffle(&mut values[r]);
+        }
+        SolvedPuzzle(values)
+    }
+
     pub fn get(&self, row: u8, col: u8) -> Thing {
         Thing { row: row, value: self.0[row as usize][col as usize] }
     }

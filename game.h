@@ -3,11 +3,11 @@
 
 
 #include <iostream>
-#include "puzgen.h"
 #include "verthints.h"
 #include "horhints.h"
 #include "puzzle.h"
 #include "screen.h"
+#include "rules.h"
 
 
 
@@ -18,8 +18,8 @@ class Watch;
 class Game
 {
     private:
-        SolvedPuzzle solvedPuzzle;
-        Rules rules;
+        SolvedPuzzle *solvedPuzzle;
+        RulesArr rules;
         Possibilities *possibilities;
         VertHints *verHints;
         HorHints *horHints;
@@ -27,8 +27,8 @@ class Game
         Puzzle *puzzle;
         Watch *watch;
         bool hinted;
-        SolvedPuzzle savedSolvedPuzzle;
-        Rules savedRules;
+        SolvedPuzzle *savedSolvedPuzzle;
+        RulesArr savedRules;
         Screen *screen;
 
     public:
@@ -37,8 +37,8 @@ class Game
         ~Game();
 
     public:
-        SolvedPuzzle& getSolvedPuzzle() { return solvedPuzzle; };
-        Rules& getRules() { return rules; };
+        SolvedPuzzle& getSolvedPuzzle() { return *solvedPuzzle; };
+        RulesArr& getRules() { return rules; };
         Possibilities* getPossibilities() { return possibilities; };
         VertHints* getVerHints() { return verHints; };
         HorHints* getHorHints() { return horHints; };

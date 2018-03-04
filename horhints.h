@@ -4,8 +4,8 @@
 
 #include <vector>
 #include "iconset.h"
-#include "puzgen.h"
 #include "widgets.h"
+#include "rules.h"
 
 
 
@@ -13,7 +13,6 @@ class HorHints: public Widget
 {
     private:
         IconSet &iconSet;
-        typedef std::vector<Rule*> RulesArr;
         RulesArr rules;
         RulesArr excludedRules;
         std::vector<int> numbersArr;
@@ -21,8 +20,8 @@ class HorHints: public Widget
         int highlighted;
     
     public:
-        HorHints(Screen *screen, IconSet &is, Rules &rules);
-        HorHints(Screen *screen, IconSet &is, Rules &rules, std::istream &stream);
+        HorHints(Screen *screen, IconSet &is, RulesArr &rules);
+        HorHints(Screen *screen, IconSet &is, RulesArr &rules, std::istream &stream);
 
     public:
         virtual void draw();
@@ -33,9 +32,7 @@ class HorHints: public Widget
         virtual bool onMouseMove(int x, int y);
         bool isActive(int ruleNo);
         void save(std::ostream &stream);
-        void reset(Rules &rules);
+        void reset(RulesArr &rules);
 };
 
-
 #endif
-

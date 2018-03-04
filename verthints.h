@@ -4,16 +4,13 @@
 
 #include <vector>
 #include "iconset.h"
-#include "puzgen.h"
 #include "widgets.h"
-
-
+#include "rules.h"
 
 class VertHints: public Widget
 {
     private:
         IconSet &iconSet;
-        typedef std::vector<Rule*> RulesArr;
         RulesArr rules;
         RulesArr excludedRules;
         std::vector<int> numbersArr;
@@ -21,8 +18,8 @@ class VertHints: public Widget
         int highlighted;
     
     public:
-        VertHints(Screen *screen, IconSet &is, Rules &rules);
-        VertHints(Screen *screen, IconSet &is, Rules &rules, std::istream &stream);
+        VertHints(Screen *screen, IconSet &is, RulesArr &rules);
+        VertHints(Screen *screen, IconSet &is, RulesArr &rules, std::istream &stream);
 
     public:
         virtual void draw();
@@ -33,9 +30,7 @@ class VertHints: public Widget
         virtual bool onMouseMove(int x, int y);
         bool isActive(int ruleNo);
         void save(std::ostream &stream);
-        void reset(Rules &rules);
+        void reset(RulesArr &rules);
 };
 
-
 #endif
-

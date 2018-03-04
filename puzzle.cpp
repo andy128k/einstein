@@ -3,6 +3,9 @@
 #include "sound.h"
 
 
+#define PUZZLE_SIZE 6
+
+
 #define FIELD_OFFSET_X    12
 #define FIELD_OFFSET_Y    68
 #define FIELD_GAP_X       4
@@ -11,7 +14,7 @@
 #define FIELD_TILE_HEIGHT 48
 
 
-Puzzle::Puzzle(Screen *screen, IconSet &is, SolvedPuzzle &s, Possibilities *p)
+Puzzle::Puzzle(Screen *screen, IconSet &is, SolvedPuzzle *s, Possibilities *p)
     : Widget(screen), iconSet(is), solved(s)
 {
     possib = p;
@@ -46,8 +49,8 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
     int posX = FIELD_OFFSET_X + col * (FIELD_TILE_WIDTH + FIELD_GAP_X);
     int posY = FIELD_OFFSET_Y + row * (FIELD_TILE_HEIGHT + FIELD_GAP_Y);
 
-    if (possib->isDefined(col, row)) {
-        int element = possib->getDefined(col, row);
+    if (ein_possibilities_is_defined(possib, col, row)) {
+        int element = ein_possibilities_get_defined(possib, col, row);
         if (element > 0)
             screen->draw(posX, posY, iconSet.getLargeIcon(row, element, 
                         (hCol == col) && (hRow == row)));
@@ -56,7 +59,7 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
         int x = posX;
         int y = posY + (FIELD_TILE_HEIGHT / 6);
         for (int i = 0; i < 6; i++) {
-            if (possib->isPossible(col, row, i + 1))
+            if (ein_possibilities_is_possible(possib, col, row, i + 1))
                 screen->draw(x, y, iconSet.getSmallIcon(row, i + 1, 
                             (hCol == col) && (hRow == row) && (i + 1 == subHNo)));
             if (i == 2) {
@@ -86,36 +89,28 @@ bool Puzzle::onMouseButtonDown(int button, int x, int y)
     if (! getCellNo(x, y, col, row, element))
         return false;
     
-    if (! possib->isDefined(col, row)) {
-        /*if (button == 3) {
-            for (int i = 1; i <= PUZZLE_SIZE; i++)
-                possib->makePossible(col, row, i);
-            drawCell(col, row);
-        }
-    } else {*/
+    if (! ein_possibilities_is_defined(possib, col, row)) {
         if (element == -1)
             return false;
         if (button == 1) {
-            if (possib->isPossible(col, row, element)) {
-                possib->set(col, row, element);
+            if (ein_possibilities_is_possible(possib, col, row, element)) {
+                possib = ein_possibilities_set(possib, col, row, element);
                 sound->play(L"laser.wav");
             }
         } else if (button == 3) {
-            if (possib->isPossible(col, row, element)) {
-                possib->exclude(col, row, element);
+            if (ein_possibilities_is_possible(possib, col, row, element)) {
+                possib = ein_possibilities_exclude(possib, col, row, element);
                 sound->play(L"whizz.wav");
             }
-            /*else
-                possib->makePossible(col, row, element);*/
         }
         drawRow(row);
     }
 
-    bool valid = possib->isValid(solved);
+    bool valid = ein_possibilities_is_valid(possib, solved);
     if (! valid)
         onFail();
     else
-        if (possib->isSolved() && valid)
+        if (ein_possibilities_is_solved(possib) && valid)
             onVictory();
     
     return true;
@@ -192,4 +187,3 @@ void Puzzle::setCommands(Command *win, Command *fail)
     winCommand = win;
     failCommand = fail;
 }
-

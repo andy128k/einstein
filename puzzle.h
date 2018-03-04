@@ -3,8 +3,8 @@
 
 
 #include "iconset.h"
-#include "puzgen.h"
 #include "widgets.h"
+#include "rules.h"
 
 
 class Puzzle: public Widget
@@ -14,13 +14,13 @@ class Puzzle: public Widget
         IconSet &iconSet;
         bool valid;
         bool win;
-        SolvedPuzzle &solved;
+        SolvedPuzzle *solved;
         int hCol, hRow;
         int subHNo;
         Command *winCommand, *failCommand;
         
     public:
-        Puzzle(Screen *screen, IconSet &is, SolvedPuzzle &solved, Possibilities *possib);
+        Puzzle(Screen *screen, IconSet &is, SolvedPuzzle *solved, Possibilities *possib);
         virtual ~Puzzle();
 
     public:
@@ -41,4 +41,3 @@ class Puzzle: public Widget
 
 
 #endif
-

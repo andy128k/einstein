@@ -34,8 +34,9 @@ class VideoMode
 
 class Screen
 {
-    private:
+    public:
         SDL_Surface *screen;
+    private:
         bool fullScreen;
         std::list<SDL_Rect> regions;
         SDL_Rect *regionsList;

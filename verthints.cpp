@@ -1,6 +1,5 @@
 #include "verthints.h"
 #include "utils.h"
-#include "puzgen.h"
 #include "sound.h"
 
 
@@ -12,14 +11,14 @@
 #define TILE_HEIGHT  48
 
 
-VertHints::VertHints(Screen *screen, IconSet &is, Rules &r)
+VertHints::VertHints(Screen *screen, IconSet &is, RulesArr &r)
     : Widget(screen), iconSet(is)
 {
     reset(r);
 }
 
 
-VertHints::VertHints(Screen *screen, IconSet &is, Rules &rl, std::istream &stream)
+VertHints::VertHints(Screen *screen, IconSet &is, RulesArr &rl, std::istream &stream)
     : Widget(screen), iconSet(is)
 {
     int qty = readInt(stream);
@@ -27,7 +26,7 @@ VertHints::VertHints(Screen *screen, IconSet &is, Rules &rl, std::istream &strea
     for (int i = 0; i < qty; i++) {
         int no = readInt(stream);
         numbersArr.push_back(no);
-        Rule *r = getRule(rl, no);
+        Rule *r = rl[no];
         int excluded = readInt(stream);
         if (excluded) {
             excludedRules.push_back(r);
@@ -45,16 +44,16 @@ VertHints::VertHints(Screen *screen, IconSet &is, Rules &rl, std::istream &strea
     highlighted = getRuleNo(x, y);
 }
 
-void VertHints::reset(Rules &r)
+void VertHints::reset(RulesArr &r)
 {
     rules.clear();
     excludedRules.clear();
     numbersArr.clear();
     
     int no = 0;
-    for (Rules::iterator i = r.begin(); i != r.end(); i++) {
+    for (RulesArr::iterator i = r.begin(); i != r.end(); i++) {
         Rule *rule = *i;
-        if (rule->getShowOpts() == Rule::SHOW_VERT) {
+        if (ein_rule_is_vertical(rule)) {
             rules.push_back(rule);
             excludedRules.push_back(NULL);
             numbersArr.push_back(no);
@@ -88,9 +87,9 @@ void VertHints::drawCell(int col, bool addToUpdate)
         else
             r = rules[col];
     }
-    if (r)
-        r->draw(screen, x, y, iconSet, highlighted == col);
-    else {
+    if (r) {
+        ein_rule_draw(r, screen->screen, x, y, highlighted == col);
+    } else {
         screen->draw(x, y, iconSet.getEmptyHintIcon());
         screen->draw(x, y + TILE_HEIGHT, iconSet.getEmptyHintIcon());
     }
@@ -191,4 +190,3 @@ void VertHints::save(std::ostream &stream)
     }
     writeInt(stream, showExcluded ? 1 : 0);
 }
-

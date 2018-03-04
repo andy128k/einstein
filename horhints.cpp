@@ -13,14 +13,14 @@
 #define TILE_HEIGHT  48
 
 
-HorHints::HorHints(Screen *screen, IconSet &is, Rules &r)
+HorHints::HorHints(Screen *screen, IconSet &is, RulesArr &r)
     : Widget(screen), iconSet(is)
 {
     reset(r);
 }
 
 
-HorHints::HorHints(Screen *screen, IconSet &is, Rules &rl, std::istream &stream)
+HorHints::HorHints(Screen *screen, IconSet &is, RulesArr &rl, std::istream &stream)
     : Widget(screen), iconSet(is)
 {
     int qty = readInt(stream);
@@ -28,7 +28,7 @@ HorHints::HorHints(Screen *screen, IconSet &is, Rules &rl, std::istream &stream)
     for (int i = 0; i < qty; i++) {
         int no = readInt(stream);
         numbersArr.push_back(no);
-        Rule *r = getRule(rl, no);
+        Rule *r = rl[no];
         int excluded = readInt(stream);
         if (excluded) {
             excludedRules.push_back(r);
@@ -47,16 +47,16 @@ HorHints::HorHints(Screen *screen, IconSet &is, Rules &rl, std::istream &stream)
 }
 
 
-void HorHints::reset(Rules &r)
+void HorHints::reset(RulesArr &r)
 {
     rules.clear();
     excludedRules.clear();
     numbersArr.clear();
     
     int no = 0;
-    for (Rules::iterator i = r.begin(); i != r.end(); i++) {
+    for (RulesArr::iterator i = r.begin(); i != r.end(); i++) {
         Rule *rule = *i;
-        if (rule->getShowOpts() == Rule::SHOW_HORIZ) {
+        if (ein_rule_is_horizontal(rule)) {
             rules.push_back(rule);
             excludedRules.push_back(NULL);
             numbersArr.push_back(no);
@@ -85,19 +85,25 @@ void HorHints::drawCell(int col, int row, bool addToUpdate)
 
     Rule *r = NULL;
     int no = row * HINTS_COLS + col;
-    if (no < (int)rules.size())
-        if (showExcluded)
+    if (no < (int)rules.size()) {
+        if (showExcluded) {
             r = excludedRules[no];
-        else
+        } else {
             r = rules[no];
-    if (r)
-        r->draw(screen, x, y, iconSet, no == highlighted);
-    else
-        for (int i = 0; i < 3; i++)
+        }
+    }
+
+    if (r) {
+        ein_rule_draw(r, screen->screen, x, y, highlighted == no);
+    } else {
+        for (int i = 0; i < 3; i++) {
             screen->draw(x + TILE_HEIGHT*i, y, iconSet.getEmptyHintIcon());
+        }
+    }
     
-    if (addToUpdate)
+    if (addToUpdate) {
         screen->addRegionToUpdate(x, y, TILE_WIDTH*3, TILE_HEIGHT);
+    }
 }
 
 
