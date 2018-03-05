@@ -11,6 +11,7 @@ extern crate regex;
 #[macro_use] extern crate lazy_static;
 
 mod error;
+mod util;
 mod locale;
 mod converge;
 mod rules;
@@ -18,6 +19,7 @@ mod puzzle_gen;
 mod iconset;
 mod ui;
 mod storage;
+mod text_parser;
 
 use std::ffi::{CStr, CString};
 use std::ptr::null;
