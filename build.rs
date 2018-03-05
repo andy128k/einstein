@@ -9,6 +9,7 @@ fn main() {
         .define("_GNU_SOURCE", "1")
         .define("_REENTRANT", None)
         .include(Path::new("/usr/include/SDL"))
+        .include(Path::new("/usr/local/include/SDL"))  // osx brew
         .file("main.cpp")
         .file("screen.cpp")
         .file("resources.cpp")
