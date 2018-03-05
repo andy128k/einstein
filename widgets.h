@@ -32,12 +32,12 @@ class Widget
         virtual ~Widget() { };
 
     public:
-        virtual bool onMouseButtonDown(int button, int x, int y) { return false; };
-        virtual bool onMouseButtonUp(int button, int x, int y) { return false; };
-        virtual bool onMouseMove(int x, int y) { return false; };
+        virtual bool onMouseButtonDown(int /*button*/, int /*x*/, int /*y*/) { return false; };
+        virtual bool onMouseButtonUp(int /*button*/, int /*x*/, int /*y*/) { return false; };
+        virtual bool onMouseMove(int /*x*/, int /*y*/) { return false; };
         virtual void draw() { };
         virtual void setParent(Area *a) { area = a; };
-        virtual bool onKeyDown(SDLKey key, unsigned char ch) { return false; };
+        virtual bool onKeyDown(SDLKey /*key*/, unsigned char /*ch*/) { return false; };
         virtual bool destroyByArea() { return true; };
 };
 
