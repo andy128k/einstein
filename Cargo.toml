@@ -12,6 +12,8 @@ rand = "*"
 serde = "*"
 serde_derive = "*"
 toml = "*"
+regex = "*"
+lazy_static = "*"
 
 [build-dependencies]
 cc = "*"

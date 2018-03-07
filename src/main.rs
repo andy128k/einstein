@@ -6,8 +6,11 @@ extern crate sdl;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate toml;
+extern crate regex;
+#[macro_use] extern crate lazy_static;
 
 mod error;
+mod locale;
 mod converge;
 mod rules;
 mod puzzle_gen;
@@ -257,6 +260,13 @@ pub extern fn ein_topscores_get_name(c: *const ::libc::c_void, ch: ::libc::c_int
 pub extern fn ein_topscores_get_score(c: *const ::libc::c_void, ch: ::libc::c_int) -> ::libc::c_int {
     let s: &storage::Scores = unsafe { &* (c as *const storage::Scores) };
     s.0[ch as usize].score as ::libc::c_int
+}
+
+#[no_mangle]
+pub extern fn ein_get_language() -> *const ::libc::c_char {
+    let language = locale::get_language().unwrap_or_default();
+    let c_str = CString::new(language).unwrap();
+    c_str.into_raw()
 }
 
 fn real_main() -> Result<()> {

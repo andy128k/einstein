@@ -555,6 +555,8 @@ void ResourcesCollection::loadResourceFiles(StringList &directories)
 
 void ResourcesCollection::processFiles()
 {
+    std::string preferred_language = ein_get_language();
+
     ResourceFile::Directory dir;
     for (std::vector<ResourceFile*>::iterator i = files.begin(); 
             i != files.end(); i++) 
@@ -565,9 +567,9 @@ void ResourcesCollection::processFiles()
                 j != dir.end(); j++) 
         {
             ResourceFile::DirectoryEntry &de = *j;
-            std::wstring name, ext, language, country;
-            splitFileName(de.name, name, ext, language, country);
-            int score = getScore(language, country, locale);
+            std::wstring name, ext, language;
+            splitFileName(de.name, name, ext, language);
+            int score = getScore(language, preferred_language);
             if (score > 0) {
                 std::wstring resName = name + L"." + ext;
                 Resource *res = resources[resName];
