@@ -79,32 +79,22 @@ void Font::draw(SDL_Surface *s, int x, int y, int r, int g, int b, bool shadow, 
     SDL_FreeSurface(surface);
 }
 
-int Font::getWidth(const std::wstring &text)
-{
-    int w, h;
-    Uint16 *str = strToUint16(text);
-    TTF_SizeUNICODE(font, str, &w, &h);
-    return w;
-}
-
-int Font::getWidth(wchar_t ch)
-{
-    int minx, maxx, miny, maxy, advance;
-    TTF_GlyphMetrics(font, (Uint16)ch, &minx, &maxx, &miny, &maxy, &advance);
-    return advance;
-}
-
-int Font::getHeight(const std::wstring &text)
-{
-    int w, h;
-    Uint16 *str = strToUint16(text);
-    TTF_SizeUNICODE(font, str, &w, &h);
-    return h;
-}
-
 void Font::getSize(const std::wstring &text, int &width, int &height)
 {
     Uint16 *str = strToUint16(text);
     TTF_SizeUNICODE(font, str, &width, &height);
 }
 
+int Font::getWidth(const std::wstring &text)
+{
+    int w, h;
+    getSize(text, w, h);
+    return w;
+}
+
+int Font::getHeight(const std::wstring &text)
+{
+    int w, h;
+    getSize(text, w, h);
+    return h;
+}

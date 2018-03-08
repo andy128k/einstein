@@ -2,7 +2,6 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_main.h>
-#include <SDL_ttf.h>
 #include "exceptions.h"
 #include "utils.h"
 #include "unicode.h"
@@ -34,10 +33,6 @@ extern "C" void loadResources()
 
 extern "C" void mainpp(int fullscreen, Config *config, TopScores* top_scores)
 {
-    if (TTF_Init())
-        throw Exception(L"Error initializing font engine");
-
     Screen screen(fullscreen);
-
     menu(&screen, config, top_scores);
 }

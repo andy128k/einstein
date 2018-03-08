@@ -240,8 +240,9 @@ TextParser::TextParser(Screen *screen, const std::wstring &text, Font &font,
         int x, int y, int width, int height)
     : screen(screen), tokenizer(text), font(font)
 {
-    spaceWidth = font.getWidth(L' ');
-    charHeight = font.getWidth(L'A');
+    spaceWidth = font.getWidth(L" ");
+    int _charWidth;
+    font.getSize(L"A", _charWidth, charHeight);
     offsetX = x;
     offsetY = y;
     pageWidth = width;

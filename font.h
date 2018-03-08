@@ -20,7 +20,6 @@ class Font
         void draw(SDL_Surface *s, int x, int y, int r, int g, int b, 
                 bool shadow, const std::wstring &text);
         int getWidth(const std::wstring &text);
-        int getWidth(wchar_t ch);
         int getHeight(const std::wstring &text);
         void getSize(const std::wstring &text, int &width, int &height);
 };

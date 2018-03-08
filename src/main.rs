@@ -3,6 +3,7 @@ extern crate libc;
 extern crate itertools;
 extern crate rand;
 extern crate sdl;
+extern crate sdl2_ttf;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate toml;
@@ -283,6 +284,8 @@ fn real_main() -> Result<()> {
         return Err(err_msg(get_error()));
     }
     set_caption("Einstein 3.0", "");
+
+    let ttf = sdl2_ttf::init()?;
 
     unsafe {
         initAudio(state.volume as i32);
