@@ -16,7 +16,6 @@ mod locale;
 mod converge;
 mod rules;
 mod puzzle_gen;
-mod iconset;
 mod ui;
 mod storage;
 mod text_parser;

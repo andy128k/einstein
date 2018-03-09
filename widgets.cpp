@@ -15,7 +15,7 @@ Button::Button(Screen *screen, int x, int y, const std::wstring &name, Command *
     : Widget(screen)
 {
     image = loadImage(name, transparent);
-    highlighted = adjustBrightness(image, 1.5, transparent);
+    highlighted = adjust_brightness(image, 1.5, transparent);
 
     left = x;
     top = y;
@@ -94,7 +94,7 @@ Button::Button(Screen *screen, int x, int y, int w, int h, Font *font,
     font->getSize(text, tW, tH);
     font->draw(image, (width - tW) / 2, (height - tH) / 2, r, g, b, true, text);
     
-    highlighted = adjustBrightness(image, 1.5, false);
+    highlighted = adjust_brightness(image, 1.5, false);
     SDL_SetColorKey(image, SDL_SRCCOLORKEY, getCornerPixel(image));
     SDL_SetColorKey(highlighted, SDL_SRCCOLORKEY, getCornerPixel(highlighted));
     
@@ -139,7 +139,7 @@ Button::Button(Screen *screen, int x, int y, int w, int h, Font *font,
     font->getSize(text, tW, tH);
     font->draw(image, (width - tW) / 2, (height - tH) / 2, r, g, b, true, text);
     
-    highlighted = adjustBrightness(image, 1.5, false);
+    highlighted = adjust_brightness(image, 1.5, false);
     
     mouseInside = false;
     command = cmd;
@@ -461,13 +461,13 @@ Window::Window(Screen *screen, int x, int y, int w, int h, const std::wstring &b
             ltK = f;  rbK = k;
         }
         for (int j = i; j < height - i - 1; j++)
-            adjustBrightness(win, i, j, ltK);
+            adjust_brightness_pixel(win, i, j, ltK);
         for (int j = i; j < width - i; j++)
-            adjustBrightness(win, j, i, ltK);
+            adjust_brightness_pixel(win, j, i, ltK);
         for (int j = i+1; j < height - i; j++)
-            adjustBrightness(win, width - i - 1, j, rbK);
+            adjust_brightness_pixel(win, width - i - 1, j, rbK);
         for (int j = i; j < width - i - 1; j++)
-            adjustBrightness(win, j, height - i - 1, rbK);
+            adjust_brightness_pixel(win, j, height - i - 1, rbK);
         k -= 0.2;
         f += 0.1;
     }
@@ -742,7 +742,7 @@ Checkbox::Checkbox(Screen *screen, int x, int y, int w, int h, Font *font,
     drawBevel(image, 1, 1, width - 2, height - 2, true, 1);
     SDL_UnlockSurface(image);
     
-    highlighted = adjustBrightness(image, 1.5, false);
+    highlighted = adjust_brightness(image, 1.5, false);
     
     checkedImage = SDL_DisplayFormat(image);
     int tW, tH;
@@ -751,7 +751,7 @@ Checkbox::Checkbox(Screen *screen, int x, int y, int w, int h, Font *font,
     tW += 2;
     font->draw(checkedImage, (width - tW) / 2, (height - tH) / 2, r, g, b, 
             true, L"X");
-    checkedHighlighted = adjustBrightness(checkedImage, 1.5, false);
+    checkedHighlighted = adjust_brightness(checkedImage, 1.5, false);
     
     mouseInside = false;
 }
@@ -941,7 +941,7 @@ void Slider::createSlider(int size)
     drawBevel(image, 1, 1, size - 2, size - 2, true, 1);
     SDL_UnlockSurface(image);
     
-    activeSlider = adjustBrightness(image, 1.5, false);
+    activeSlider = adjust_brightness(image, 1.5, false);
     slider = SDL_DisplayFormat(image);
     
     SDL_FreeSurface(image);

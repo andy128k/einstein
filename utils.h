@@ -13,13 +13,13 @@
 
 
 SDL_Surface* loadImage(const std::wstring &name, bool transparent=false);
-SDL_Surface* adjustBrightness(SDL_Surface *image, double k, bool transparent=false);
+extern "C" SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent=false);
 int gettimeofday(struct timeval* tp);
 void drawWallpaper(Screen *screen, const std::wstring &name);
 void showWindow(Screen *screen, Area *area, const std::wstring &fileName);
 bool isInRect(int evX, int evY, int x, int y, int w, int h);
 std::wstring numToStr(int no);
-void adjustBrightness(SDL_Surface *image, int x, int y, double k);
+extern "C" void adjust_brightness_pixel(SDL_Surface *image, int x, int y, double k);
 std::wstring secToStr(int time);
 void showMessageWindow(Screen *screen, Area *area, const std::wstring &pattern, 
         int width, int height, Font *font, int r, int g, int b,

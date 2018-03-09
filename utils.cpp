@@ -173,7 +173,7 @@ static int gammaTable[256];
 static double lastGamma = -1.0;
 
 
-void adjustBrightness(SDL_Surface *image, int x, int y, double k)
+void adjust_brightness_pixel(SDL_Surface *image, int x, int y, double k)
 {
     if (lastGamma != k) {
         for (int i = 0; i <= 255; i++) {
@@ -190,7 +190,7 @@ void adjustBrightness(SDL_Surface *image, int x, int y, double k)
 }
 
 
-SDL_Surface* adjustBrightness(SDL_Surface *image, double k, bool transparent)
+SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent)
 {
     if (lastGamma != k) {
         for (int i = 0; i <= 255; i++) {
@@ -320,13 +320,13 @@ void drawBevel(SDL_Surface *s, int left, int top, int width, int height,
     }
     for (int i = 0; i < size; i++) {
         for (int j = i; j < height - i - 1; j++)
-            adjustBrightness(s, left + i, top + j, k);
+            adjust_brightness_pixel(s, left + i, top + j, k);
         for (int j = i; j < width - i; j++)
-            adjustBrightness(s, left + j, top + i, k);
+            adjust_brightness_pixel(s, left + j, top + i, k);
         for (int j = i+1; j < height - i; j++)
-            adjustBrightness(s, left + width - i - 1, top + j, f);
+            adjust_brightness_pixel(s, left + width - i - 1, top + j, f);
         for (int j = i; j < width - i - 1; j++)
-            adjustBrightness(s, left + j, top + height - i - 1, f);
+            adjust_brightness_pixel(s, left + j, top + height - i - 1, f);
         k += kAdv;
         f += fAdv;
     }
