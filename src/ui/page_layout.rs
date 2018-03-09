@@ -1,7 +1,6 @@
-use failure::err_msg;
 use itertools::join;
-use sdl::video::{Surface, SurfaceFlag, Color};
-use sdl::video::ll::{SDL_LoadBMP_RW, SDL_RWFromConstMem};
+use regex::Regex;
+use sdl::video::Surface;
 use sdl2_ttf::Font;
 use util::group_by_weight::group_by_weight;
 use ui::utils::load_image;
@@ -31,8 +30,12 @@ impl PageItem {
     }
 }
 
+lazy_static! {
+    static ref SPLIT_REGEX: Regex = Regex::new(r"\s+").unwrap();
+}
+
 fn wrap_lines(text: &str, page_width: u16, font: &Font) -> Vec<String> {
-    group_by_weight(text.split(" "), |words, word| { // TODO regex split \s
+    group_by_weight(SPLIT_REGEX.split(text), |words, word| {
         let line = join(words, " ") + " " + word;
         match font.size_of(&line) {
             Ok((width, _)) => (width as u16) < page_width,
@@ -64,25 +67,33 @@ impl PagesBuilder {
         }
     }
 
-    fn add_item(&mut self, item: PageItem) {
+    fn add_item(&mut self, span: u16, item: PageItem) {
         let height = item.get_height();
 
-        if self.y + 10 + height > self.page_height {
+        let y = if self.y == 0 {
+            0
+        } else {
+            self.y + span
+        };
+
+        if y + height > self.page_height {
             let mut page = Page::new();
             page.push(item.set_y(0));
             self.pages.push(page);
             self.y = height;
         } else {
-            self.pages.last_mut().unwrap().push(item.set_y(self.y + 10));
-            self.y += 10 + height;
+            self.pages.last_mut().unwrap().push(item.set_y(y));
+            self.y = y + height;
         }
     }
 
     pub fn add_text(&mut self, text: &str, font: &Font) -> Result<()> {
         let lines = wrap_lines(text, self.page_width, font);
+        let mut span = 16;
         for line in lines {
             let (width, height) = font.size_of(&line)?;
-            self.add_item(PageItem::Text(line, 0, 0, width as u16, height as u16));
+            self.add_item(span, PageItem::Text(line, 0, 0, width as u16, height as u16));
+            span = 4;
         }
         Ok(())
     }
@@ -92,7 +103,7 @@ impl PagesBuilder {
         let width = image.get_width();
         let height = image.get_height();
         let x = (self.page_width - width) / 2;
-        self.add_item(PageItem::Image(image, x, 0, width, height));
+        self.add_item(16, PageItem::Image(image, x, 0, width, height));
         Ok(())
     }
 

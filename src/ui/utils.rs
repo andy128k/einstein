@@ -1,7 +1,16 @@
 use failure::err_msg;
-use sdl::video::Surface;
+use sdl::video::{Surface, SurfaceFlag};
 use sdl::video::ll::{SDL_LoadBMP_RW, SDL_RWFromConstMem};
+use sdl::video::ll::SDL_Surface;
+use sdl2;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2_ttf::Font;
 use error::*;
+
+unsafe fn surface2_to_surface(surface: &sdl2::surface::Surface) -> Surface {
+    Surface { raw: surface.raw() as * mut SDL_Surface, owned: false }
+}
 
 mod cpp {
     use libc::{c_int, c_double};
@@ -29,4 +38,110 @@ pub fn load_image(data: &[u8]) -> Result<Surface> {
     };
     let surface = surface.display_format().map_err(err_msg)?;
     Ok(surface)
+}
+
+pub fn tiled_image(data: &[u8], width: u16, height: u16) -> Result<Surface> {
+    let win = Surface::new(&[SurfaceFlag::SWSurface], width as isize, height as isize, 32, 0, 0, 0, 0).map_err(err_msg)?;
+
+    let tile = load_image(data)?;
+
+    let tile_width = tile.get_width();
+    let tile_height = tile.get_height();
+
+    let cw = (width + tile_width - 1) / tile_width;
+    let ch = (height + tile_height - 1) / tile_height;
+
+    for j in 0..ch {
+        for i in 0..cw {
+            win.blit_at(&tile, (i * tile_width) as i16, (j * tile_height) as i16);
+        }
+    }
+
+    let image = win.display_format().map_err(err_msg)?;
+    Ok(image)
+}
+
+pub fn draw_bevel(s: &mut Surface, rect: Rect, raised: bool, size: u16) {
+    let mut k;
+    let mut f;
+    let mut k_adv;
+    let mut f_adv;
+    if raised {
+        k = 2.6;
+        f = 0.1;
+        k_adv = -0.2;
+        f_adv = 0.1;
+    } else {
+        k = 0.1;
+        f = 2.6;
+        k_adv = 0.1;
+        f_adv = -0.2;
+    }
+    let left = rect.left() as u16;
+    let top = rect.top() as u16;
+    let width = rect.width() as u16;
+    let height = rect.height() as u16;
+    for i in 0..size {
+        for j in i..(height - i) {
+            adjust_brightness_pixel(s, left + i, top + j, k);
+        }
+        for j in i..(width - i) {
+            adjust_brightness_pixel(s, left + j, top + i, k);
+        }
+        for j in (i + 1)..(height - i) {
+            adjust_brightness_pixel(s, left + width - i - 1, top + j, f);
+        }
+        for j in i..(width - i) {
+            adjust_brightness_pixel(s, left + j, top + height - i - 1, f);
+        }
+        k += k_adv;
+        f += f_adv;
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum HorizontalAlign {
+    Left,
+    Center,
+    Right
+}
+
+#[derive(Clone, Copy)]
+pub enum VerticalAlign {
+    Top,
+    Middle,
+    Bottom
+}
+
+pub fn draw_text(surface: &Surface,
+    text: &str,
+    font: &Font, color: Color, shadow: bool,
+    rect: Rect, horizontal_align: HorizontalAlign, vertical_align: VerticalAlign) -> Result<()>
+{
+    let (w, h) = font.size_of(text)?;
+
+    let x = match horizontal_align {
+        HorizontalAlign::Left => rect.left(),
+        HorizontalAlign::Center => rect.left() + ((rect.width() - w) as i32) / 2,
+        HorizontalAlign::Right => rect.left() + ((rect.width() - w) as i32)
+    };
+
+    let y = match vertical_align {
+        VerticalAlign::Top => rect.top(),
+        VerticalAlign::Middle => rect.top() + ((rect.height() - h) as i32) / 2,
+        VerticalAlign::Bottom => rect.top() + ((rect.height() - h) as i32)
+    };
+
+    if shadow {
+        let shadow_surface = font.render(text).blended(Color::RGBA(1, 1, 1, 1))?;
+        unsafe {
+            surface.blit_at(&surface2_to_surface(&shadow_surface), (x + 1) as i16, (y + 1) as i16);
+        }
+    }
+    let text_surface = font.render(text).blended(color.clone())?;
+    unsafe {
+        surface.blit_at(&surface2_to_surface(&text_surface), x as i16, y as i16);
+    }
+
+    Ok(())
 }

@@ -4,12 +4,6 @@ resources = {
     { name = "rain.bmp" }
     { name = "tile.bmp" }
     { name = "hint-tile.bmp" }
-    { name = "opensquare.bmp" }
-    { name = "closed.bmp" }
-    { name = "verthint.bmp" }
-    { name = "hornearhint.bmp" }
-    { name = "horposhint.bmp" }
-    { name = "horbetweenhint.bmp" }
     { name = "title.bmp" }
     { name = "marble1.bmp" }
     { name = "blue.bmp" }
@@ -21,8 +15,6 @@ resources = {
     { name = "nova.ttf" }
     { name = "laudcn2.ttf" }
     { name = "btn.bmp" }
-    { name = "rules.txt", format = "messages" group = "messages" }
-    { name = "rules_ru.txt", format = "messages" group = "messages" }
     { name = "messages.txt", format = "messages" group = "messages" }
     { name = "messages_ru.txt", format = "messages" group = "messages" }
     { name = "click.wav" }

@@ -36,7 +36,6 @@ fn main() {
         .file("i18n.cpp")
         .file("lexal.cpp")
         .file("streams.cpp")
-        .file("tokenizer.cpp")
         .file("sound.cpp")
         .compile("foo");
 

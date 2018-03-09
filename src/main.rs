@@ -3,6 +3,7 @@ extern crate libc;
 extern crate itertools;
 extern crate rand;
 extern crate sdl;
+extern crate sdl2;
 extern crate sdl2_ttf;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
@@ -10,15 +11,15 @@ extern crate toml;
 extern crate regex;
 #[macro_use] extern crate lazy_static;
 
-mod error;
-mod util;
-mod locale;
-mod converge;
-mod rules;
-mod puzzle_gen;
-mod ui;
-mod storage;
-mod text_parser;
+pub mod error;
+pub mod util;
+pub mod locale;
+pub mod converge;
+pub mod rules;
+pub mod puzzle_gen;
+pub mod ui;
+pub mod storage;
+pub mod text_parser;
 
 use std::ffi::{CStr, CString};
 use std::ptr::null;
@@ -28,6 +29,7 @@ use std::fs::create_dir_all;
 use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};
 use sdl::wm::set_caption;
+use sdl2_ttf::Sdl2TtfContext;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
@@ -271,6 +273,10 @@ pub extern fn ein_get_language() -> *const ::libc::c_char {
     c_str.into_raw()
 }
 
+pub struct AppContext {
+    pub ttf: Sdl2TtfContext,
+}
+
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
     create_dir_all(home.join(".einstein"))?;
@@ -286,7 +292,11 @@ fn real_main() -> Result<()> {
     }
     set_caption("Einstein 3.0", "");
 
-    let ttf = sdl2_ttf::init()?;
+    let app_context = AppContext {
+        ttf: sdl2_ttf::init()?
+    };
+
+    ui::fonts::init_fonts(&app_context.ttf)?;
 
     unsafe {
         initAudio(state.volume as i32);
