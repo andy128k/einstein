@@ -4,6 +4,7 @@ use sdl::video::{Surface, SurfaceFlag, Color};
 use sdl::video::ll::{SDL_LoadBMP_RW, SDL_RWFromConstMem};
 use sdl2_ttf::Font;
 use util::group_by_weight::group_by_weight;
+use ui::utils::load_image;
 use error::*;
 
 pub type Page = Vec<PageItem>;
@@ -28,15 +29,6 @@ impl PageItem {
         }
         self
     }
-}
-
-fn load_image(data: &[u8]) -> Result<Surface> {
-    let surface = unsafe {
-        let op = SDL_RWFromConstMem(data.as_ptr() as * const ::libc::c_void, data.len() as i32);
-        Surface { raw: SDL_LoadBMP_RW(op, 0), owned: true }
-    };
-    let surface = surface.display_format().map_err(err_msg)?;
-    Ok(surface)
 }
 
 fn wrap_lines(text: &str, page_width: u16, font: &Font) -> Vec<String> {
