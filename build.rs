@@ -32,10 +32,7 @@ fn main() {
         .file("buffer.cpp")
         .file("unicode.cpp")
         .file("convert.cpp")
-        .file("table.cpp")
         .file("i18n.cpp")
-        .file("lexal.cpp")
-        .file("streams.cpp")
         .file("sound.cpp")
         .compile("foo");
 
