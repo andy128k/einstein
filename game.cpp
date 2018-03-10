@@ -312,57 +312,6 @@ class FailCommand: public Command
 };
 
 
-class CheatAccel: public Widget
-{
-    private:
-        Command *command;
-        std::wstring typed;
-        std::wstring cheat;
-
-    public:
-        CheatAccel(Screen *screen, const std::wstring s, Command *cmd): Widget(screen), cheat(s) {
-            command = cmd;
-        };
-
-    public:
-        virtual bool onKeyDown(SDLKey key, unsigned char ch) {
-            if ((key >= SDLK_a) && (key <= SDLK_z)) {
-                wchar_t s = L'a' + key - SDLK_a;
-                typed += s;
-                if (typed.length() == cheat.length()) {
-                    if (command && (typed == cheat))
-                        command->doAction();
-                } else {
-                    int pos = typed.length() - 1;
-                    if (typed[pos] == cheat[pos])
-                        return false;
-                }
-            }
-            if (typed.length() > 0) 
-                typed = L"";
-            return false;
-        }
-};
-
-
-class CheatCommand: public Command
-{
-    private:
-        Area *gameArea;
-
-    public:
-        CheatCommand(Area *a) { gameArea = a; };
-        
-        virtual void doAction() {
-            Font font(L"nova.ttf", 30);
-            showMessageWindow(gameArea->screen, gameArea, L"darkpattern.bmp", 
-                    500, 100, &font, 255,255,255, 
-                    msg(L"iddqd"));
-            gameArea->draw();
-        };
-};
-
-
 class SaveGameCommand: public Command
 {
     private:
@@ -577,8 +526,6 @@ void Game::run(Config* config, TopScores *top_scores)
 
     GameBackground *background = new GameBackground(screen);
     area.add(background);
-    CheatCommand cheatCmd(&area);
-    area.add(new CheatAccel(screen, L"iddqd", &cheatCmd));
     WinCommand winCmd(&area, watch, this, config, top_scores);
     FailCommand failCmd(&area, this);
     puzzle->setCommands(&winCmd, &failCmd);

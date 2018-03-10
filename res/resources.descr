@@ -10,7 +10,6 @@ resources = {
     { name = "luximb.ttf" }
     { name = "redpattern.bmp" }
     { name = "greenpattern.bmp" }
-    { name = "darkpattern.bmp" }
     { name = "nova.bmp" }
     { name = "nova.ttf" }
     { name = "laudcn2.ttf" }
