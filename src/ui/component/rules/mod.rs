@@ -19,6 +19,7 @@ use ui::utils::{load_image, tiled_image, adjust_brightness, adjust_brightness_pi
 use ui::fonts::*;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
+use ui::background::BLUE_PATTERN;
 use locale::get_language;
 
 const WIDTH: u16 = 600;
@@ -162,8 +163,6 @@ struct DescriptionPrivate {
 
 type Description = Container<DescriptionPrivate>;
 
-const BLUE_BG: &[u8] = include_bytes!("../../../../res/blue.bmp");
-
 impl DescriptionPrivate {
     fn new(messages: &Messages, text: &[TextItem]) -> Result<Description> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
@@ -179,7 +178,7 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         });
 
-        let window = Window::new(rect.clone(), BLUE_BG)?;
+        let window = Window::new(rect.clone(), BLUE_PATTERN)?;
 
         let title = Label {
             font: title_font()?,
@@ -195,7 +194,7 @@ impl DescriptionPrivate {
 
         let prev = {
             let this = ptr.weak_private();
-            Button::new(Rect::new(110, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_BG, messages.prev,
+            Button::new(Rect::new(110, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.prev,
                 None,
                 move || {
                     if let Some(this) = this.upgrade() {
@@ -209,7 +208,7 @@ impl DescriptionPrivate {
 
         let next = {
             let this = ptr.weak_private();
-            Button::new(Rect::new(200, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_BG, messages.next,
+            Button::new(Rect::new(200, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.next,
                 None,
                 move || {
                     if let Some(this) = this.upgrade() {
@@ -221,7 +220,7 @@ impl DescriptionPrivate {
             )?
         };
 
-        let close = Button::new(Rect::new(610, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_BG, messages.close,
+        let close = Button::new(Rect::new(610, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.close,
             Some(Key::Escape),
             || Some(Effect::Terminate)
         )?;
