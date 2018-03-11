@@ -8,7 +8,7 @@
                 argNo = readInt(data + offset); \
                 if (argNo > maxArg) \
                     maxArg = argNo; \
-                commands[commandsCnt].data = (void*)argNo; \
+                commands[commandsCnt].data = reinterpret_cast<void*>(argNo); \
                 commandsCnt++;
 
 Formatter::Formatter(unsigned char *data, int offset)

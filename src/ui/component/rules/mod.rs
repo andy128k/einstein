@@ -1,13 +1,10 @@
-use std::rc::{Rc, Weak};
+use std::rc::Rc;
 use std::cell::{Cell, RefCell};
-use failure::err_msg;
 use sdl;
 use sdl::video::{Surface};
-use sdl::event::{Key, Mouse};
-use sdl2;
+use sdl::event::Key;
 use sdl2::pixels::Color;
-use sdl2::rect::{Rect, Point};
-use sdl2::ttf::Font;
+use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
@@ -15,7 +12,7 @@ use ui::widget::button::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
-use ui::utils::{load_image, tiled_image, adjust_brightness, adjust_brightness_pixel, draw_bevel, draw_text, HorizontalAlign, VerticalAlign};
+use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::fonts::*;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
@@ -233,11 +230,6 @@ impl DescriptionPrivate {
         ptr.add(Box::new(close));
 
         Ok(ptr)
-    }
-
-    fn get_page(&self) -> &Page {
-        let current_page_index = self.current_page_index.get();
-        &self.pages[current_page_index]
     }
 
     fn prev(&mut self) -> Option<Effect> {

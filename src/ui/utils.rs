@@ -64,8 +64,8 @@ pub fn tiled_image(data: &[u8], width: u16, height: u16) -> Result<Surface> {
 pub fn draw_bevel(s: &mut Surface, rect: Rect, raised: bool, size: u16) {
     let mut k;
     let mut f;
-    let mut k_adv;
-    let mut f_adv;
+    let k_adv;
+    let f_adv;
     if raised {
         k = 2.6;
         f = 0.1;

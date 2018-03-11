@@ -1,5 +1,4 @@
 use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::ttf::Font;

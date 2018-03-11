@@ -1,6 +1,5 @@
 use rules::{Rule, Thing};
 use sdl::video::{Surface, SurfaceFlag, Color};
-use sdl::video::ll::{SDL_RWFromConstMem};
 use super::thing::{LARGE_IMAGES, SMALL_IMAGES};
 use super::utils::adjust_brightness;
 use error::*;

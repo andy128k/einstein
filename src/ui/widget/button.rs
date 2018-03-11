@@ -63,7 +63,7 @@ impl Widget for Button {
     }
 
     fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
-        if self.rect.contains(Point::new(x as i32, y as i32)) && button == Mouse::Left {
+        if self.rect.contains_point(Point::new(x as i32, y as i32)) && button == Mouse::Left {
             // sound->play(L"click.wav"); TODO
             (*self.action)()
         } else {
@@ -72,7 +72,7 @@ impl Widget for Button {
     }
 
     fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
-        let to_highlight = self.rect.contains(Point::new(x as i32, y as i32));
+        let to_highlight = self.rect.contains_point(Point::new(x as i32, y as i32));
         if self.highlighted.get() != to_highlight {
             self.highlighted.set(to_highlight);
             Some(Effect::Redraw(vec![self.rect]))
