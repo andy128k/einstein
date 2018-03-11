@@ -2,13 +2,13 @@ use sdl::video::Surface;
 use sdl::event::{Key, Mouse};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
-use sdl2_ttf::Font;
+use sdl2::ttf::Font;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 
 pub struct Label<'font> {
-    pub font: &'font Font<'font>,
+    pub font: &'font Font<'font, 'font>,
     pub text: String,
     pub rect: Rect,
     pub color: Color,

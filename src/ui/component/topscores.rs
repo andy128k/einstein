@@ -7,7 +7,7 @@ use sdl::event::{Key, Mouse};
 use sdl2;
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
-use sdl2_ttf::Font;
+use sdl2::ttf::Font;
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;

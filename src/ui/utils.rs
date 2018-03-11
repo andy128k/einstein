@@ -5,7 +5,7 @@ use sdl::video::ll::SDL_Surface;
 use sdl2;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
-use sdl2_ttf::Font;
+use sdl2::ttf::Font;
 use error::*;
 
 unsafe fn surface2_to_surface(surface: &sdl2::surface::Surface) -> Surface {

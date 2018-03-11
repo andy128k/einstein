@@ -1,7 +1,7 @@
 use itertools::join;
 use regex::Regex;
 use sdl::video::Surface;
-use sdl2_ttf::Font;
+use sdl2::ttf::Font;
 use util::group_by_weight::group_by_weight;
 use ui::utils::load_image;
 use error::*;

@@ -4,7 +4,6 @@ extern crate itertools;
 extern crate rand;
 extern crate sdl;
 extern crate sdl2;
-extern crate sdl2_ttf;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate toml;
@@ -19,7 +18,6 @@ pub mod rules;
 pub mod puzzle_gen;
 pub mod ui;
 pub mod storage;
-pub mod text_parser;
 
 use std::ffi::{CStr, CString};
 use std::ptr::null;
@@ -29,7 +27,7 @@ use std::fs::create_dir_all;
 use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};
 use sdl::wm::set_caption;
-use sdl2_ttf::Sdl2TtfContext;
+use sdl2::ttf::Sdl2TtfContext;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
@@ -273,10 +271,12 @@ fn real_main() -> Result<()> {
     set_caption("Einstein 3.0", "");
 
     let app_context = AppContext {
-        ttf: sdl2_ttf::init()?
+        ttf: sdl2::ttf::init()?
     };
 
-    ui::fonts::init_fonts(&app_context.ttf)?;
+    unsafe {
+        ui::fonts::init_fonts(::std::mem::transmute(&app_context.ttf))?;
+    }
 
     unsafe {
         initAudio(state.volume as i32);
