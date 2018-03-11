@@ -122,14 +122,14 @@ pub fn draw_text(surface: &Surface,
 
     let x = match horizontal_align {
         HorizontalAlign::Left => rect.left(),
-        HorizontalAlign::Center => rect.left() + ((rect.width() - w) as i32) / 2,
-        HorizontalAlign::Right => rect.left() + ((rect.width() - w) as i32)
+        HorizontalAlign::Center => rect.left() + (rect.width().saturating_sub(w) as i32) / 2,
+        HorizontalAlign::Right => rect.left() + (rect.width().saturating_sub(w) as i32)
     };
 
     let y = match vertical_align {
         VerticalAlign::Top => rect.top(),
-        VerticalAlign::Middle => rect.top() + ((rect.height() - h) as i32) / 2,
-        VerticalAlign::Bottom => rect.top() + ((rect.height() - h) as i32)
+        VerticalAlign::Middle => rect.top() + (rect.height().saturating_sub(h) as i32) / 2,
+        VerticalAlign::Bottom => rect.top() + (rect.height().saturating_sub(h) as i32)
     };
 
     if shadow {

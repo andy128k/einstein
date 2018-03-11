@@ -12,12 +12,10 @@ extern "C" {
 
     int ein_topscores_is_deserving(TopScores*, int);
     int ein_topscores_add(TopScores*, const char*, int);
-    int ein_topscores_get_count(TopScores*);
-    const char* ein_topscores_get_name(TopScores*, int);
-    int ein_topscores_get_score(TopScores*, int);
 }
 
 void showScoresWindow(Area *area, TopScores *scores, int highlightPos=-1);
+
 std::wstring enterNameDialog(Area *area, std::wstring &name);
 
 #endif

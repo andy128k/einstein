@@ -247,26 +247,6 @@ pub extern fn ein_topscores_add(c: *mut ::libc::c_void, l: * const ::libc::c_cha
 }
 
 #[no_mangle]
-pub extern fn ein_topscores_get_count(c: *const ::libc::c_void) -> ::libc::c_int {
-    let s: &storage::Scores = unsafe { &* (c as *const storage::Scores) };
-    s.0.len() as ::libc::c_int
-}
-
-#[no_mangle]
-pub extern fn ein_topscores_get_name(c: *const ::libc::c_void, ch: ::libc::c_int) -> *const ::libc::c_char {
-    let s: &storage::Scores = unsafe { &* (c as *const storage::Scores) };
-    let nn = &s.0[ch as usize].name;
-    let c_str = CString::new(nn.clone()).unwrap();
-    c_str.into_raw()
-}
-
-#[no_mangle]
-pub extern fn ein_topscores_get_score(c: *const ::libc::c_void, ch: ::libc::c_int) -> ::libc::c_int {
-    let s: &storage::Scores = unsafe { &* (c as *const storage::Scores) };
-    s.0[ch as usize].score as ::libc::c_int
-}
-
-#[no_mangle]
 pub extern fn ein_get_language() -> *const ::libc::c_char {
     let language = locale::get_language().unwrap_or_default();
     let c_str = CString::new(language).unwrap();
