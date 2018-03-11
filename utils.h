@@ -7,7 +7,6 @@
 #include <sys/time.h>
 #endif
 #include <iostream>
-#include "resources.h"
 #include "widgets.h"
 
 

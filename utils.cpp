@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "unicode.h"
 #include "sound.h"
+#include "resources.h"
 
 
 

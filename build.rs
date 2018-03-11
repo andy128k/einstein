@@ -22,7 +22,6 @@ fn main() {
         .file("horhints.cpp")
         .file("menu.cpp")
         .file("font.cpp")
-        .file("conf.cpp")
         .file("topscores.cpp")
         .file("opensave.cpp")
         .file("descr.cpp")

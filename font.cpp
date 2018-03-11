@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "unicode.h"
 #include "exceptions.h"
+#include "resources.h"
 
 
 static Uint16 *convBuf = NULL;

@@ -9,6 +9,7 @@
 #include "sound.h"
 #include "topscores.h"
 #include "config.h"
+#include "resources.h"
 
 void menu(Screen *screen, Config *config, TopScores* top_scores);
 
