@@ -15,7 +15,7 @@ const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug, Copy)]
 pub struct Thing { pub row: u8, pub value: Value }
 
 impl Thing {
@@ -191,7 +191,7 @@ impl Possibilities {
         new
     }
 
-    pub fn is_possible(&self, col: u8, thing: &Thing) -> bool {
+    pub fn is_possible(&self, col: u8, thing: Thing) -> bool {
         self.0[thing.row as usize].0[col as usize].contains(thing.value)
     }
 
@@ -307,18 +307,18 @@ pub fn generate_rule(puzzle: &SolvedPuzzle) -> Rule {
 
 pub fn display_rule(rule: &Rule) -> String {
     match *rule {
-        Rule::Near(ref thing1, ref thing2) => format!("{} is near to {}", thing1.display_name(), thing2.display_name()),
-        Rule::Direction(ref thing1, ref thing2) => format!("{} is from the left of {}", thing1.display_name(), thing2.display_name()),
-        Rule::Open(col, ref thing) => format!("{} is at column {}", thing.display_name(), col + 1),
-        Rule::Under(ref thing1, ref thing2) => format!("{} is the same column as {}", thing1.display_name(), thing2.display_name()),
-        Rule::Between(ref thing1, ref thing2, ref thing3) => format!("{} is between {} and {}", thing2.display_name(), thing1.display_name(), thing3.display_name())
+        Rule::Near(thing1, thing2) => format!("{} is near to {}", thing1.display_name(), thing2.display_name()),
+        Rule::Direction(thing1, thing2) => format!("{} is from the left of {}", thing1.display_name(), thing2.display_name()),
+        Rule::Open(col, thing) => format!("{} is at column {}", thing.display_name(), col + 1),
+        Rule::Under(thing1, thing2) => format!("{} is the same column as {}", thing1.display_name(), thing2.display_name()),
+        Rule::Between(thing1, thing2, thing3) => format!("{} is between {} and {}", thing2.display_name(), thing1.display_name(), thing3.display_name())
     }
 }
 
 pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
     match *rule {
-        Rule::Near(ref thing1, ref thing2) => {
-            fn is_applicable_to_col(pos: &Possibilities, col: u8, thing: &Thing, neighbour: &Thing) -> bool {
+        Rule::Near(thing1, thing2) => {
+            fn is_applicable_to_col(pos: &Possibilities, col: u8, thing: Thing, neighbour: Thing) -> bool {
                 let has_left = if col == 0 {
                     false
                 } else {
@@ -345,7 +345,7 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 pos
             })
         },
-        Rule::Direction(ref thing1, ref thing2) => {
+        Rule::Direction(thing1, thing2) => {
             let mut new_pos = *pos;
             for col in 0..PUZZLE_SIZE {
                 if new_pos.is_possible(col as u8, thing2) {
@@ -365,10 +365,10 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
             }
             new_pos
         },
-        Rule::Open(col, ref thing) => {
+        Rule::Open(col, thing) => {
             pos.set(col, thing.row, thing.value)
         },
-        Rule::Under(ref thing1, ref thing2) => {
+        Rule::Under(thing1, thing2) => {
             let mut new_pos = *pos;
             for col in 0..PUZZLE_SIZE {
                 if !new_pos.is_possible(col as u8, thing1) {
@@ -380,8 +380,8 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
             }
             new_pos
         },
-        Rule::Between(ref thing1, ref thing2, ref thing3) => {
-            fn check_middle_thing(pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
+        Rule::Between(thing1, thing2, thing3) => {
+            fn check_middle_thing(pos: &Possibilities, col: u8, thing1: Thing, thing2: Thing, thing3: Thing) -> bool {
                 col > 0 && col < PUZZLE_SIZE as u8 - 1 &&
                 pos.is_possible(col as u8, thing2) && (
                     (pos.is_possible(col as u8 - 1, thing1) && pos.is_possible(col as u8 + 1, thing3)) ||
@@ -389,7 +389,7 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 )
             }
 
-            fn check_side_thing(pos: &Possibilities, col: u8, thing1: &Thing, thing2: &Thing, thing3: &Thing) -> bool {
+            fn check_side_thing(pos: &Possibilities, col: u8, thing1: Thing, thing2: Thing, thing3: Thing) -> bool {
                 if pos.is_possible(col as u8, thing3) {
                     let left_possible = if col < 2 {
                         false

@@ -115,7 +115,7 @@ pub extern fn ein_possibilities_open_initials(p: * const Possibilities, rules: *
 #[no_mangle]
 pub extern fn ein_possibilities_is_possible(p: *const Possibilities, col: ::libc::c_int, row: ::libc::c_int, value: ::libc::c_int) -> ::libc::c_int {
     let pos: &Possibilities = unsafe { &*p };
-    pos.is_possible(col as u8, &Thing { row: row as u8, value: value as u8 - 1 }) as i32
+    pos.is_possible(col as u8, Thing { row: row as u8, value: value as u8 - 1 }) as i32
 }
 
 #[no_mangle]
@@ -165,13 +165,13 @@ pub extern fn ein_possibilities_free(p: * const Possibilities) {
 #[no_mangle]
 pub extern fn ein_draw_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
     let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    ui::rule::draw_thing(&Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
+    ui::rule::draw_thing(Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
 }
 
 #[no_mangle]
 pub extern fn ein_draw_small_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
     let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    ui::rule::draw_small_thing(&Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
+    ui::rule::draw_small_thing(Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
 }
 
 #[no_mangle]

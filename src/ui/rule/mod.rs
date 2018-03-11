@@ -9,7 +9,7 @@ const HINT_NEAR_ICON: &[u8] = include_bytes!("./hint-near.bmp");
 const HINT_SIDE_ICON: &[u8] = include_bytes!("./hint-side.bmp");
 const HINT_BETWEEN_ICON: &[u8] = include_bytes!("./betwarr.bmp");
 
-fn load_thing_icon(thing: &Thing, hightlighted: bool) -> Result<Surface> {
+fn load_thing_icon(thing: Thing, hightlighted: bool) -> Result<Surface> {
     let mut image = load_image(LARGE_IMAGES[thing.row as usize][thing.value as usize])?;
     if hightlighted {
         image = adjust_brightness(&image, 1.5, false);
@@ -17,7 +17,7 @@ fn load_thing_icon(thing: &Thing, hightlighted: bool) -> Result<Surface> {
     Ok(image)
 }
 
-pub fn draw_thing(thing: &Thing, surface: &Surface, x: i16, y: i16, hightlighted: bool) -> Result<()> {
+pub fn draw_thing(thing: Thing, surface: &Surface, x: i16, y: i16, hightlighted: bool) -> Result<()> {
     let mut icon = load_image(LARGE_IMAGES[thing.row as usize][thing.value as usize])?;
     if hightlighted {
         icon = adjust_brightness(&icon, 1.5, false);
@@ -26,7 +26,7 @@ pub fn draw_thing(thing: &Thing, surface: &Surface, x: i16, y: i16, hightlighted
     Ok(())
 }
 
-pub fn draw_small_thing(thing: &Thing, surface: &Surface, x: i16, y: i16, hightlighted: bool) -> Result<()> {
+pub fn draw_small_thing(thing: Thing, surface: &Surface, x: i16, y: i16, hightlighted: bool) -> Result<()> {
     let mut icon = load_image(SMALL_IMAGES[thing.row as usize][thing.value as usize])?;
     if hightlighted {
         icon = adjust_brightness(&icon, 1.5, false);
@@ -37,7 +37,7 @@ pub fn draw_small_thing(thing: &Thing, surface: &Surface, x: i16, y: i16, hightl
 
 pub fn draw_rule(rule: &Rule, surface: &Surface, x: i16, y: i16, hightlighted: bool) -> Result<()> {
     match *rule {
-        Rule::Near(ref thing1, ref thing2) => {
+        Rule::Near(thing1, thing2) => {
             let icon1 = load_thing_icon(thing1, hightlighted)?;
             let mut hint = load_image(HINT_NEAR_ICON)?;
             if hightlighted {
@@ -48,7 +48,7 @@ pub fn draw_rule(rule: &Rule, surface: &Surface, x: i16, y: i16, hightlighted: b
             surface.blit_at(&hint, x + icon1.get_width() as i16, y);
             surface.blit_at(&icon2, x + icon1.get_width() as i16 * 2, y);
         },
-        Rule::Direction(ref thing1, ref thing2) => {
+        Rule::Direction(thing1, thing2) => {
             let icon1 = load_thing_icon(thing1, hightlighted)?;
             let mut hint = load_image(HINT_SIDE_ICON)?;
             if hightlighted {
@@ -59,13 +59,13 @@ pub fn draw_rule(rule: &Rule, surface: &Surface, x: i16, y: i16, hightlighted: b
             surface.blit_at(&hint, x + icon1.get_width() as i16, y);
             surface.blit_at(&icon2, x + icon1.get_width() as i16 * 2, y);
         },
-        Rule::Under(ref thing1, ref thing2) => {
+        Rule::Under(thing1, thing2) => {
             let icon1 = load_thing_icon(thing1, hightlighted)?;
             let icon2 = load_thing_icon(thing2, hightlighted)?;
             surface.blit_at(&icon1, x, y);
             surface.blit_at(&icon2, x, y + icon1.get_height() as i16);
         },
-        Rule::Between(ref thing1, ref thing2, ref thing3) => {
+        Rule::Between(thing1, thing2, thing3) => {
             let icon1 = load_thing_icon(thing1, hightlighted)?;
             let icon2 = load_thing_icon(thing2, hightlighted)?;
             let icon3 = load_thing_icon(thing3, hightlighted)?;
