@@ -23,6 +23,7 @@ pub fn group_by_weight<T, I, F>(iter: I, fits_to_bag: F) -> Vec<Vec<T>>
 
 #[cfg(test)]
 mod tests {
+    use itertools::join;
     use super::*;
 
     #[test]
