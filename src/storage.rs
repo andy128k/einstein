@@ -3,8 +3,9 @@ use std::io::{Read, Write};
 use std::fs::{File, create_dir_all};
 use std::env::home_dir;
 use failure::err_msg;
-use toml;
+use serde_json;
 use error::*;
+use ui::component::game::GamePrivate;
 
 fn read_file(filename: &Path) -> Result<Vec<u8>> {
     let mut file = File::open(filename)?;
@@ -26,10 +27,11 @@ fn app_dir() -> Result<PathBuf> {
 }
 
 fn storage_path() -> Result<PathBuf> {
-    Ok(app_dir()?.join("einstein.toml"))
+    Ok(app_dir()?.join("einstein.json"))
 }
 
-const MAX_SCORES: usize = 10;
+pub const MAX_SLOTS: usize = 10;
+pub const MAX_SCORES: usize = 10;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Score {
@@ -69,18 +71,25 @@ impl Scores {
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SavedGame {
+    pub name: String,
+    pub game: GamePrivate,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Storage {
     pub fullscreen: bool,
     pub volume: u32,
     pub last_name: Option<String>,
     pub scores: Scores,
+    pub saved_games: [Option<SavedGame>; MAX_SLOTS],
 }
 
 impl Storage {
     pub fn load_from_file(filename: &Path) -> Result<Self> {
         let buf = read_file(filename)?;
-        let mut storage: Storage = toml::from_slice(&buf)?;
+        let mut storage: Storage = serde_json::from_slice(&buf)?;
         storage.scores.init();
         Ok(storage)
     }
@@ -90,7 +99,7 @@ impl Storage {
     }
 
     pub fn save_to_file(&self, filename: &Path) -> Result<()> {
-        let dump = toml::to_vec(self)?;
+        let dump = serde_json::to_vec_pretty(self)?;
         write_file(&filename, &dump)?;
         Ok(())
     }

@@ -525,37 +525,4 @@ void Game::run(Config* config, TopScores *top_scores)
     if (quit) {
         exit(0);
     }
-/*
-    Area area = Area(screen);
-    Font btnFont(L"laudcn2.ttf", 14);
-    
-    area.setTimer(300, watch);
-
-    GameBackground *background = new GameBackground(screen);
-    area.add(background);
-    WinCommand winCmd(&area, watch, this, config, top_scores);
-    FailCommand failCmd(&area, this);
-    puzzle->setCommands(&winCmd, &failCmd);
-    area.add(puzzle, false);
-    area.add(verHints, false);
-    area.add(horHints, false);
-    
-    PauseGameCommand pauseGameCmd(&area, watch, background);
-    BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
-    ToggleHintCommand toggleHintsCmd(verHints, horHints);
-    BUTTON(screen, 119, 400, L"switch", &toggleHintsCmd)
-    SaveGameCommand saveCmd(&area, watch, background, this);
-    BUTTON(screen, 12, 440, L"save", &saveCmd)
-    GameOptionsCommand optionsCmd(&area, config);
-    BUTTON(screen, 119, 440, L"options", &optionsCmd)
-    ExitCommand exitGameCmd(area);
-    BUTTON(screen, 226, 400, L"exit", &exitGameCmd)
-    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitGameCmd));
-    HelpCommand helpCmd(&area, watch, background);
-    BUTTON(screen, 226, 440, L"help", &helpCmd)
-    area.add(watch, false);
-
-    watch->start();
-    area.run();
-*/
 }

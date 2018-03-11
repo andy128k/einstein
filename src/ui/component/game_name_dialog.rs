@@ -17,6 +17,7 @@ use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::fonts::*;
+use ui::component::dialog::DialogResult;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
 use ui::background::BLUE_PATTERN;
@@ -39,12 +40,6 @@ const MESSAGES_RU: Messages = Messages {
     ok: "OK",
     cancel: "Отмена",
 };
-
-pub enum DialogResult<T> {
-    Ok(T),
-    Cancel,
-    Quit,
-}
 
 struct GameNameState {
     ok: bool,
@@ -100,7 +95,7 @@ fn new_game_name(name: &str, messages: &Messages) -> Result<Container<GameNameSt
     Ok(container)
 }
 
-fn ask_game_name(surface: &Surface, default_name: &str) -> Result<DialogResult<String>> {
+pub fn ask_game_name(surface: &Surface, default_name: &str) -> Result<DialogResult<String>> {
     let messages = if get_language() == Some("ru".to_string()) {
         &MESSAGES_RU
     } else {

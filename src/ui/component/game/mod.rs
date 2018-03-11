@@ -22,21 +22,23 @@ use ui::component::puzzle::horizontal_rules::HorizontalRules;
 use ui::component::puzzle::vertical_rules::VerticalRules;
 use ui::component::watch::Watch;
 use ui::component::rules_dialog::show_description;
+use ui::component::save_dialog::save_game;
 use error::*;
 use storage::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub struct HorizontalRule {
     pub is_excluded: bool,
     pub original_index: usize,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub struct VerticalRule {
     pub is_excluded: bool,
     pub original_index: usize,
 }
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct GamePrivate {
     pub solved_puzzle: SolvedPuzzle,
     pub rules: Vec<Rule>,
@@ -49,6 +51,7 @@ pub struct GamePrivate {
     pub show_excluded: bool,
 
     pub elapsed: Duration,
+    #[serde(skip)]
     pub started: Option<Instant>,
 
     // VertHints *verHints;
@@ -378,7 +381,11 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget<F: Fn() -> bool + 'static>(state: Rc<RefCell<GamePrivate>>, show_help: F) -> Result<Container<()>> {
+pub fn new_game_widget<FnHelp, FnSave>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, save: FnSave) -> Result<Container<()>>
+where
+    FnHelp: Fn() -> bool + 'static,
+    FnSave: Fn() -> bool + 'static
+{
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let mut container = Container::new(screen_rect, ());
@@ -405,6 +412,29 @@ pub fn new_game_widget<F: Fn() -> bool + 'static>(state: Rc<RefCell<GamePrivate>
     let highlighted_button_bg = adjust_brightness(&button_bg, 1.5, false);
     let button_bg2 = load_image(BUTTON_BG)?;
     let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5, false);
+    let button_bg3 = load_image(BUTTON_BG)?;
+    let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5, false);
+
+    container.add(Box::new({
+        let this_state = Rc::downgrade(&state);
+        Button::new1(
+            Rect::new(12, 440, 94, 30), button_bg3, highlighted_button_bg3, yellow,
+            "Save", // TODO i18n
+            None,
+            move || {
+                let state = this_state.upgrade()?;
+                state.borrow_mut().stop();
+
+                let quit = save();
+                if quit {
+                    return Some(Effect::Quit);
+                }
+
+                state.borrow_mut().start();
+                Some(Effect::Redraw(vec![screen_rect]))
+            }
+        )
+    }));
 
     container.add(Box::new(Button::new1(
         Rect::new(226, 400, 94, 30), button_bg, highlighted_button_bg, yellow,
@@ -418,7 +448,7 @@ pub fn new_game_widget<F: Fn() -> bool + 'static>(state: Rc<RefCell<GamePrivate>
         Button::new1(
             Rect::new(226, 440, 94, 30), button_bg2, highlighted_button_bg2, yellow,
             "Help", // TODO i18n
-            Some(Key::Escape),
+            None,
             move || {
                 let state = this_state.upgrade()?;
                 state.borrow_mut().stop();
@@ -559,17 +589,17 @@ void Game::run(Config* config, TopScores *top_scores)
     
     PauseGameCommand pauseGameCmd(&area, watch, background);
     BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
+
     ToggleHintCommand toggleHintsCmd(verHints, horHints);
     BUTTON(screen, 119, 400, L"switch", &toggleHintsCmd)
+
     SaveGameCommand saveCmd(&area, watch, background, this);
     BUTTON(screen, 12, 440, L"save", &saveCmd)
+
     GameOptionsCommand optionsCmd(&area, config);
     BUTTON(screen, 119, 440, L"options", &optionsCmd)
-    ExitCommand exitGameCmd(area);
-    BUTTON(screen, 226, 400, L"exit", &exitGameCmd)
-    area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitGameCmd));
-    HelpCommand helpCmd(&area, watch, background);
-    BUTTON(screen, 226, 440, L"help", &helpCmd)
+
+
     area.add(watch, false);
 
     watch->start();
@@ -578,16 +608,26 @@ void Game::run(Config* config, TopScores *top_scores)
 */
 
 #[no_mangle]
-pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *const Storage, sc: *mut Scores) -> ::libc::c_int {
-    let surface = ::sdl::video::Surface { raw: surface_ptr, owned: false };
-    let surface2 = ::sdl::video::Surface { raw: surface_ptr, owned: false };
-    let storage: &Storage = unsafe { & * st };
+pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut Storage, sc: *mut Scores) -> ::libc::c_int {
+    let surface = Rc::new( ::sdl::video::Surface { raw: surface_ptr, owned: false } );
     let scores: &mut Scores = unsafe { &mut * sc };
 
     let game = GamePrivate::new().unwrap();
     let game_widget = new_game_widget(game.clone(),
-        move || {
-            show_description(&surface2).expect("No errors")
+        {
+            let surface2 = surface.clone();
+            move || {
+                show_description(&surface2).expect("No errors")
+            }
+        },
+        {
+            let surface2 = surface.clone();
+            let game2 = game.clone();
+            move || {
+                let storage: &mut Storage = unsafe { &mut * st }; // HACK
+                save_game(surface2.clone(), storage, &game2.borrow()).expect("No errors");
+                false
+            }
         }
     ).unwrap();
     game.borrow_mut().start();

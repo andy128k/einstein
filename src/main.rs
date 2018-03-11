@@ -6,7 +6,7 @@ extern crate sdl;
 extern crate sdl2;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
-extern crate toml;
+extern crate serde_json;
 extern crate regex;
 #[macro_use] extern crate lazy_static;
 extern crate debug_cell;
@@ -253,7 +253,7 @@ fn real_main() -> Result<()> {
     }
     set_caption("Einstein 3.0", "");
 
-    ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Keu repeat is not set.");
+    ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Key repeat is not set.");
     enable_unicode(true);
 
     let app_context = AppContext {

@@ -15,7 +15,7 @@ pub const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 
-#[derive(PartialEq, Eq, Clone, Debug, Copy)]
+#[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize)]
 pub struct Thing { pub row: u8, pub value: Value }
 
 impl Thing {
@@ -33,6 +33,7 @@ impl Thing {
 }
 
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
 
 impl SolvedPuzzle {
@@ -53,7 +54,7 @@ impl SolvedPuzzle {
 }
 
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct ValueSet([bool; PUZZLE_SIZE]);
 
 impl ValueSet {
@@ -109,7 +110,7 @@ impl ValueSet {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct PossibilitiesRow([ValueSet; PUZZLE_SIZE]);
 
 impl PossibilitiesRow {
@@ -171,7 +172,7 @@ impl PossibilitiesRow {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct Possibilities([PossibilitiesRow; PUZZLE_SIZE]);
 
 impl Possibilities {
@@ -219,7 +220,7 @@ impl Possibilities {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub enum Rule {
     Near(Thing, Thing),
     Direction(Thing, Thing),
