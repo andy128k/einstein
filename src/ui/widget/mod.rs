@@ -1,4 +1,5 @@
 pub mod widget;
+pub mod image;
 pub mod window;
 pub mod label;
 pub mod button;

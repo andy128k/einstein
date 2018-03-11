@@ -17,7 +17,6 @@ extern "C" {
 
     int ein_rule_is_vertical(Rule*);
     int ein_rule_is_horizontal(Rule*);
-    void ein_rule_draw(Rule*, SDL_Surface*, int, int, int);
     void ein_rule_free(Rule*);
 
     Possibilities* ein_possibilities_new();
@@ -33,9 +32,6 @@ extern "C" {
     int ein_possibilities_is_solved(Possibilities*);
 
     void ein_possibilities_free(Possibilities*);
-
-    void ein_draw_thing(int t, int v, SDL_Surface*, int x, int y, int h);
-    void ein_draw_small_thing(int t, int v, SDL_Surface*, int x, int y, int h);
 }
 
 #endif

@@ -11,7 +11,7 @@ fn only<T>(values: &[T]) -> Option<&T> {
 }
 
 
-const PUZZLE_SIZE: usize = 6;
+pub const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 

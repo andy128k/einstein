@@ -30,7 +30,7 @@ pub fn main_loop(surface: &Surface, widget: &Widget) -> Result<bool> {
         match effect {
             Some(Effect::Terminate) => return Ok(false),
             Some(Effect::Redraw(rects)) => {
-                widget.draw(surface)?;
+                widget.draw_in_rects(surface, &rects)?;
                 let rects1 = rects.iter().map(rect2_to_rect).collect::<Vec<_>>();
                 surface.update_rects(&rects1);
             },

@@ -49,26 +49,6 @@ void Puzzle::drawCell(int col, int row, bool addToUpdate)
     int posX = FIELD_OFFSET_X + col * (FIELD_TILE_WIDTH + FIELD_GAP_X);
     int posY = FIELD_OFFSET_Y + row * (FIELD_TILE_HEIGHT + FIELD_GAP_Y);
 
-    if (ein_possibilities_is_defined(possib, col, row)) {
-        int element = ein_possibilities_get_defined(possib, col, row);
-        if (element > 0) {
-            ein_draw_thing(row, element, screen->screen, posX, posY, (hCol == col) && (hRow == row));
-        }
-    } else {
-        screen->draw(posX, posY, iconSet.getEmptyFieldIcon());
-        int x = posX;
-        int y = posY + (FIELD_TILE_HEIGHT / 6);
-        for (int i = 0; i < 6; i++) {
-            if (ein_possibilities_is_possible(possib, col, row, i + 1))
-                ein_draw_small_thing(row, i + 1, screen->screen, x, y, 
-                            (hCol == col) && (hRow == row) && (i + 1 == subHNo));
-            if (i == 2) {
-                x = posX;
-                y += (FIELD_TILE_HEIGHT / 3);
-            } else
-                x += (FIELD_TILE_WIDTH / 3);
-        }
-    }
     if (addToUpdate)
         screen->addRegionToUpdate(posX, posY, FIELD_TILE_WIDTH, 
                 FIELD_TILE_HEIGHT);

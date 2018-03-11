@@ -1,5 +1,3 @@
-use std::rc::{Rc, Weak};
-use std::cell::RefCell;
 use sdl::video::Surface;
 use sdl::event::{Key, Mouse};
 use sdl2::rect::Rect;
@@ -17,7 +15,7 @@ impl<T> Container<T> {
         Self {
             rect,
             widgets: Vec::new(),
-            private
+            private,
         }
     }
 
@@ -83,6 +81,13 @@ impl<T> Widget for Container<T> {
     fn draw(&self, surface: &Surface) -> Result<()> {
         for widget in &self.widgets {
             widget.draw(surface)?;
+        }
+        Ok(())
+    }
+
+    fn draw_in_rects(&self, surface: &Surface, rects: &[Rect]) -> Result<()> {
+        for widget in &self.widgets {
+            widget.draw_in_rects(surface, rects)?;
         }
         Ok(())
     }

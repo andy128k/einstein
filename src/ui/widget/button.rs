@@ -19,35 +19,41 @@ pub struct Button {
     action: Box<Fn() -> Option<Effect>>
 }
 
+pub fn beveled_button_backgrounds(image: &[u8], width: u32, height: u32) -> Result<(Surface, Surface)> {
+    let mut image = tiled_image(image, width as u16, height as u16)?;
+
+    image.lock();
+    {
+        let inner_rect = Rect::new(1, 1, width - 2, height - 2);
+        draw_bevel(&mut image, inner_rect, true, 1);
+
+        let outer_rect = Rect::new(0, 0, width, height);
+        draw_bevel(&mut image, outer_rect, false, 1);
+    }
+    image.unlock();
+
+    let highlighted_image = adjust_brightness(&mut image, 1.5, false);
+
+    Ok((image, highlighted_image))
+}
+
 impl Button {
-    pub fn new<A: Fn() -> Option<Effect> + 'static>(rect: Rect, color: Color, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button> {
-        let mut image = tiled_image(image, rect.width() as u16, rect.height() as u16)?;
-
-        image.lock();
-        {
-            let inner_rect = Rect::new(1, 1, rect.width() - 2, rect.height() - 2);
-            draw_bevel(&mut image, inner_rect, true, 1);
-
-            let outer_rect = Rect::new(0, 0, rect.width(), rect.height());
-            draw_bevel(&mut image, outer_rect, false, 1);
-        }
-        image.unlock();
-
-        let text_rect = Rect::new(0, 0, rect.width(), rect.height());
-        draw_text(&image, &text, button_font()?, color, true, text_rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
-
-        let highlighted_image = adjust_brightness(&mut image, 1.5, false);
-
-        Ok(Self {
+    pub fn new1<A: Fn() -> Option<Effect> + 'static>(rect: Rect, bg: Surface, highlighted_bg: Surface, color: Color, text: &str, key: Option<Key>, action: A) -> Button {
+        Self {
             text: text.to_string(),
             rect,
             color,
-            image,
-            highlighted_image,
+            image: bg,
+            highlighted_image: highlighted_bg,
             highlighted: Cell::new(false),
             key,
             action: Box::new(action)
-        })
+        }
+    }
+
+    pub fn new<A: Fn() -> Option<Effect> + 'static>(rect: Rect, color: Color, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button> {
+        let (bg, highlighted_bg) = beveled_button_backgrounds(image, rect.width(), rect.height())?;
+        Ok(Self::new1(rect, bg, highlighted_bg, color, text, key, action))
     }
 }
 
@@ -88,6 +94,11 @@ impl Widget for Button {
             &self.image
         };
         surface.blit_at(image, self.rect.left() as i16, self.rect.top() as i16);
+
+        let rect = self.get_rect();
+        let text_rect = rect;
+        draw_text(surface, &self.text, button_font()?, self.color, true, text_rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
+
         Ok(())
     }
 }

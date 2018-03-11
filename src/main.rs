@@ -9,6 +9,7 @@ extern crate serde;
 extern crate toml;
 extern crate regex;
 #[macro_use] extern crate lazy_static;
+extern crate debug_cell;
 
 pub mod error;
 pub mod util;
@@ -84,13 +85,6 @@ pub extern fn ein_rule_is_horizontal(r: * const Rule) -> ::libc::c_int {
 }
 
 #[no_mangle]
-pub extern fn ein_rule_draw(r: * const Rule, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
-    let rule: &Rule = unsafe { &*r };
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    ui::rule::draw_rule(rule, &surface, x as i16, y as i16, h != 0).unwrap();
-}
-
-#[no_mangle]
 pub extern fn ein_rule_free(r: * const Rule) {
     let _: Box<Rule> = unsafe { transmute(r) };
 }
@@ -161,18 +155,6 @@ pub extern fn ein_possibilities_is_solved(p: * const Possibilities) -> bool {
 #[no_mangle]
 pub extern fn ein_possibilities_free(p: * const Possibilities) {
     let _: Box<Possibilities> = unsafe { transmute(p) };
-}
-
-#[no_mangle]
-pub extern fn ein_draw_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    ui::rule::draw_thing(Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
-}
-
-#[no_mangle]
-pub extern fn ein_draw_small_thing(t: ::libc::c_int, v: ::libc::c_int, surface_ptr: * mut sdl::video::ll::SDL_Surface, x: ::libc::c_int, y: ::libc::c_int, h: ::libc::c_int) {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    ui::rule::draw_small_thing(Thing { row: t as u8, value: (v - 1) as u8 }, &surface, x as i16, y as i16, h != 0).unwrap();
 }
 
 #[no_mangle]

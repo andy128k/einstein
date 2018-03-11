@@ -1,56 +1,80 @@
-#include "utils.h"
-#include "widgets.h"
-#include "puzzle.h"
-#include "verthints.h"
-#include "horhints.h"
-#include "widgets.h"
-#include "font.h"
-#include "topscores.h"
-#include "opensave.h"
-#include "options.h"
-#include "game.h"
-#include "messages.h"
-#include "sound.h"
-#include "descr.h"
-#include "unicode.h"
+use std::time::{Duration, Instant};
+use std::rc::Rc;
+use std::cell::{Cell};
+use debug_cell::RefCell;
+use sdl::video::Surface;
+use sdl::event::{Key, Mouse};
+use sdl2::rect::{Rect, Point};
+use sdl2::pixels::Color;
+use rules::{Rule, SolvedPuzzle, Possibilities, Thing, apply};
+use puzzle_gen::generate_puzzle;
+use ui::widget::widget::*;
+use ui::widget::container::Container;
+use ui::widget::window::Window;
+use ui::widget::button::Button;
+use ui::widget::image::Image;
+use ui::widget::label::Label;
+use ui::utils::{load_image, tiled_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
+use ui::fonts::title_font;
+use ui::main_loop::main_loop;
+use ui::component::puzzle::puzzle::new_puzzle_widget;
+use ui::component::puzzle::horizontal_rules::HorizontalRules;
+use ui::component::puzzle::vertical_rules::VerticalRules;
+use ui::component::watch::Watch;
+use ui::component::rules_dialog::show_description;
+use error::*;
+use storage::*;
 
+#[derive(Clone, Copy)]
+pub struct HorizontalRule {
+    pub is_excluded: bool,
+    pub original_index: usize,
+}
 
+#[derive(Clone, Copy)]
+pub struct VerticalRule {
+    pub is_excluded: bool,
+    pub original_index: usize,
+}
+
+pub struct GamePrivate {
+    pub solved_puzzle: SolvedPuzzle,
+    pub rules: Vec<Rule>,
+    pub possibilities: Possibilities,
+    pub valid: bool,
+    pub win: bool,
+
+    pub horizontal_rules: Vec<HorizontalRule>,
+    pub vertical_rules: Vec<VerticalRule>,
+    pub show_excluded: bool,
+
+    pub elapsed: Duration,
+    pub started: Option<Instant>,
+
+    // VertHints *verHints;
+    // HorHints *horHints;
+    // IconSet iconSet;
+    // Puzzle *puzzle;
+    // Watch *watch;
+    // bool hinted;
+    // SolvedPuzzle *savedSolvedPuzzle;
+    // RulesArr savedRules;
+    // Screen *screen;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // DUMMY
-static void savePuzzle(SolvedPuzzle *puzzle, std::ostream &stream) {}
-static void loadPuzzle(SolvedPuzzle *puzzle, std::istream &stream) {}
-static void saveRules(RulesArr &rules, std::ostream &stream){}
-static void loadRules(RulesArr &rules, std::istream &stream){}
+// fn savePuzzle(puzzle: &SolvedPuzzle) {}
+// fn loadPuzzle() -> SolvedPuzzle {}
+// fn saveRules(rules: &[Rule]) {}
+// fn loadRules() -> Vec<Rule> {}
 //////////////////////////////////////////////////////////////////////////
 
+const RAIN_TILE: &[u8] = include_bytes!("./rain.bmp");
+const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
+const BUTTON_BG: &[u8] = include_bytes!("./btn.bmp");
 
-class GameBackground: public Widget
-{
-    public:
-        GameBackground(Screen *screen): Widget(screen) {}
-        virtual void draw();
-};
-
-
-void GameBackground::draw()
-{
-    // draw background
-    drawWallpaper(screen, L"rain.bmp");
-
-    // draw title
-    SDL_Surface *tile = loadImage(L"title.bmp");
-    screen->draw(8, 10, tile);
-    SDL_FreeSurface(tile);
-    
-    Font titleFont(L"nova.ttf", 28);
-    titleFont.draw(screen->getSurface(), 20, 20, 255,255,0, true, 
-            msg(L"einsteinPuzzle"));
-    
-    screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
-}
-
-
+/*
 class ToggleHintCommand: public Command
 {
     private:
@@ -68,109 +92,6 @@ class ToggleHintCommand: public Command
             horHints->toggleExcluded();
         };
 };
-
-
-class Watch: public TimerHandler, public Widget
-{
-    private:
-        Uint32 lastRun;
-        Uint32 elapsed;
-        bool stoped;
-        int lastUpdate;
-        Font *font;
-    
-    public:
-        Watch(Screen *screen);
-        Watch(Screen *screen, std::istream &stream);
-        virtual ~Watch();
-
-    public:
-        virtual void onTimer();
-        void stop();
-        void start();
-        virtual void draw();
-        int getElapsed() { return elapsed; };
-        void save(std::ostream &stream);
-        void reset();
-};
-
-
-Watch::Watch(Screen *screen)
-    : Widget(screen)
-{
-    lastRun = elapsed = lastUpdate = 0;
-    stop();
-    font = new Font(L"luximb.ttf", 16);
-}
-
-Watch::Watch(Screen *screen, std::istream &stream)
-    : Widget(screen)
-{
-    elapsed = readInt(stream);
-    lastUpdate = 0;
-    stop();
-    font = new Font(L"luximb.ttf", 16);
-}
-
-Watch::~Watch()
-{
-    delete font;
-}
-
-void Watch::onTimer()
-{
-    if (stoped)
-        return;
-    
-    Uint32 now = SDL_GetTicks();
-    elapsed += now - lastRun;
-    lastRun = now;
-
-    int seconds = elapsed / 1000;
-    if (seconds != lastUpdate)
-        draw();
-}
-
-void Watch::stop()
-{
-    stoped = true;
-}
-
-void Watch::start()
-{
-    stoped = false;
-    lastRun = SDL_GetTicks();
-}
-
-void Watch::draw()
-{
-    int time = elapsed / 1000;
-    std::wstring s = secToStr(time);
-    
-    int x = 700;
-    int y = 24;
-    int w, h;
-    font->getSize(s, w, h);
-    SDL_Rect rect = { x-2, y-2, w+4, h+4 };
-    SDL_FillRect(screen->getSurface(), &rect, 
-            SDL_MapRGB(screen->getSurface()->format, 0, 0, 255));
-    font->draw(screen->getSurface(), x, y, 255,255,255, true, s);
-    screen->addRegionToUpdate(x-2, y-2, w+4, h+4);
-    
-    lastUpdate = time;
-}
-
-void Watch::save(std::ostream &stream)
-{
-    writeInt(stream, elapsed);
-}
-
-void Watch::reset()
-{
-    elapsed = lastUpdate = 0;
-    lastRun = SDL_GetTicks();
-}
-
 
 class PauseGameCommand: public Command
 {
@@ -360,38 +281,163 @@ class GameOptionsCommand: public Command
             gameArea->draw();
         };
 };
+*/
+
+impl GamePrivate {
+    pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
+        let (solved_puzzle, rules) = generate_puzzle()?;
+
+        let mut possibilities = Possibilities::new();
+        for rule in &rules {
+            if let Rule::Open(..) = *rule {
+                possibilities = apply(&possibilities, rule);
+            }
+        }
+
+        let mut vertical_rules = Vec::new();
+        let mut horizontal_rules = Vec::new();
+        for (index, rule) in rules.iter().enumerate() {
+            match *rule {
+                Rule::Under(..) => vertical_rules.push(VerticalRule {
+                    is_excluded: false,
+                    original_index: index
+                }),
+                Rule::Near(..) |
+                Rule::Between(..) |
+                Rule::Direction(..) => horizontal_rules.push(HorizontalRule {
+                    is_excluded: false,
+                    original_index: index
+                }),
+                _ => {}
+            }
+        }
+
+        Ok(Rc::new(RefCell::new(GamePrivate {
+            solved_puzzle,
+            rules,
+            possibilities,
+            valid: true,
+            win: false,
+            elapsed: Duration::new(0, 0),
+            started: None,
+            vertical_rules,
+            horizontal_rules,
+            show_excluded: false,
+        })))
+    }
+
+    pub fn is_valid(&self) -> bool {
+        self.possibilities.is_valid(&self.solved_puzzle)
+    }
+
+    pub fn start(&mut self) {
+        if self.started.is_none() {
+            self.started = Some(Instant::now());
+        }
+    }
+
+    pub fn stop(&mut self) {
+        if let Some(started_at) = self.started {
+            self.elapsed += Instant::now() - started_at;
+            self.started = None;
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.elapsed = Duration::new(0, 0);
+        self.started = Some(Instant::now());
+    }
+
+    pub fn get_current_duration(&self) -> Duration {
+        match self.started {
+            Some(started_at) => self.elapsed + (Instant::now() - started_at),
+            None => self.elapsed
+        }
+    }
+
+    pub fn toggle_show_excluded(&mut self) {
+        self.show_excluded = !self.show_excluded;
+    }
+
+    pub fn toggle_horizontal_rule(&mut self, index: usize) -> Option<bool> {
+        let rule = self.horizontal_rules.get_mut(index)?;
+        if self.show_excluded != rule.is_excluded {
+            return None;
+        }
+        rule.is_excluded = !rule.is_excluded;
+        Some(rule.is_excluded)
+    }
+
+    pub fn toggle_vertical_rule(&mut self, index: usize) -> Option<bool> {
+        let rule = self.vertical_rules.get_mut(index)?;
+        if self.show_excluded != rule.is_excluded {
+            return None;
+        }
+        rule.is_excluded = !rule.is_excluded;
+        Some(rule.is_excluded)
+    }
+}
+
+pub fn new_game_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()>> {
+    let screen_rect = Rect::new(0, 0, 800, 600);
+
+    let mut container = Container::new(screen_rect, ());
+
+    container.add(Box::new(Image::new(screen_rect, RAIN_TILE)?));
+    container.add(Box::new(Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?));
+    container.add(Box::new(Label {
+        font: title_font()?,
+        text: "Einstein Puzzle".to_string(), // i18n msg(L"einsteinPuzzle")
+        rect: Rect::new(20, 10, 500, 47),
+        color: Color::RGB(255, 255, 0),
+        horizontal_align: HorizontalAlign::Left,
+        vertical_align: VerticalAlign::Middle,
+        shadow: true
+    }));
+
+    container.add(Box::new(Watch::new(state.clone())));
+    container.add(Box::new(new_puzzle_widget(state.clone())?));
+    container.add(Box::new(HorizontalRules::new(state.clone())?));
+    container.add(Box::new(VerticalRules::new(state.clone())?));
+
+    let yellow = Color::RGB(255, 255, 0);
+    let button_bg = load_image(BUTTON_BG)?;
+    let highlighted_button_bg = adjust_brightness(&button_bg, 1.5, false);
+
+    container.add(Box::new(Button::new1(
+        Rect::new(226, 400, 94, 30), button_bg, highlighted_button_bg, yellow,
+        "Exit", // TODO i18n
+        Some(Key::Escape),
+        || Some(Effect::Terminate)
+    )));
+
+    container.add(Box::new({
+        let this_state = Rc::downgrade(&state);
+        Button::new1(
+            Rect::new(226, 440, 94, 30), button_bg, highlighted_button_bg, yellow,
+            "Help", // TODO i18n
+            Some(Key::Escape),
+            || {
+                let state = this_state.upgrade()?;
+                state.borrow_mut().stop();
+
+                let quit = show_description(screen).expect("No errors");
+                if quit {
+                    return Some(Effect::Quit);
+                }
+
+                state.borrow_mut().start();
+                Some(Effect::Redraw(vec![screen_rect]))
+            }
+        )
+    }));
+
+    Ok(container)
+}
 
 
-class HelpCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Watch *watch;
-        Widget *background;
-
-    public:
-        HelpCommand(Area *a, Watch *w, Widget *b) { 
-            gameArea = a;
-            watch = w;
-            background = b;
-        };
-        
-        virtual void doAction() {
-            watch->stop();
-            Area area(gameArea->screen);
-            area.add(background, false);
-            area.draw();
-            showDescription(&area);
-            gameArea->updateMouse();
-            gameArea->draw();
-            watch->start();
-        };
-};
-
-
-
+/*
 Game::Game(Screen *screen)
-    : screen(screen)
 {
     genPuzzle();
 
@@ -424,16 +470,6 @@ Game::Game(Screen *screen, std::istream &stream)
     hinted = true;
 }
 
-Game::~Game()
-{
-    delete watch;
-    ein_possibilities_free(possibilities);
-    delete verHints;
-    delete horHints;
-    delete puzzle;
-    deleteRules();
-}
-
 void Game::save(std::ostream &stream)
 {
     savePuzzle(solvedPuzzle, stream);
@@ -442,14 +478,6 @@ void Game::save(std::ostream &stream)
     verHints->save(stream);
     horHints->save(stream);
     watch->save(stream);
-}
-
-void Game::deleteRules()
-{
-    for (RulesArr::iterator i = rules.begin(); i != rules.end(); i++) {
-        ein_rule_free(*i);
-    }
-    rules.clear();
 }
 
 void Game::pleaseWait()
@@ -469,9 +497,6 @@ void Game::genPuzzle()
 {
     pleaseWait();
     
-    if (rules.size() > 0)
-        deleteRules();
-
     rules.resize(500);
     size_t rules_arr_size;
     ein_generate_puzzle(&solvedPuzzle, &rules[0], &rules_arr_size);
@@ -479,7 +504,7 @@ void Game::genPuzzle()
 
     savedSolvedPuzzle = ein_solved_puzzle_clone(solvedPuzzle);
     savedRules = rules;
-    
+
     hinted = false;
 }
 
@@ -517,25 +542,15 @@ void Game::restart()
     area.add(new Button(screen, x, y, 94, 30, &btnFont, 255,255,0, \
                 L"btn.bmp", msg(text), false, cmd));
 
-extern "C" int ein_game_run(SDL_Surface *surface_ptr, Config* config, TopScores *top_scores);
-
 void Game::run(Config* config, TopScores *top_scores)
 {
-    int quit = ein_game_run(screen->screen, config, top_scores);
-    if (quit) {
-        exit(0);
-    }
-/*
     Area area = Area(screen);
     Font btnFont(L"laudcn2.ttf", 14);
-    
-    area.setTimer(300, watch);
 
-    GameBackground *background = new GameBackground(screen);
-    area.add(background);
     WinCommand winCmd(&area, watch, this, config, top_scores);
     FailCommand failCmd(&area, this);
     puzzle->setCommands(&winCmd, &failCmd);
+
     area.add(puzzle, false);
     area.add(verHints, false);
     area.add(horHints, false);
@@ -557,5 +572,17 @@ void Game::run(Config* config, TopScores *top_scores)
 
     watch->start();
     area.run();
+}
 */
+
+#[no_mangle]
+pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *const Storage, sc: *mut Scores) -> ::libc::c_int {
+    let surface = ::sdl::video::Surface { raw: surface_ptr, owned: false };
+    let storage: &Storage = unsafe { & * st };
+    let scores: &mut Scores = unsafe { &mut * sc };
+
+    let game = GamePrivate::new().unwrap();
+    let game_widget = new_game_widget(game.clone()).unwrap();
+    game.borrow_mut().start();
+    main_loop(&surface, &game_widget).unwrap() as i32
 }

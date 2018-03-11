@@ -80,20 +80,6 @@ void VertHints::drawCell(int col, bool addToUpdate)
     int x = TILE_X + col * (TILE_WIDTH + TILE_GAP);
     int y = TILE_Y;
 
-    Rule *r = NULL;
-    if (col < (int)rules.size()) {
-        if (showExcluded)
-            r = excludedRules[col];
-        else
-            r = rules[col];
-    }
-    if (r) {
-        ein_rule_draw(r, screen->screen, x, y, highlighted == col);
-    } else {
-        screen->draw(x, y, iconSet.getEmptyHintIcon());
-        screen->draw(x, y + TILE_HEIGHT, iconSet.getEmptyHintIcon());
-    }
-    
     if (addToUpdate)
         screen->addRegionToUpdate(x, y, TILE_WIDTH, TILE_HEIGHT*2);
 }

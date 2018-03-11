@@ -15,6 +15,7 @@ use ui::main_loop::main_loop;
 use ui::background::BLUE_PATTERN;
 use locale::get_language;
 use storage::Scores;
+use util::time::sec_to_str;
 
 struct Messages {
     title: &'static str,
@@ -31,16 +32,10 @@ const MESSAGES_RU: Messages = Messages {
     ok: "OK",
 };
 
-fn sec_to_str(time: u32) -> String {
-    format!("{:02}:{:02}:{:02}", time / 3600, time / 60 % 60, time % 60)
-}
-
-type TopScores = Container<()>;
-
-fn create_topscores(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<TopScores> {
+fn create_topscores(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
     let rect = Rect::new(240, 125, 320, 350);
 
-    let mut container = TopScores::new(rect, ());
+    let mut container = Container::new(rect, ());
 
     let window = Window::new(rect.clone(), BLUE_PATTERN)?;
 

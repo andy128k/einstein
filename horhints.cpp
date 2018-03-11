@@ -83,24 +83,6 @@ void HorHints::drawCell(int col, int row, bool addToUpdate)
     int x = TILE_X + col * (TILE_WIDTH*3 + TILE_GAP_X);
     int y = TILE_Y + row * (TILE_HEIGHT + TILE_GAP_Y);
 
-    Rule *r = NULL;
-    int no = row * HINTS_COLS + col;
-    if (no < (int)rules.size()) {
-        if (showExcluded) {
-            r = excludedRules[no];
-        } else {
-            r = rules[no];
-        }
-    }
-
-    if (r) {
-        ein_rule_draw(r, screen->screen, x, y, highlighted == no);
-    } else {
-        for (int i = 0; i < 3; i++) {
-            screen->draw(x + TILE_HEIGHT*i, y, iconSet.getEmptyHintIcon());
-        }
-    }
-    
     if (addToUpdate) {
         screen->addRegionToUpdate(x, y, TILE_WIDTH*3, TILE_HEIGHT);
     }

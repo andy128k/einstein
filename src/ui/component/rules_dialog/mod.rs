@@ -158,10 +158,10 @@ struct DescriptionPrivate {
     current_page: Rc<RefCell<Rc<Page>>>
 }
 
-type Description = Container<Rc<RefCell<DescriptionPrivate>>>;
+type DescriptionPtr = Rc<RefCell<DescriptionPrivate>>;
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<Description> {
+    fn new(messages: &Messages, text: &[TextItem]) -> Result<Container<DescriptionPtr>> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
             .into_iter().map(Rc::new).collect();
 
@@ -176,7 +176,7 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         }));
 
-        let mut ptr = Description::new(rect, state.clone());
+        let mut ptr = Container::new(rect, state.clone());
 
         let window = Window::new(rect.clone(), BLUE_PATTERN)?;
 

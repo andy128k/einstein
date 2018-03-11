@@ -15,6 +15,7 @@ serde_derive = "*"
 toml = "*"
 regex = "*"
 lazy_static = "*"
+debug-cell = "0.1.0"
 
 [build-dependencies]
 cc = "*"
