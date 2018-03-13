@@ -158,7 +158,7 @@ struct DescriptionPrivate {
     current_page: Rc<RefCell<Rc<Page>>>
 }
 
-type Description = Container<DescriptionPrivate>;
+type Description = Container<Rc<RefCell<DescriptionPrivate>>>;
 
 impl DescriptionPrivate {
     fn new(messages: &Messages, text: &[TextItem]) -> Result<Description> {
@@ -168,12 +168,15 @@ impl DescriptionPrivate {
         let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
 
         let current_page = Rc::new(RefCell::new(pages[0].clone()));
-        let mut ptr = Description::new(rect, DescriptionPrivate {
+
+        let state = Rc::new(RefCell::new(DescriptionPrivate {
             rect,
             pages,
             current_page_index: Cell::new(0),
             current_page: current_page.clone()
-        });
+        }));
+
+        let mut ptr = Description::new(rect, state.clone());
 
         let window = Window::new(rect.clone(), BLUE_PATTERN)?;
 
@@ -190,7 +193,7 @@ impl DescriptionPrivate {
         let page_view = PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page);
 
         let prev = {
-            let this = ptr.weak_private();
+            let this = Rc::downgrade(&state);
             Button::new(Rect::new(110, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.prev,
                 None,
                 move || {
@@ -204,7 +207,7 @@ impl DescriptionPrivate {
         };
 
         let next = {
-            let this = ptr.weak_private();
+            let this = Rc::downgrade(&state);
             Button::new(Rect::new(200, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.next,
                 None,
                 move || {

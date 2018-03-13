@@ -9,7 +9,7 @@ use ui::widget::widget::*;
 pub struct Container<T> {
     rect: Rect,
     widgets: Vec<Box<Widget>>,
-    private: Rc<RefCell<T>>
+    private: T
 }
 
 impl<T> Container<T> {
@@ -17,16 +17,12 @@ impl<T> Container<T> {
         Self {
             rect,
             widgets: Vec::new(),
-            private: Rc::new(RefCell::new(private))
+            private
         }
     }
 
     pub fn add(&mut self, widget: Box<Widget>) {
         self.widgets.push(widget);
-    }
-
-    pub fn weak_private(&self) -> Weak<RefCell<T>> {
-        Rc::downgrade(&self.private)
     }
 }
 
