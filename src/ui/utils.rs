@@ -12,6 +12,14 @@ unsafe fn surface2_to_surface(surface: &sdl2::surface::Surface) -> Surface {
     Surface { raw: surface.raw() as * mut SDL_Surface, owned: false }
 }
 
+pub fn rect2_to_rect(rect: Rect) -> ::sdl::Rect {
+    ::sdl::Rect::new(rect.left() as i16, rect.top() as i16, rect.width() as u16, rect.height() as u16)
+}
+
+pub fn rect_to_rect2(rect: ::sdl::Rect) -> Rect {
+    Rect::new(rect.x as i32, rect.y as i32, rect.w as u32, rect.h as u32)
+}
+
 mod cpp {
     use libc::{c_int, c_double};
     use sdl::video::ll::SDL_Surface;
