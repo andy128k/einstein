@@ -378,7 +378,7 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()>> {
+pub fn new_game_widget<F: Fn() -> bool + 'static>(state: Rc<RefCell<GamePrivate>>, show_help: F) -> Result<Container<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let mut container = Container::new(screen_rect, ());
@@ -403,6 +403,8 @@ pub fn new_game_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()>>
     let yellow = Color::RGB(255, 255, 0);
     let button_bg = load_image(BUTTON_BG)?;
     let highlighted_button_bg = adjust_brightness(&button_bg, 1.5, false);
+    let button_bg2 = load_image(BUTTON_BG)?;
+    let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5, false);
 
     container.add(Box::new(Button::new1(
         Rect::new(226, 400, 94, 30), button_bg, highlighted_button_bg, yellow,
@@ -414,14 +416,14 @@ pub fn new_game_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()>>
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
         Button::new1(
-            Rect::new(226, 440, 94, 30), button_bg, highlighted_button_bg, yellow,
+            Rect::new(226, 440, 94, 30), button_bg2, highlighted_button_bg2, yellow,
             "Help", // TODO i18n
             Some(Key::Escape),
-            || {
+            move || {
                 let state = this_state.upgrade()?;
                 state.borrow_mut().stop();
 
-                let quit = show_description(screen).expect("No errors");
+                let quit = show_help();
                 if quit {
                     return Some(Effect::Quit);
                 }
@@ -578,11 +580,16 @@ void Game::run(Config* config, TopScores *top_scores)
 #[no_mangle]
 pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *const Storage, sc: *mut Scores) -> ::libc::c_int {
     let surface = ::sdl::video::Surface { raw: surface_ptr, owned: false };
+    let surface2 = ::sdl::video::Surface { raw: surface_ptr, owned: false };
     let storage: &Storage = unsafe { & * st };
     let scores: &mut Scores = unsafe { &mut * sc };
 
     let game = GamePrivate::new().unwrap();
-    let game_widget = new_game_widget(game.clone()).unwrap();
+    let game_widget = new_game_widget(game.clone(),
+        move || {
+            show_description(&surface2).expect("No errors")
+        }
+    ).unwrap();
     game.borrow_mut().start();
     main_loop(&surface, &game_widget).unwrap() as i32
 }
