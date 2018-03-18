@@ -27,6 +27,7 @@ use std::fs::create_dir_all;
 use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};
 use sdl::wm::set_caption;
+use sdl::event::{enable_key_repeat, RepeatDelay, RepeatInterval, enable_unicode};
 use sdl2::ttf::Sdl2TtfContext;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
@@ -269,6 +270,9 @@ fn real_main() -> Result<()> {
         return Err(err_msg(get_error()));
     }
     set_caption("Einstein 3.0", "");
+
+    ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Keu repeat is not set.");
+    enable_unicode(true);
 
     let app_context = AppContext {
         ttf: sdl2::ttf::init()?
