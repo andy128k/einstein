@@ -51,25 +51,6 @@ void GameBackground::draw()
 }
 
 
-class ToggleHintCommand: public Command
-{
-    private:
-        VertHints *verHints;
-        HorHints *horHints;
-
-    public:
-        ToggleHintCommand(VertHints *v, HorHints *h) {
-            verHints = v;
-            horHints = h;
-        };
-        
-        virtual void doAction() {
-            verHints->toggleExcluded();
-            horHints->toggleExcluded();
-        };
-};
-
-
 class Watch: public TimerHandler, public Widget
 {
     private:
@@ -308,36 +289,6 @@ class FailCommand: public Command
                 gameArea->updateMouse();
             } else
                 gameArea->finishEventLoop();
-        };
-};
-
-
-class SaveGameCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Watch *watch;
-        Widget *background;
-        Game *game;
-
-    public:
-        SaveGameCommand(Area *a, Watch *w, Widget *bg, Game *g) { 
-            gameArea = a; 
-            watch = w;
-            background = bg;
-            game = g;
-        };
-        
-        virtual void doAction() {
-            watch->stop();
-
-            Area area(gameArea->screen);
-            area.add(background, false);
-            saveGame(&area, game);
-            
-            gameArea->updateMouse();
-            gameArea->draw();
-            watch->start();
         };
 };
 

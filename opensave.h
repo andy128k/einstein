@@ -7,7 +7,6 @@
 
 
 
-bool saveGame(Area *parentArea, Game *game);
 Game* loadGame(Area *parentArea);
 
 

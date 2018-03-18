@@ -66,70 +66,6 @@ class OkCommand: public Command
 };
 
 
-extern "C" int ein_ask_game_name(SDL_Surface *surface, const char *default_name, char *name_ptr);
-
-
-class SaveCommand: public Command
-{
-    private:
-        SavedGame &savedGame;
-        Area *parentArea;
-        bool *saved;
-        Font *font;
-        std::wstring defaultName;
-        Game *game;
-
-    public:
-        SaveCommand(SavedGame &sg, Font *f, Area *area, bool *s,
-                const std::wstring &dflt, Game *g): savedGame(sg), defaultName(dflt) 
-        {
-            parentArea = area;
-            saved = s;
-            font = f;
-            game = g;
-        };
-        
-    public:
-        virtual void doAction() {
-            Screen *screen = parentArea->screen;
-
-            std::string default_name;
-            if (savedGame.isExists())
-                default_name = toMbcs(savedGame.getName());
-            else
-                default_name = toMbcs(defaultName);
-
-            char name[200];
-            switch (ein_ask_game_name(screen->screen, default_name.c_str(), name)) {
-                case 0:
-                    try {
-                        std::ofstream stream(toMbcs(savedGame.getFileName()).
-                            c_str(), std::ofstream::out | std::ofstream::binary);
-                        if (stream.fail())
-                            throw Exception(L"Error creating save file");
-                        writeString(stream, fromMbcs(name));
-                        game->save(stream);
-                        if (stream.fail())
-                            throw Exception(L"Error saving game");
-                        stream.close();
-                        *saved = true;
-                    } catch (...) { 
-                        showMessageWindow(screen, parentArea, L"redpattern.bmp", 300, 80, font,
-                                255,255,255, msg(L"saveError"));
-                    }
-                    parentArea->finishEventLoop();
-                    break;
-                case 1:
-                    parentArea->updateMouse();
-                    parentArea->draw();
-                    break;
-                default:
-                    exit(0);
-            }
-        };
-};
-
-
 static std::wstring getSavesPath()
 {
     std::wstring path(fromMbcs(getenv("HOME")) + std::wstring(L"/.einstein/save"));
@@ -166,36 +102,6 @@ static void showListWindow(SavesList &list, Command **commands,
     }
     
     area.run();
-}
-
-
-bool saveGame(Area *parentArea, Game *game)
-{
-    std::wstring path = getSavesPath();
-
-    Screen *screen = parentArea->screen;
-
-    Area area(screen);
-    area.add(parentArea, false);
-    Font font(L"laudcn2.ttf", 14);
-    bool saved = false;
-    
-    SavesList list;
-    Command **commands = new Command*[MAX_SLOTS];
-    for (int i = 0; i < MAX_SLOTS; i++) {
-        SavedGame sg(path + L"/" + toString(i) + L".sav");
-        list.push_back(sg);
-        commands[i] = new SaveCommand(*(--(list.end())), &font, 
-                &area, &saved, L"game " + toString(i+1), game);
-    }
-    
-    showListWindow(list, commands, msg(L"saveGame"), area, &font);
-
-    for (int i = 0; i < MAX_SLOTS; i++)
-        delete commands[i];
-    delete[] commands;
-   
-    return saved;
 }
 
 

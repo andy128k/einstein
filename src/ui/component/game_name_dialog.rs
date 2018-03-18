@@ -114,24 +114,3 @@ pub fn ask_game_name(surface: &Surface, default_name: &str) -> Result<DialogResu
         Ok(DialogResult::Cancel)
     }
 }
-
-
-#[no_mangle]
-pub extern fn ein_ask_game_name(surface_ptr: * mut sdl::video::ll::SDL_Surface, default_name_ptr: *const ::libc::c_char, name_ptr: *mut ::libc::c_char) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let default_name = unsafe {
-        let cstr = CStr::from_ptr(default_name_ptr);
-        cstr.to_str().unwrap().to_owned()
-    };
-    match ask_game_name(&surface, &default_name).unwrap() {
-        DialogResult::Ok(name) => {
-            unsafe {
-                memcpy(name_ptr as *mut ::libc::c_void, name.as_ptr() as *const ::libc::c_void, name.len());
-                *name_ptr.offset(name.len() as isize) = 0i8;
-            }
-            0
-        },
-        DialogResult::Cancel => 1,
-        DialogResult::Quit => 2,
-    }
-}
