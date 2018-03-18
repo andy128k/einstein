@@ -66,6 +66,8 @@ class OkCommand: public Command
 };
 
 
+extern "C" int ein_ask_game_name(SDL_Surface *surface, const char *default_name, char *name_ptr);
+
 
 class SaveCommand: public Command
 {
@@ -91,48 +93,38 @@ class SaveCommand: public Command
         virtual void doAction() {
             Screen *screen = parentArea->screen;
 
-            Area area(screen);
-            area.add(parentArea, false);
-            area.add(new Window(screen, 170, 280, 460, 100, L"blue.bmp"));
-            std::wstring name;
+            std::string default_name;
             if (savedGame.isExists())
-                name = savedGame.getName();
+                default_name = toMbcs(savedGame.getName());
             else
-                name = defaultName;
-            area.add(new Label(screen, font, 180, 300, 255,255,0, msg(L"enterGame")));
-            area.add(new InputField(screen, 340, 300, 280, 26, L"blue.bmp", name, 20,  
-                        255,255,0,  font));
-            ExitCommand exitCmd(area);
-            OkCommand okCmd(area, saved);
-            area.add(new Button(screen, 310, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
-                        msg(L"ok"), &okCmd));
-            area.add(new Button(screen, 400, 340, 80, 25, font, 255,255,0, L"blue.bmp", 
-                        msg(L"cancel"), &exitCmd));
-            area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
-            area.add(new KeyAccel(screen, SDLK_RETURN, &okCmd));
-            area.run();
+                default_name = toMbcs(defaultName);
 
-            if (*saved) {
-                *saved = false;
-                try {
-                    std::ofstream stream(toMbcs(savedGame.getFileName()).
-                        c_str(), std::ofstream::out | std::ofstream::binary);
-                    if (stream.fail())
-                        throw Exception(L"Error creating save file");
-                    writeString(stream, name);
-                    game->save(stream);
-                    if (stream.fail())
-                        throw Exception(L"Error saving game");
-                    stream.close();
-                    *saved = true;
-                } catch (...) { 
-                    showMessageWindow(screen, &area, L"redpattern.bmp", 300, 80, font,
-                            255,255,255, msg(L"saveError"));
-                }
-                parentArea->finishEventLoop();
-            } else {
-                parentArea->updateMouse();
-                parentArea->draw();
+            char name[200];
+            switch (ein_ask_game_name(screen->screen, default_name.c_str(), name)) {
+                case 0:
+                    try {
+                        std::ofstream stream(toMbcs(savedGame.getFileName()).
+                            c_str(), std::ofstream::out | std::ofstream::binary);
+                        if (stream.fail())
+                            throw Exception(L"Error creating save file");
+                        writeString(stream, fromMbcs(name));
+                        game->save(stream);
+                        if (stream.fail())
+                            throw Exception(L"Error saving game");
+                        stream.close();
+                        *saved = true;
+                    } catch (...) { 
+                        showMessageWindow(screen, parentArea, L"redpattern.bmp", 300, 80, font,
+                                255,255,255, msg(L"saveError"));
+                    }
+                    parentArea->finishEventLoop();
+                    break;
+                case 1:
+                    parentArea->updateMouse();
+                    parentArea->draw();
+                    break;
+                default:
+                    exit(0);
             }
         };
 };

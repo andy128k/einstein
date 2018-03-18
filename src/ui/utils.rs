@@ -126,6 +126,10 @@ pub fn draw_text(surface: &Surface,
     font: &Font, color: Color, shadow: bool,
     rect: Rect, horizontal_align: HorizontalAlign, vertical_align: VerticalAlign) -> Result<()>
 {
+    if text.is_empty() {
+        return Ok(());
+    }
+
     let (w, h) = font.size_of(text)?;
 
     let x = match horizontal_align {

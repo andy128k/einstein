@@ -9,7 +9,7 @@ use ui::widget::widget::*;
 pub struct Container<T> {
     rect: Rect,
     widgets: Vec<Box<Widget>>,
-    private: T
+    pub private: T
 }
 
 impl<T> Container<T> {

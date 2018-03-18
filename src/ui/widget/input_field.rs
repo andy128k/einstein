@@ -1,4 +1,5 @@
 use std::time::{Instant, Duration};
+use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use failure::err_msg;
 use sdl::event::{Key, Mouse};
@@ -10,19 +11,19 @@ use ui::utils::{tiled_image, draw_bevel, draw_text, HorizontalAlign, VerticalAli
 use ui::fonts::text_font;
 use error::*;
 
-struct InputField {
+pub struct InputField {
     rect: Rect,
     background: Surface,
     cursor: Surface,
     max_len: usize,
-    text: RefCell<String>,
+    text: Rc<RefCell<String>>,
     cursor_pos: Cell<usize>,
     last_cursor: Cell<Instant>,
     cursor_visible: Cell<bool>,
 }
 
 impl InputField {
-    pub fn new(rect: Rect, bg: &[u8], text: &str, max_len: usize) -> Result<Self> {
+    pub fn new(rect: Rect, bg: &[u8], text: Rc<RefCell<String>>, max_len: usize) -> Result<Self> {
         let cursor = Surface::new(&[SurfaceFlag::SWSurface], 2, rect.height() as isize - 4, 32, 0, 0, 0, 0).map_err(err_msg)?;
         cursor.fill(::sdl::video::Color::RGB(255, 255, 0));
 
@@ -35,13 +36,16 @@ impl InputField {
         win.unlock();
 
         let background = win.display_format().map_err(err_msg)?;
+
+        let text_len = text.borrow().len();
+
         Ok(Self {
             rect,
             background,
             cursor,
             max_len,
-            text: RefCell::new(text.to_string()),
-            cursor_pos: Cell::new(text.len()),
+            text,
+            cursor_pos: Cell::new(text_len),
             last_cursor: Cell::new(Instant::now()),
             cursor_visible: Cell::new(true),
         })
