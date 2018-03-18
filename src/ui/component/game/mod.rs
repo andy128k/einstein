@@ -78,24 +78,6 @@ const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
 const BUTTON_BG: &[u8] = include_bytes!("./btn.bmp");
 
 /*
-class ToggleHintCommand: public Command
-{
-    private:
-        VertHints *verHints;
-        HorHints *horHints;
-
-    public:
-        ToggleHintCommand(VertHints *v, HorHints *h) {
-            verHints = v;
-            horHints = h;
-        };
-        
-        virtual void doAction() {
-            verHints->toggleExcluded();
-            horHints->toggleExcluded();
-        };
-};
-
 class PauseGameCommand: public Command
 {
     private:
@@ -232,36 +214,6 @@ class FailCommand: public Command
                 gameArea->updateMouse();
             } else
                 gameArea->finishEventLoop();
-        };
-};
-
-
-class SaveGameCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Watch *watch;
-        Widget *background;
-        Game *game;
-
-    public:
-        SaveGameCommand(Area *a, Watch *w, Widget *bg, Game *g) { 
-            gameArea = a; 
-            watch = w;
-            background = bg;
-            game = g;
-        };
-        
-        virtual void doAction() {
-            watch->stop();
-
-            Area area(gameArea->screen);
-            area.add(background, false);
-            saveGame(&area, game);
-            
-            gameArea->updateMouse();
-            gameArea->draw();
-            watch->start();
         };
 };
 
@@ -414,6 +366,8 @@ where
     let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5, false);
     let button_bg3 = load_image(BUTTON_BG)?;
     let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5, false);
+    let button_bg4 = load_image(BUTTON_BG)?;
+    let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5, false);
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
@@ -431,6 +385,20 @@ where
                 }
 
                 state.borrow_mut().start();
+                Some(Effect::Redraw(vec![screen_rect]))
+            }
+        )
+    }));
+
+    container.add(Box::new({
+        let this_state = Rc::downgrade(&state);
+        Button::new1(
+            Rect::new(119, 400, 94, 30), button_bg4, highlighted_button_bg4, yellow,
+            "switch", // TODO i18n
+            None,
+            move || {
+                let state = this_state.upgrade()?;
+                state.borrow_mut().toggle_show_excluded();
                 Some(Effect::Redraw(vec![screen_rect]))
             }
         )
@@ -589,12 +557,6 @@ void Game::run(Config* config, TopScores *top_scores)
     
     PauseGameCommand pauseGameCmd(&area, watch, background);
     BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
-
-    ToggleHintCommand toggleHintsCmd(verHints, horHints);
-    BUTTON(screen, 119, 400, L"switch", &toggleHintsCmd)
-
-    SaveGameCommand saveCmd(&area, watch, background, this);
-    BUTTON(screen, 12, 440, L"save", &saveCmd)
 
     GameOptionsCommand optionsCmd(&area, config);
     BUTTON(screen, 119, 440, L"options", &optionsCmd)
