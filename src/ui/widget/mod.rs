@@ -4,5 +4,7 @@ pub mod label;
 pub mod button;
 pub mod any_key;
 pub mod input_field;
+pub mod checkbox;
+pub mod slider;
 pub mod page_view;
 pub mod container;
