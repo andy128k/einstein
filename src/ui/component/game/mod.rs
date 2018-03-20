@@ -23,6 +23,7 @@ use ui::component::puzzle::vertical_rules::VerticalRules;
 use ui::component::watch::Watch;
 use ui::component::rules_dialog::show_description;
 use ui::component::save_dialog::save_game;
+use ui::component::options_dialog::show_options_window;
 use error::*;
 use storage::*;
 
@@ -216,26 +217,6 @@ class FailCommand: public Command
                 gameArea->finishEventLoop();
         };
 };
-
-
-class GameOptionsCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Config *config;
-
-    public:
-        GameOptionsCommand(Area *a, Config *config) { 
-            gameArea = a; 
-            this->config = config;
-        };
-        
-        virtual void doAction() {
-            showOptionsWindow(gameArea, config);
-            gameArea->updateMouse();
-            gameArea->draw();
-        };
-};
 */
 
 impl GamePrivate {
@@ -333,9 +314,10 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget<FnHelp, FnSave>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, save: FnSave) -> Result<Container<()>>
+pub fn new_game_widget<FnHelp, FnOpts, FnSave>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave) -> Result<Container<()>>
 where
     FnHelp: Fn() -> bool + 'static,
+    FnOpts: Fn() -> bool + 'static,
     FnSave: Fn() -> bool + 'static
 {
     let screen_rect = Rect::new(0, 0, 800, 600);
@@ -368,6 +350,8 @@ where
     let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5, false);
     let button_bg4 = load_image(BUTTON_BG)?;
     let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5, false);
+    let button_bg5 = load_image(BUTTON_BG)?;
+    let highlighted_button_bg5 = adjust_brightness(&button_bg, 1.5, false);
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
@@ -422,6 +406,27 @@ where
                 state.borrow_mut().stop();
 
                 let quit = show_help();
+                if quit {
+                    return Some(Effect::Quit);
+                }
+
+                state.borrow_mut().start();
+                Some(Effect::Redraw(vec![screen_rect]))
+            }
+        )
+    }));
+
+    container.add(Box::new({
+        let this_state = Rc::downgrade(&state);
+        Button::new1(
+            Rect::new(119, 440, 94, 30), button_bg5, highlighted_button_bg5, yellow,
+            "Options", // TODO i18n
+            None,
+            move || {
+                let state = this_state.upgrade()?;
+                state.borrow_mut().stop();
+
+                let quit = show_options();
                 if quit {
                     return Some(Effect::Quit);
                 }
@@ -558,10 +563,6 @@ void Game::run(Config* config, TopScores *top_scores)
     PauseGameCommand pauseGameCmd(&area, watch, background);
     BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
 
-    GameOptionsCommand optionsCmd(&area, config);
-    BUTTON(screen, 119, 440, L"options", &optionsCmd)
-
-
     area.add(watch, false);
 
     watch->start();
@@ -580,6 +581,13 @@ pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut S
             let surface2 = surface.clone();
             move || {
                 show_description(&surface2).expect("No errors")
+            }
+        },
+        {
+            let surface2 = surface.clone();
+            move || {
+                let storage: &mut Storage = unsafe { &mut * st }; // HACK
+                show_options_window(&*surface2, storage).expect("No errors")
             }
         },
         {

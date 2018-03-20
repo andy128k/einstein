@@ -93,12 +93,9 @@ fn new_options_dialog(storage: &Storage) -> Result<Container<Rc<Options>>> {
     Ok(container)
 }
 
-#[no_mangle]
-pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *mut ::libc::c_void) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let storage: &mut Storage = unsafe { &mut * (storage_ptr as *mut Storage) };
-    let container = new_options_dialog(storage).unwrap();
-    let quit = main_loop(&surface, &container).unwrap();
+pub fn show_options_window(surface: &Surface, storage: &mut Storage) -> Result<bool> {
+    let container = new_options_dialog(storage)?;
+    let quit = main_loop(&surface, &container)?;
     if container.private.ok.get() {
         storage.fullscreen = container.private.fullscreen.get();
         storage.volume = (container.private.volume.get() * 100f32) as u32;
@@ -106,5 +103,12 @@ pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, s
         // screen->setMode(VideoMode(800, 600, 24, container.private.fullscreen.get()));
         // sound->setVolume(container.private.volume.get());
     }
-    quit as i32
+    Ok(quit)
+}
+
+#[no_mangle]
+pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *mut ::libc::c_void) -> ::libc::c_int {
+    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
+    let storage: &mut Storage = unsafe { &mut * (storage_ptr as *mut Storage) };
+    show_options_window(&surface, storage).unwrap() as i32
 }
