@@ -207,64 +207,6 @@ class Label: public Widget
 };
 
 
-class InputField: public Window, public TimerHandler
-{
-    private:
-        std::wstring &text;
-        int maxLength;
-        int cursorPos;
-        int red, green, blue;
-        Font *font;
-        Uint32 lastCursor;
-        bool cursorVisible;
-        char lastChar;
-        Uint32 lastKeyUpdate;
-    
-    public:
-        InputField(Screen *screen, int x, int y, int w, int h, const std::wstring &background, 
-                std::wstring &name, int maxLength, int r, int g, int b, Font *font);
-        ~InputField();
-        
-    public:
-        virtual void draw();
-        virtual void setParent(Area *a);
-        virtual void onTimer();
-        virtual bool onKeyDown(SDLKey key, unsigned char ch);
-        virtual bool onKeyUp(SDLKey key);
-        virtual void onCharTyped(unsigned char ch);
-
-    private:
-        void moveCursor(int pos);
-};
-
-
-class Checkbox: public Widget
-{
-    protected:
-        int left, top, width, height;
-        SDL_Surface *image, *highlighted;
-        SDL_Surface *checkedImage, *checkedHighlighted;
-        bool &checked;
-        bool mouseInside;
-        
-    public:
-        Checkbox(Screen *screen, int x, int y, int width, int height, Font *font, 
-                int r, int g, int b, const std::wstring &background,
-                bool &checked);
-        virtual ~Checkbox();
-
-    public:
-        virtual void draw();
-        void getBounds(int &left, int &top, int &width, int &height);
-        int getLeft() const { return left; };
-        int getTop() const { return top; };
-        int getWidth() const { return width; };
-        int getHeight() const { return height; };
-        virtual bool onMouseButtonDown(int button, int x, int y);
-        virtual bool onMouseMove(int x, int y);
-        void moveTo(int x, int y) { left = x; top = y; };
-};
-
 class Picture: public Widget
 {
     protected:
@@ -290,36 +232,5 @@ class Picture: public Widget
         int getHeight() const { return height; };
         
 };
-
-
-class Slider: public Widget
-{
-    private:
-        int left, top, width, height;
-        float &value;
-        SDL_Surface *background;
-        SDL_Surface *slider;
-        SDL_Surface *activeSlider;
-        bool highlight;
-        bool dragging;
-        int dragOffsetX;
-
-    public:
-        Slider(Screen *screen, int x, int y, int width, int height, float &value);
-        virtual ~Slider();
-
-    public:
-        virtual void draw();
-        virtual bool onMouseButtonDown(int button, int x, int y);
-        virtual bool onMouseButtonUp(int button, int x, int y);
-        virtual bool onMouseMove(int x, int y);
-
-    private:
-        void createBackground();
-        void createSlider(int size);
-        int valueToX(float value);
-        float xToValue(int pos);
-};
-
 
 #endif
