@@ -6,6 +6,7 @@ use error::*;
 static mut TITLE_FONT: Option<Font<'static, 'static>> = None;
 static mut BUTTON_FONT: Option<Font<'static, 'static>> = None;
 static mut TEXT_FONT: Option<Font<'static, 'static>> = None;
+static mut MENU_FONT: Option<Font<'static, 'static>> = None;
 
 const FONT_DUMP: &[u8] = include_bytes!("../../res/nova.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
@@ -20,6 +21,7 @@ pub fn init_fonts(context: &'static Sdl2TtfContext) -> Result<()> {
         TITLE_FONT = Some(load_font(context, 26)?);
         BUTTON_FONT = Some(load_font(context, 14)?);
         TEXT_FONT = Some(load_font(context, 16)?);
+        MENU_FONT = Some(load_font(context, 20)?);
     }
     Ok(())
 }
@@ -34,4 +36,8 @@ pub fn button_font() -> Result<&'static Font<'static, 'static>> {
 
 pub fn text_font() -> Result<&'static Font<'static, 'static>> {
     unsafe { TEXT_FONT.as_ref().ok_or_else(|| err_msg("Text font is not loaded.")) }
+}
+
+pub fn menu_font() -> Result<&'static Font<'static, 'static>> {
+    unsafe { MENU_FONT.as_ref().ok_or_else(|| err_msg("Menu font is not loaded.")) }
 }

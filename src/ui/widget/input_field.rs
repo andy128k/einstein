@@ -1,6 +1,7 @@
 use std::time::{Instant, Duration};
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell};
+use debug_cell::RefCell;
 use failure::err_msg;
 use sdl::event::{Key, Mouse};
 use sdl::video::{Surface, SurfaceFlag};

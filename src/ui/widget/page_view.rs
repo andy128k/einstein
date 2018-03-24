@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use std::cell::RefCell;
+use debug_cell::RefCell;
 use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;

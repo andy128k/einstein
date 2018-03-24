@@ -1,11 +1,7 @@
 #include <vector>
 #include "utils.h"
 #include "widgets.h"
-#include "topscores.h"
-#include "opensave.h"
-#include "game.h"
 #include "descr.h"
-#include "options.h"
 #include "messages.h"
 #include "config.h"
 
@@ -35,23 +31,26 @@ void MenuBackground::draw()
     screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
 }
 
-
+extern "C" int ein_game_run(SDL_Surface *surface_ptr, Config* config);
+extern "C" int ein_game_load(SDL_Surface *surface_ptr, Config* config);
 
 class NewGameCommand: public Command
 {
     private:
         Area *area;
         Config *config;
-        TopScores* top_scores;
     
     public:
-        NewGameCommand(Area *a, Config *config, TopScores* top_scores) { area = a; this->config = config; this->top_scores = top_scores; };
+        NewGameCommand(Area *a, Config *config) { area = a; this->config = config; };
 
         virtual void doAction() {
             Screen *screen = area->screen;
 
-            Game game(screen);
-            game.run(config, top_scores);
+            int quit = ein_game_run(screen->screen, config);
+            if (quit) {
+                exit(0);
+            }
+
             area->updateMouse();
             area->draw();
         };
@@ -63,16 +62,15 @@ class LoadGameCommand: public Command
     private:
         Area *area;
         Config *config;
-        TopScores* top_scores;
     
     public:
-        LoadGameCommand(Area *a, Config *config, TopScores* top_scores) { area = a; this->config = config; this->top_scores = top_scores; };
+        LoadGameCommand(Area *a, Config *config) { area = a; this->config = config; };
 
         virtual void doAction() {
-            Game *game = loadGame(area);
-            if (game) {
-                game->run(config, top_scores);
-                delete game;
+            Screen *screen = area->screen;
+            int quit = ein_game_load(screen->screen, config);
+            if (quit) {
+                exit(0);
             }
             area->updateMouse();
             area->draw();
@@ -80,18 +78,23 @@ class LoadGameCommand: public Command
 };
 
 
+extern "C" int ein_show_scores(SDL_Surface *surface, Config *config);
 
 class TopScoresCommand: public Command
 {
     private:
         Area *area;
-        TopScores* top_scores;
+        Config *config;
     
     public:
-        TopScoresCommand(Area *a, TopScores* top_scores) { area = a; this->top_scores = top_scores; };
+        TopScoresCommand(Area *a, Config *config) { area = a; this->config = config; };
 
         virtual void doAction() {
-            showScoresWindow(area, top_scores);
+            int quit = ein_show_scores(area->screen->screen, config);
+            if (quit) {
+                exit(0);
+            }
+
             area->updateMouse();
             area->draw();
         };
@@ -113,6 +116,7 @@ class RulesCommand: public Command
         };
 };
 
+extern "C" int ein_show_options_window(SDL_Surface*, Config*);
 
 class OptionsCommand: public Command
 {
@@ -124,7 +128,11 @@ class OptionsCommand: public Command
         OptionsCommand(Area *a, Config *config) { area = a; this->config = config; };
 
         virtual void doAction() {
-            showOptionsWindow(area, config);
+            int quit = ein_show_options_window(area->screen->screen, config);
+            if (quit) {
+                exit(0);
+            }
+
             area->updateMouse();
             area->draw();
         };
@@ -178,7 +186,7 @@ static Button* menuButton(Screen *screen, int y, Font *font, const std::wstring 
 }
 
 
-void menu(Screen *screen, Config *config, TopScores* top_scores)
+void menu(Screen *screen, Config *config)
 {
     Area area(screen);
     Font font(L"laudcn2.ttf", 20);
@@ -186,11 +194,11 @@ void menu(Screen *screen, Config *config, TopScores* top_scores)
     area.add(new MenuBackground(screen));
     area.draw();
         
-    NewGameCommand newGameCmd(&area, config, top_scores);
+    NewGameCommand newGameCmd(&area, config);
     area.add(menuButton(screen, 340, &font, msg(L"newGame"), &newGameCmd));
-    LoadGameCommand loadGameCmd(&area, config, top_scores);
+    LoadGameCommand loadGameCmd(&area, config);
     area.add(menuButton(screen, 370, &font, msg(L"loadGame"), &loadGameCmd));
-    TopScoresCommand topScoresCmd(&area, top_scores);
+    TopScoresCommand topScoresCmd(&area, config);
     area.add(menuButton(screen, 400, &font, msg(L"topScores"), &topScoresCmd));
     RulesCommand rulesCmd(&area);
     area.add(menuButton(screen, 430, &font, msg(L"rules"), &rulesCmd));

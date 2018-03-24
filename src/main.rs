@@ -20,6 +20,8 @@ pub mod puzzle_gen;
 pub mod ui;
 pub mod storage;
 
+use std::rc::Rc;
+use debug_cell::RefCell;
 use std::ffi::{CStr, CString};
 use std::ptr::null;
 use std::mem::transmute;
@@ -37,7 +39,7 @@ use puzzle_gen::generate_puzzle;
 extern "C" {
     fn loadResources() -> ::libc::c_void;
     fn initAudio(volume: ::libc::c_int) -> ::libc::c_void;
-    fn mainpp(fullscreen: ::libc::c_int, config: *const ::libc::c_void, top_scores: *const ::libc::c_void) -> *const ::libc::c_void;
+    fn mainpp(fullscreen: ::libc::c_int, config: *const ::libc::c_void) -> *const ::libc::c_void;
 }
 
 #[no_mangle]
@@ -158,76 +160,6 @@ pub extern fn ein_possibilities_free(p: * const Possibilities) {
 }
 
 #[no_mangle]
-pub extern fn ein_config_get_last_name(c: *const ::libc::c_void) -> * const ::libc::c_char {
-    let s: &storage::Storage = unsafe { &* (c as *const storage::Storage) };
-    match s.last_name {
-        Some(ref n) => {
-            let nn = n.clone();
-            let c_str = CString::new(nn).unwrap();
-            c_str.into_raw()
-        },
-        _ => null()
-    }
-}
-
-#[no_mangle]
-pub extern fn ein_config_set_last_name(c: *mut ::libc::c_void, l: * const ::libc::c_char) {
-    let s: &mut storage::Storage = unsafe { &mut * (c as *mut storage::Storage) };
-    s.last_name = if l.is_null() {
-        None
-    } else {
-        unsafe {
-            let cstr = CStr::from_ptr(l);
-            Some(cstr.to_str().unwrap().to_owned())
-        }
-    };
-}
-
-#[no_mangle]
-pub extern fn ein_config_get_fullscreen(c: *const ::libc::c_void) -> ::libc::c_int {
-    let s: &storage::Storage = unsafe { &* (c as *const storage::Storage) };
-    s.fullscreen as ::libc::c_int
-}
-
-#[no_mangle]
-pub extern fn ein_config_set_fullscreen(c: *mut ::libc::c_void, l: ::libc::c_int) {
-    let s: &mut storage::Storage = unsafe { &mut * (c as *mut storage::Storage) };
-    s.fullscreen = l != 0;
-}
-
-#[no_mangle]
-pub extern fn ein_config_get_volume(c: *const ::libc::c_void) -> ::libc::c_int {
-    let s: &storage::Storage = unsafe { &* (c as *const storage::Storage) };
-    s.volume as ::libc::c_int
-}
-
-#[no_mangle]
-pub extern fn ein_config_set_volume(c: *mut ::libc::c_void, l: ::libc::c_int) {
-    let s: &mut storage::Storage = unsafe { &mut * (c as *mut storage::Storage) };
-    s.volume = l as u32;
-}
-
-#[no_mangle]
-pub extern fn ein_topscores_is_deserving(c: *const ::libc::c_void, ch: ::libc::c_int) -> ::libc::c_int {
-    let s: &storage::Scores = unsafe { &* (c as *const storage::Scores) };
-    s.is_deserving(ch as u32) as ::libc::c_int
-}
-
-#[no_mangle]
-pub extern fn ein_topscores_add(c: *mut ::libc::c_void, l: * const ::libc::c_char, ch: ::libc::c_int) -> ::libc::c_int {
-    let s: &mut storage::Scores = unsafe { &mut * (c as *mut storage::Scores) };
-    let name: String = if l.is_null() {
-        String::new()
-    } else {
-        unsafe {
-            let cstr = CStr::from_ptr(l);
-            cstr.to_str().unwrap().to_owned()
-        }
-    };
-    s.add_score_entry(storage::Score { name, score: ch as u32 }).map(|c| c as i32).unwrap_or(-1)
-}
-
-#[no_mangle]
 pub extern fn ein_get_language() -> *const ::libc::c_char {
     let language = locale::get_language().unwrap_or_default();
     let c_str = CString::new(language).unwrap();
@@ -242,7 +174,8 @@ fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
     create_dir_all(home.join(".einstein"))?;
 
-    let mut state = storage::Storage::load().unwrap_or_default();
+    let state = Rc::new(RefCell::new(storage::Storage::load().unwrap_or_default()));
+    let state_box = Box::new(state.clone());
 
     unsafe {
         loadResources();
@@ -264,14 +197,17 @@ fn real_main() -> Result<()> {
         ui::fonts::init_fonts(::std::mem::transmute(&app_context.ttf))?;
     }
 
+    let fullscreen = state.borrow().fullscreen;
+    let volume = state.borrow().volume;
+
     unsafe {
-        initAudio(state.volume as i32);
-        mainpp(state.fullscreen as i32, transmute(&state), transmute(&state.scores));
+        initAudio(volume as i32);
+        mainpp(fullscreen as i32, transmute(&state_box));
     }
 
     quit();
 
-    state.save()?;
+    // state.borrow_mut().save()?;
 
     Ok(())
 }

@@ -1,5 +1,6 @@
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell};
+use debug_cell::RefCell;
 use std::ffi::{CStr, CString};
 use libc::memcpy;
 use sdl;
@@ -112,26 +113,5 @@ fn ask_player_name(surface: &Surface, default_name: &str) -> Result<DialogResult
         Ok(DialogResult::Ok(name))
     } else {
         Ok(DialogResult::Ok(default_name.to_string()))
-    }
-}
-
-
-#[no_mangle]
-pub extern fn ein_ask_player_name(surface_ptr: * mut sdl::video::ll::SDL_Surface, default_name_ptr: *const ::libc::c_char, name_ptr: *mut ::libc::c_char) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let default_name = unsafe {
-        let cstr = CStr::from_ptr(default_name_ptr);
-        cstr.to_str().unwrap().to_owned()
-    };
-    match ask_player_name(&surface, &default_name).unwrap() {
-        DialogResult::Ok(name) => {
-            unsafe {
-                memcpy(name_ptr as *mut ::libc::c_void, name.as_ptr() as *const ::libc::c_void, name.len());
-                *name_ptr.offset(name.len() as isize) = 0i8;
-            }
-            0
-        },
-        DialogResult::Cancel => 2,
-        DialogResult::Quit => 2,
     }
 }

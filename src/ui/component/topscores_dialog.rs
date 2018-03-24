@@ -1,3 +1,5 @@
+use std::rc::Rc;
+use debug_cell::RefCell;
 use sdl;
 use sdl::video::{Surface};
 use sdl::event::{Key};
@@ -14,7 +16,7 @@ use ui::fonts::*;
 use ui::main_loop::main_loop;
 use ui::background::BLUE_PATTERN;
 use locale::get_language;
-use storage::Scores;
+use storage::{Storage, Scores};
 use util::time::sec_to_str;
 
 struct Messages {
@@ -114,9 +116,8 @@ pub fn show_scores(surface: &Surface, scores: &Scores, highlight: Option<usize>)
 }
 
 #[no_mangle]
-pub extern fn ein_show_scores(surface_ptr: * mut sdl::video::ll::SDL_Surface, scores_ptr: *const ::libc::c_void, highlight: ::libc::c_int) -> ::libc::c_int {
+pub extern fn ein_show_scores(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
     let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let scores: &Scores = unsafe { &* (scores_ptr as *const Scores) };
-    let highlight_opt = if highlight < 0 { None } else { Some(highlight as usize) };
-    show_scores(&surface, scores, highlight_opt).unwrap() as i32
+    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
+    show_scores(&surface, &storage.borrow().scores, None).unwrap() as i32
 }

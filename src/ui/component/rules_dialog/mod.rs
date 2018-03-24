@@ -1,5 +1,6 @@
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell};
+use debug_cell::RefCell;
 use sdl;
 use sdl::video::{Surface};
 use sdl::event::Key;

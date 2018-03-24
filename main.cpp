@@ -7,11 +7,10 @@
 #include "unicode.h"
 #include "messages.h"
 #include "sound.h"
-#include "topscores.h"
 #include "config.h"
 #include "resources.h"
 
-void menu(Screen *screen, Config *config, TopScores* top_scores);
+void menu(Screen *screen, Config *config);
 
 extern "C" void initAudio(int volume)
 {
@@ -32,8 +31,8 @@ extern "C" void loadResources()
     msg.load();
 }
 
-extern "C" void mainpp(int fullscreen, Config *config, TopScores* top_scores)
+extern "C" void mainpp(int fullscreen, Config *config)
 {
     Screen screen(fullscreen);
-    menu(&screen, config, top_scores);
+    menu(&screen, config);
 }

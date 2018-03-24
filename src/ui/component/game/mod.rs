@@ -109,19 +109,30 @@ class WinCommand: public Command
             int score = watch->getElapsed() / 1000;
             int pos = -1;
             if (! game->isHinted()) {
-                if (ein_topscores_is_deserving(top_scores, score)) {
+                if (storage.scores.is_deserving(score)) {
                     const char* lastname = ein_config_get_last_name(config);
                     if (lastname == NULL) {
                         lastname = "anonymous";
                     }
                     auto wlastname = fromUtf8(lastname);
-                    std::string name = toUtf8(enterNameDialog(gameArea, wlastname));
 
-                    ein_config_set_last_name(config, name.c_str());
-                    pos = ein_topscores_add(top_scores, name.c_str(), score);
+                    match ask_player_name(&surface, &last_name).unwrap() {
+                        DialogResult::Ok(name) => {
+                            storage.last_name = Some(name);
+                            pos = storage.scores.add_score_entry(storage::Score { name, score });
+                        },
+                        DialogResult::Cancel => {},
+                        DialogResult::Quit =>
+                            exit(0),
+                    }
                 }
             }
-            showScoresWindow(gameArea, top_scores, pos);
+
+            let quit = show_scores(&surface, scores, pos)?;
+            if quit {
+                exit(0);
+            }
+
             gameArea->finishEventLoop();
         };
 };
@@ -555,12 +566,7 @@ void Game::run(Config* config, TopScores *top_scores)
 }
 */
 
-#[no_mangle]
-pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut Storage, sc: *mut Scores) -> ::libc::c_int {
-    let surface = Rc::new( ::sdl::video::Surface { raw: surface_ptr, owned: false } );
-    let scores: &mut Scores = unsafe { &mut * sc };
-
-    let game = GamePrivate::new().unwrap();
+pub fn game_run(surface: Rc<Surface>, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
     let game_widget = new_game_widget(game.clone(),
         {
             let surface2 = surface.clone();
@@ -570,17 +576,17 @@ pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut S
         },
         {
             let surface2 = surface.clone();
+            let storage2 = storage.clone();
             move || {
-                let storage: &mut Storage = unsafe { &mut * st }; // HACK
-                show_options_window(&*surface2, storage).expect("No errors")
+                show_options_window(&*surface2, &mut storage2.borrow_mut()).expect("No errors")
             }
         },
         {
             let surface2 = surface.clone();
+            let storage2 = storage.clone();
             let game2 = game.clone();
             move || {
-                let storage: &mut Storage = unsafe { &mut * st }; // HACK
-                save_game(surface2.clone(), storage, &game2.borrow()).expect("No errors");
+                save_game(surface2.clone(), &mut storage2.borrow_mut(), &game2.borrow()).expect("No errors");
                 false
             }
         },
@@ -590,7 +596,15 @@ pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut S
                 pause(&*surface2).expect("No errors")
             }
         }
-    ).unwrap();
+    )?;
     game.borrow_mut().start();
-    main_loop(&surface, &game_widget).unwrap() as i32
+    main_loop(&surface, &game_widget)
+}
+
+#[no_mangle]
+pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
+    let surface = Rc::new( ::sdl::video::Surface { raw: surface_ptr, owned: false } );
+    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
+    let game = GamePrivate::new().unwrap();
+    game_run(surface, game, storage.clone()).unwrap() as i32
 }

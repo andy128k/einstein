@@ -1,5 +1,6 @@
 use std::rc::Rc;
-use std::cell::{RefCell, Cell};
+use std::cell::{Cell};
+use debug_cell::RefCell;
 use sdl;
 use sdl::video::{Surface};
 use sdl::event::{Key};
@@ -107,8 +108,8 @@ pub fn show_options_window(surface: &Surface, storage: &mut Storage) -> Result<b
 }
 
 #[no_mangle]
-pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *mut ::libc::c_void) -> ::libc::c_int {
+pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
     let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let storage: &mut Storage = unsafe { &mut * (storage_ptr as *mut Storage) };
-    show_options_window(&surface, storage).unwrap() as i32
+    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
+    show_options_window(&surface, &mut storage.borrow_mut()).unwrap() as i32
 }
