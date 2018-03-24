@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_main.h>
 #include "exceptions.h"
+#include "screen.h"
 #include "utils.h"
 #include "unicode.h"
 #include "messages.h"

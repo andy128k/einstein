@@ -99,21 +99,6 @@ int gettimeofday(struct timeval* tp)
 #endif
 }
 
-void drawWallpaper(Screen *screen, const std::wstring &name)
-{
-    SDL_Surface *tile = loadImage(name);
-    SDL_Rect src = { 0, 0, tile->w, tile->h };
-    SDL_Rect dst = { 0, 0, tile->w, tile->h };
-    for (int y = 0; y < screen->getHeight(); y += tile->h)
-        for (int x = 0; x < screen->getWidth(); x += tile->w) {
-            dst.x = x;
-            dst.y = y;
-            SDL_BlitSurface(tile, &src, screen->getSurface(), &dst);
-        }
-    SDL_FreeSurface(tile);
-}
-
-
 void setPixel(SDL_Surface *s, int x, int y, int r, int g, int b)
 {
     int bpp = s->format->BytesPerPixel;
@@ -224,44 +209,6 @@ SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent)
 }
 
 
-class CenteredBitmap: public Widget
-{
-    private:
-        SDL_Surface *tile;
-        int x, y;
-        
-    public:
-        CenteredBitmap(Screen *screen, const std::wstring &fileName)
-            : Widget(screen)
-        {
-            tile = loadImage(fileName);
-            x = (screen->getWidth() - tile->w) / 2;
-            y = (screen->getHeight() - tile->h) / 2;
-        };
-
-        virtual ~CenteredBitmap() {
-            SDL_FreeSurface(tile);
-        };
-
-        virtual void draw() {
-            screen->draw(x, y, tile);
-            screen->addRegionToUpdate(x, y, tile->w, tile->h);
-        };
-};
-
-
-void showWindow(Screen *screen, Area *parentArea, const std::wstring &fileName)
-{
-    Area area = Area(screen);
-
-    area.add(parentArea);
-    area.add(new CenteredBitmap(screen, fileName));
-    area.add(new AnyKeyAccel(screen));
-    area.run();
-    sound->play(L"click.wav");
-}
-
-
 bool isInRect(int evX, int evY, int x, int y, int w, int h)
 {
     return ((evX >= x) && (evX < x + w) && (evY >= y) && (evY < y + h));
@@ -282,25 +229,6 @@ std::wstring secToStr(int time)
 #endif
 
     return buf;
-}
-
-
-void showMessageWindow(Screen *screen, Area *parentArea, const std::wstring &pattern, 
-        int width, int height, Font *font, int r, int g, int b,
-        const std::wstring &msg)
-{
-    Area area = Area(screen);
-
-    int x = (screen->getWidth() - width) / 2;
-    int y = (screen->getHeight() - height) / 2;
-    
-    area.add(parentArea);
-    area.add(new Window(screen, x, y, width, height, pattern, 6));
-    area.add(new Label(screen, font, x, y, width, height, Label::ALIGN_CENTER,
-                Label::ALIGN_MIDDLE, r, g, b, msg));
-    area.add(new AnyKeyAccel(screen));
-    area.run();
-    sound->play(L"click.wav");
 }
 
 

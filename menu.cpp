@@ -1,6 +1,6 @@
 #include <vector>
-#include "utils.h"
 #include "widgets.h"
+#include "utils.h"
 #include "messages.h"
 #include "config.h"
 
