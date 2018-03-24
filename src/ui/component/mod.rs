@@ -13,3 +13,4 @@ pub mod puzzle;
 pub mod background;
 pub mod game;
 pub mod menu;
+pub mod about_dialog;

@@ -139,6 +139,9 @@ class OptionsCommand: public Command
 };
 
 
+extern "C" int ein_show_about(SDL_Surface *surface);
+
+
 class AboutCommand: public Command
 {
     private:
@@ -150,28 +153,10 @@ class AboutCommand: public Command
         virtual void doAction() {
             Screen *screen = parentArea->screen;
 
-            Area area(screen);
-            Font titleFont(L"nova.ttf", 26);
-            Font font(L"laudcn2.ttf", 14);
-            Font urlFont(L"luximb.ttf", 16);
-
-#define LABEL(pos, c, f, text) area.add(new Label(screen, &f, 220, pos, 360, 20, \
-            Label::ALIGN_CENTER, Label::ALIGN_MIDDLE, 255,255,c, text));
-            area.add(parentArea);
-            area.add(new Window(screen, 220, 160, 360, 280, L"blue.bmp"));
-            area.add(new Label(screen, &titleFont, 250, 165, 300, 40, Label::ALIGN_CENTER,
-                        Label::ALIGN_MIDDLE, 255,255,0, msg(L"about")));
-            LABEL(240, 255, font, msg(L"einsteinPuzzle"))
-            LABEL(260, 255, font, msg(L"version"))
-            LABEL(280, 255, font, msg(L"copyright"))
-            LABEL(330, 0, urlFont, L"http://games.flowix.com")
-#undef LABEL
-            ExitCommand exitCmd(area);
-            area.add(new Button(screen, 360, 400, 80, 25, &font, 255,255,0, L"blue.bmp", 
-                        msg(L"ok"), &exitCmd));
-            area.add(new KeyAccel(screen, SDLK_ESCAPE, &exitCmd));
-            area.add(new KeyAccel(screen, SDLK_RETURN, &exitCmd));
-            area.run();
+            int quit = ein_show_about(screen->screen);
+            if (quit) {
+                exit(0);
+            }
 
             parentArea->updateMouse();
             parentArea->draw();
