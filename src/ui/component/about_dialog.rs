@@ -119,9 +119,3 @@ pub fn show_about(surface: &Surface) -> Result<bool> {
     let about = create_about(messages)?;
     main_loop(surface, &about)
 }
-
-#[no_mangle]
-pub extern fn ein_show_about(surface_ptr: * mut sdl::video::ll::SDL_Surface) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    show_about(&surface).unwrap() as i32
-}

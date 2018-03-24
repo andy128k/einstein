@@ -40,6 +40,10 @@ extern "C" {
     fn loadResources() -> ::libc::c_void;
     fn initAudio(volume: ::libc::c_int) -> ::libc::c_void;
     fn mainpp(fullscreen: ::libc::c_int, config: *const ::libc::c_void) -> *const ::libc::c_void;
+
+// extern "C" Screen *new_screen(int fullscreen) {
+// extern "C" void delete_screen(Screen *screen) {
+
 }
 
 #[no_mangle]

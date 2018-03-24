@@ -20,7 +20,6 @@ fn main() {
         .file("resources.cpp")
         .file("utils.cpp")
         .file("widgets.cpp")
-        .file("menu.cpp")
         .file("font.cpp")
         .file("messages.cpp")
         .file("formatter.cpp")

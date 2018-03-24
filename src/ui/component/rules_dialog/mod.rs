@@ -266,9 +266,3 @@ pub fn show_description(surface: &Surface) -> Result<bool> {
     let description = DescriptionPrivate::new(messages, rules)?;
     main_loop(surface, &description)
 }
-
-#[no_mangle]
-pub extern fn ein_show_description(surface_ptr: * mut sdl::video::ll::SDL_Surface) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    show_description(&surface).unwrap() as i32
-}

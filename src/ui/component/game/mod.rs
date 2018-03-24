@@ -600,11 +600,3 @@ pub fn game_run(surface: Rc<Surface>, game: Rc<RefCell<GamePrivate>>, storage: R
     game.borrow_mut().start();
     main_loop(&surface, &game_widget)
 }
-
-#[no_mangle]
-pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
-    let surface = Rc::new( ::sdl::video::Surface { raw: surface_ptr, owned: false } );
-    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
-    let game = GamePrivate::new().unwrap();
-    game_run(surface, game, storage.clone()).unwrap() as i32
-}

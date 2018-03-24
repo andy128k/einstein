@@ -11,8 +11,6 @@
 #include "config.h"
 #include "resources.h"
 
-void menu(Screen *screen, Config *config);
-
 extern "C" void initAudio(int volume)
 {
     sound = new Sound();
@@ -32,8 +30,24 @@ extern "C" void loadResources()
     msg.load();
 }
 
+extern "C" int ein_menu(SDL_Surface *surface_ptr, Config *config);
+
+extern "C" Screen *new_screen(int fullscreen) {
+    return new Screen(fullscreen);
+}
+
+extern "C" void delete_screen(Screen *screen) {
+    delete screen;
+}
+
 extern "C" void mainpp(int fullscreen, Config *config)
 {
-    Screen screen(fullscreen);
-    menu(&screen, config);
+    Screen *screen = new_screen(fullscreen);
+
+    int quit = ein_menu(screen->screen, config);
+    if (quit) {
+        exit(0);
+    }
+
+    delete_screen(screen);
 }

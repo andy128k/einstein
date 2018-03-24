@@ -114,10 +114,3 @@ pub fn show_scores(surface: &Surface, scores: &Scores, highlight: Option<usize>)
     let topscores = create_topscores(scores, messages, highlight)?;
     main_loop(surface, &topscores)
 }
-
-#[no_mangle]
-pub extern fn ein_show_scores(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
-    show_scores(&surface, &storage.borrow().scores, None).unwrap() as i32
-}

@@ -106,10 +106,3 @@ pub fn show_options_window(surface: &Surface, storage: &mut Storage) -> Result<b
     }
     Ok(quit)
 }
-
-#[no_mangle]
-pub fn ein_show_options_window(surface_ptr: * mut sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
-    show_options_window(&surface, &mut storage.borrow_mut()).unwrap() as i32
-}
