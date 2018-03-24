@@ -24,6 +24,7 @@ use ui::component::watch::Watch;
 use ui::component::rules_dialog::show_description;
 use ui::component::save_dialog::save_game;
 use ui::component::options_dialog::show_options_window;
+use ui::component::pause_dialog::*;
 use error::*;
 use storage::*;
 
@@ -79,39 +80,6 @@ const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
 const BUTTON_BG: &[u8] = include_bytes!("./btn.bmp");
 
 /*
-class PauseGameCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Watch *watch;
-        Widget *background;
-
-    public:
-        PauseGameCommand(Area *a, Watch *w, Widget *bg) { 
-            gameArea = a; 
-            watch = w;
-            background = bg;
-        };
-        
-        virtual void doAction() {
-            watch->stop();
-            Screen *screen = gameArea->screen;
-            Area area(screen);
-            area.add(background, false);
-            Font font(L"laudcn2.ttf", 16);
-            area.add(new Window(screen, 280, 275, 240, 50, L"greenpattern.bmp", 6));
-            area.add(new Label(screen, &font, 280, 275, 240, 50, Label::ALIGN_CENTER,
-                Label::ALIGN_MIDDLE, 255,255,0, msg(L"paused")));
-            area.add(new AnyKeyAccel(screen));
-            area.run();
-            sound->play(L"click.wav");
-            gameArea->updateMouse();
-            gameArea->draw();
-            watch->start();
-        };
-};
-
-
 class WinCommand: public Command
 {
     private:
@@ -314,11 +282,12 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget<FnHelp, FnOpts, FnSave>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave) -> Result<Container<()>>
+pub fn new_game_widget<FnHelp, FnOpts, FnSave, FnPause>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave, show_pause: FnPause) -> Result<Container<()>>
 where
     FnHelp: Fn() -> bool + 'static,
     FnOpts: Fn() -> bool + 'static,
-    FnSave: Fn() -> bool + 'static
+    FnSave: Fn() -> bool + 'static,
+    FnPause: Fn() -> bool + 'static,
 {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
@@ -352,6 +321,8 @@ where
     let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5, false);
     let button_bg5 = load_image(BUTTON_BG)?;
     let highlighted_button_bg5 = adjust_brightness(&button_bg, 1.5, false);
+    let button_bg6 = load_image(BUTTON_BG)?;
+    let highlighted_button_bg6 = adjust_brightness(&button_bg, 1.5, false);
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
@@ -427,6 +398,27 @@ where
                 state.borrow_mut().stop();
 
                 let quit = show_options();
+                if quit {
+                    return Some(Effect::Quit);
+                }
+
+                state.borrow_mut().start();
+                Some(Effect::Redraw(vec![screen_rect]))
+            }
+        )
+    }));
+
+    container.add(Box::new({
+        let this_state = Rc::downgrade(&state);
+        Button::new1(
+            Rect::new(12, 400, 94, 30), button_bg6, highlighted_button_bg6, yellow,
+            "Pause", // TODO i18n
+            None,
+            move || {
+                let state = this_state.upgrade()?;
+                state.borrow_mut().stop();
+
+                let quit = show_pause();
                 if quit {
                     return Some(Effect::Quit);
                 }
@@ -543,10 +535,6 @@ void Game::restart()
     hinted = true;
 }
 
-#define BUTTON(screen, x, y, text, cmd) \
-    area.add(new Button(screen, x, y, 94, 30, &btnFont, 255,255,0, \
-                L"btn.bmp", msg(text), false, cmd));
-
 void Game::run(Config* config, TopScores *top_scores)
 {
     Area area = Area(screen);
@@ -559,9 +547,6 @@ void Game::run(Config* config, TopScores *top_scores)
     area.add(puzzle, false);
     area.add(verHints, false);
     area.add(horHints, false);
-    
-    PauseGameCommand pauseGameCmd(&area, watch, background);
-    BUTTON(screen, 12, 400, L"pause", &pauseGameCmd)
 
     area.add(watch, false);
 
@@ -597,6 +582,12 @@ pub fn ein_game_run(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, st: *mut S
                 let storage: &mut Storage = unsafe { &mut * st }; // HACK
                 save_game(surface2.clone(), storage, &game2.borrow()).expect("No errors");
                 false
+            }
+        },
+        {
+            let surface2 = surface.clone();
+            move || {
+                pause(&*surface2).expect("No errors")
             }
         }
     ).unwrap();
