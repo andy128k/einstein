@@ -25,13 +25,13 @@ mod cpp {
     use sdl::video::ll::SDL_Surface;
 
     extern "C" {
-        pub fn adjust_brightness(image: * mut SDL_Surface, k: c_double, transparent: c_int) -> * mut SDL_Surface;
+        pub fn adjust_brightness(image: * mut SDL_Surface, k: c_double) -> * mut SDL_Surface;
         pub fn adjust_brightness_pixel(image: * mut SDL_Surface, x: c_int, y: c_int, k: c_double);
     }
 }
 
-pub fn adjust_brightness(image: &Surface, k: f64, transparent: bool) -> Surface {
-    let s = unsafe { cpp::adjust_brightness(image.raw, k, if transparent { 1 } else { 0 }) };
+pub fn adjust_brightness(image: &Surface, k: f64) -> Surface {
+    let s = unsafe { cpp::adjust_brightness(image.raw, k) };
     Surface { raw: s, owned: true }
 }
 

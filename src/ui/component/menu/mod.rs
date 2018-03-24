@@ -186,11 +186,7 @@ fn make_menu(surface: Rc<Surface>, storage: Rc<RefCell<Storage>>) -> Result<Cont
     Ok(container)
 }
 
-#[no_mangle]
-pub fn ein_menu(surface_ptr: * mut ::sdl::video::ll::SDL_Surface, storage_ptr: *const Rc<RefCell<Storage>>) -> ::libc::c_int {
-    let surface = Rc::new( ::sdl::video::Surface { raw: surface_ptr, owned: false } );
-    let storage: &Rc<RefCell<Storage>> = unsafe { &* storage_ptr };
-
-    let menu = make_menu(surface.clone(), storage.clone()).unwrap();
-    main_loop(&surface, &menu).unwrap() as i32
+pub fn menu(surface: Rc<Surface>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
+    let menu = make_menu(surface.clone(), storage.clone())?;
+    main_loop(&surface, &menu)
 }

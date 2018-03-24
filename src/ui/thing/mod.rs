@@ -128,7 +128,7 @@ impl ThingImages {
             for row in 0..PUZZLE_SIZE {
                 for value in 0..PUZZLE_SIZE {
                     let image = load_image(bytes[row as usize][value as usize])?;
-                    let hightlighted = adjust_brightness(&image, 1.5, false);
+                    let hightlighted = adjust_brightness(&image, 1.5);
                     things.insert(make_key(row as u8, value as u8, size > 0, false), image);
                     things.insert(make_key(row as u8, value as u8, size > 0, true), hightlighted);
                 }

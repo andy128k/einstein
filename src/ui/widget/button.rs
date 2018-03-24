@@ -32,7 +32,7 @@ pub fn beveled_button_backgrounds(image: &[u8], width: u32, height: u32) -> Resu
     }
     image.unlock();
 
-    let highlighted_image = adjust_brightness(&mut image, 1.5, false);
+    let highlighted_image = adjust_brightness(&mut image, 1.5);
 
     Ok((image, highlighted_image))
 }

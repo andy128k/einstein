@@ -31,7 +31,7 @@ impl Checkbox {
         }
         image.unlock();
 
-        let highlighted = adjust_brightness(&mut image, 1.5, false);
+        let highlighted = adjust_brightness(&mut image, 1.5);
 
         Ok(Self{
             rect,

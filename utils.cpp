@@ -1,103 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <math.h>
-#include <wchar.h>
-
-//#ifndef WIN32
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-//#endif
-
-#include <fstream>
-
-#include "exceptions.h"
+#include <iostream>
 #include "utils.h"
-#include "unicode.h"
-#include "sound.h"
-#include "resources.h"
-
-
-
-int getCornerPixel(SDL_Surface *surface)
-{
-    SDL_LockSurface(surface);
-    int bpp = surface->format->BytesPerPixel;
-    Uint8 *p = (Uint8*)surface->pixels;
-    int pixel = 0;
-    switch (bpp) {
-        case 1: pixel = *p;  break;
-        case 2: pixel = *(Uint16 *)p; break;
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-                pixel = p[0] << 16 | p[1] << 8 | p[2];
-            else
-                pixel = p[0] | p[1] << 8 | p[2] << 16;
-            break;
-        case 4: pixel = *(Uint32 *)p; break;
-        default: pixel = 0;       /* shouldn't happen, but avoids warnings */
-    }
-    SDL_UnlockSurface(surface);
-    return pixel;
-}
-
-
-
-SDL_Surface* loadImage(const std::wstring &name, bool transparent)
-{
-    int size;
-    void *bmp;
-
-    bmp = resources->getRef(name, size);
-    if (! bmp)
-        throw Exception(name + L" is not found");
-    SDL_RWops *op = SDL_RWFromMem(bmp, size);
-    SDL_Surface *s = SDL_LoadBMP_RW(op, 0);
-    SDL_FreeRW(op);
-    resources->delRef(bmp);
-    if (! s)
-        throw Exception(L"Error loading " + name);
-    SDL_Surface *screenS = SDL_DisplayFormat(s);
-    SDL_FreeSurface(s);
-    if (! screenS)
-        throw Exception(L"Error translating to screen format " + name);
-    if (transparent)
-        SDL_SetColorKey(screenS, SDL_SRCCOLORKEY, getCornerPixel(screenS));
-    return screenS;
-}
-
-
-#ifdef WIN32
-#include <sys/timeb.h>
-struct timezone { };
-
-int gettimeofday(struct timeval* tp, int* /*tz*/) 
-{
-    struct timeb tb;
-    ftime(&tb);
-    tp->tv_sec = tb.time;
-    tp->tv_usec = 1000*tb.millitm;
-    return 0;
-}
-
-int gettimeofday(struct timeval* tp, struct timezone* /*tz*/) 
-{
-    return gettimeofday(tp, (int*)NULL);
-}
-#endif
-
-
-
-int gettimeofday(struct timeval* tp)
-{
-#ifdef WIN32
-    return gettimeofday(tp, (int*)NULL);
-#else
-    struct timezone tz;
-    return gettimeofday(tp, &tz);
-#endif
-}
 
 void setPixel(SDL_Surface *s, int x, int y, int r, int g, int b)
 {
@@ -176,7 +80,7 @@ void adjust_brightness_pixel(SDL_Surface *image, int x, int y, double k)
 }
 
 
-SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent)
+SDL_Surface* adjust_brightness(SDL_Surface *image, double k)
 {
     if (lastGamma != k) {
         for (int i = 0; i <= 255; i++) {
@@ -188,8 +92,10 @@ SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent)
     }
     
     SDL_Surface *s = SDL_DisplayFormat(image);
-    if (! s)
-        throw Exception(L"Error converting image to display format");
+    if (! s) {
+        std::cerr << "Error converting image to display format" << std::endl;
+        abort();
+    }
     
     SDL_LockSurface(s);
     
@@ -202,149 +108,5 @@ SDL_Surface* adjust_brightness(SDL_Surface *image, double k, int transparent)
     
     SDL_UnlockSurface(s);
 
-    if (transparent)
-        SDL_SetColorKey(s, SDL_SRCCOLORKEY, getCornerPixel(s));
-
     return s;
 }
-
-
-bool isInRect(int evX, int evY, int x, int y, int w, int h)
-{
-    return ((evX >= x) && (evX < x + w) && (evY >= y) && (evY < y + h));
-}
-
-std::wstring secToStr(int time)
-{
-    int hours = time / 3600;
-    int v = time - hours * 3600;
-    int minutes = v / 60;
-    int seconds = v - minutes * 60;
-
-    wchar_t buf[50];
-#ifdef WIN32
-    swprintf(buf, L"%02i:%02i:%02i", hours, minutes, seconds);
-#else
-    swprintf(buf, 50, L"%02i:%02i:%02i", hours, minutes, seconds);
-#endif
-
-    return buf;
-}
-
-
-void drawBevel(SDL_Surface *s, int left, int top, int width, int height,
-        bool raised, int size)
-{
-    double k, f, kAdv, fAdv;
-    if (raised) {
-        k = 2.6;
-        f = 0.1;
-        kAdv = -0.2;
-        fAdv = 0.1;
-    } else {
-        f = 2.6;
-        k = 0.1;
-        fAdv = -0.2;
-        kAdv = 0.1;
-    }
-    for (int i = 0; i < size; i++) {
-        for (int j = i; j < height - i - 1; j++)
-            adjust_brightness_pixel(s, left + i, top + j, k);
-        for (int j = i; j < width - i; j++)
-            adjust_brightness_pixel(s, left + j, top + i, k);
-        for (int j = i+1; j < height - i; j++)
-            adjust_brightness_pixel(s, left + width - i - 1, top + j, f);
-        for (int j = i; j < width - i - 1; j++)
-            adjust_brightness_pixel(s, left + j, top + height - i - 1, f);
-        k += kAdv;
-        f += fAdv;
-    }
-}
-
-//#ifndef WIN32
-
-void ensureDirExists(const std::wstring &fileName)
-{
-    std::string s(toMbcs(fileName));
-    struct stat buf;
-    if (! stat(s.c_str(), &buf)) {
-        if (! S_ISDIR(buf.st_mode))
-            unlink(s.c_str());
-        else
-            return;
-    }
-#ifndef WIN32
-    mkdir(s.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
-#else
-    mkdir(s.c_str());
-#endif
-}
-
-/*#else
-
-void ensureDirExists(const std::wstring &fileName)
-{
-    PORT ME!
-}
-
-#endif*/
-
-int readInt(std::istream &stream)
-{
-    if (stream.fail())
-        throw Exception(L"Error reading string");
-    unsigned char buf[4];
-    stream.read((char*)buf, 4);
-    if (stream.fail())
-        throw Exception(L"Error reading string");
-    return buf[0] + buf[1] * 256 + buf[2] * 256 * 256 + 
-        buf[3] * 256 * 256 * 256;
-}
-
-
-std::wstring readString(std::istream &stream)
-{
-    std::string str;
-    char c;
-
-    if (stream.fail())
-        throw Exception(L"Error reading string");
-    
-    c = stream.get();
-    while (c && (! stream.fail())) {
-        str += c;
-        c = stream.get();
-    }
-
-    if (stream.fail())
-        throw Exception(L"Error reading string");
-
-    return fromUtf8(str);
-}
-
-void writeInt(std::ostream &stream, int v)
-{
-    unsigned char b[4];
-    int i, ib;
-
-    for (i = 0; i < 4; i++) {
-        ib = v & 0xFF;
-        v = v >> 8;
-        b[i] = ib;
-    }
-    
-    stream.write((char*)&b, 4);
-}
-
-void writeString(std::ostream &stream, const std::wstring &value)
-{
-    std::string s(toUtf8(value));
-    stream.write(s.c_str(), s.length() + 1);
-}
-
-int readInt(unsigned char *buf)
-{
-    return buf[0] + buf[1] * 256 + buf[2] * 256 * 256 + 
-        buf[3] * 256 * 256 * 256;
-}
-

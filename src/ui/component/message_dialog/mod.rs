@@ -56,17 +56,3 @@ pub fn show_message(surface: &Surface, message_type: MessageType, message: &str)
     let message_box = create_message(rect_to_rect2(surface.get_rect()), message_type, message)?;
     main_loop(surface, &message_box)
 }
-
-#[no_mangle]
-pub extern fn ein_show_message_neutral(surface_ptr: * mut sdl::video::ll::SDL_Surface, message: *const ::libc::c_char) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let msg = unsafe { CStr::from_ptr(message).to_str().unwrap() };
-    show_message(&surface, MessageType::Neutral, msg).unwrap() as i32
-}
-
-#[no_mangle]
-pub extern fn ein_show_message_failure(surface_ptr: * mut sdl::video::ll::SDL_Surface, message: *const ::libc::c_char) -> ::libc::c_int {
-    let surface = sdl::video::Surface { raw: surface_ptr, owned: false };
-    let msg = unsafe { CStr::from_ptr(message).to_str().unwrap() };
-    show_message(&surface, MessageType::Failure, msg).unwrap() as i32
-}

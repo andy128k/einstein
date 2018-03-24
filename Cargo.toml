@@ -8,7 +8,7 @@ libc = "*"
 failure = "*"
 itertools = "*"
 sdl = { path = "../rust-sdl" }
-sdl2 = { version = "*", default-features = false, features = ["ttf"] }
+sdl2 = { version = "*", default-features = false, features = ["ttf", "mixer"] }
 rand = "*"
 serde = "*"
 serde_derive = "*"

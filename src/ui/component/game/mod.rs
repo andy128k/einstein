@@ -323,17 +323,17 @@ where
 
     let yellow = Color::RGB(255, 255, 0);
     let button_bg = load_image(BUTTON_BG)?;
-    let highlighted_button_bg = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg = adjust_brightness(&button_bg, 1.5);
     let button_bg2 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5);
     let button_bg3 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5);
     let button_bg4 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5);
     let button_bg5 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg5 = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg5 = adjust_brightness(&button_bg, 1.5);
     let button_bg6 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg6 = adjust_brightness(&button_bg, 1.5, false);
+    let highlighted_button_bg6 = adjust_brightness(&button_bg, 1.5);
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);

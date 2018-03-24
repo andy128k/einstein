@@ -39,7 +39,7 @@ impl Slider {
         }
         slider.unlock();
 
-        let active_slider = adjust_brightness(&mut slider, 1.5, false);
+        let active_slider = adjust_brightness(&mut slider, 1.5);
 
         Ok(Self {
             rect,

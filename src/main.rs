@@ -19,6 +19,7 @@ pub mod rules;
 pub mod puzzle_gen;
 pub mod ui;
 pub mod storage;
+pub mod audio;
 
 use std::rc::Rc;
 use debug_cell::RefCell;
@@ -31,20 +32,13 @@ use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};
 use sdl::wm::set_caption;
 use sdl::event::{enable_key_repeat, RepeatDelay, RepeatInterval, enable_unicode};
+use sdl::video::{set_video_mode, SurfaceFlag, VideoFlag};
 use sdl2::ttf::Sdl2TtfContext;
+use sdl2::mixer;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
-
-extern "C" {
-    fn loadResources() -> ::libc::c_void;
-    fn initAudio(volume: ::libc::c_int) -> ::libc::c_void;
-    fn mainpp(fullscreen: ::libc::c_int, config: *const ::libc::c_void) -> *const ::libc::c_void;
-
-// extern "C" Screen *new_screen(int fullscreen) {
-// extern "C" void delete_screen(Screen *screen) {
-
-}
+use ui::component::menu::menu;
 
 #[no_mangle]
 pub extern fn ein_generate_puzzle(sp: *mut *const SolvedPuzzle, r: *mut *const Rule, rs: *mut ::libc::size_t) {
@@ -179,11 +173,6 @@ fn real_main() -> Result<()> {
     create_dir_all(home.join(".einstein"))?;
 
     let state = Rc::new(RefCell::new(storage::Storage::load().unwrap_or_default()));
-    let state_box = Box::new(state.clone());
-
-    unsafe {
-        loadResources();
-    }
 
     if !init(&[InitFlag::Video, InitFlag::Audio]) {
         return Err(err_msg(get_error()));
@@ -204,14 +193,18 @@ fn real_main() -> Result<()> {
     let fullscreen = state.borrow().fullscreen;
     let volume = state.borrow().volume;
 
-    unsafe {
-        initAudio(volume as i32);
-        mainpp(fullscreen as i32, transmute(&state_box));
+    let flags: &[VideoFlag] = if fullscreen { &[VideoFlag::Fullscreen] } else { &[] };
+    let surface = Rc::new(set_video_mode(800, 600, 24, &[SurfaceFlag::SWSurface], flags).map_err(err_msg)?);
+
+    {
+        mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
+        let audio = audio::Audio::new()?;
+        menu(surface.clone(), state.clone())?;
     }
 
     quit();
 
-    // state.borrow_mut().save()?;
+    state.borrow_mut().save()?;
 
     Ok(())
 }
