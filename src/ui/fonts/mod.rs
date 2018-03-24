@@ -8,7 +8,7 @@ static mut BUTTON_FONT: Option<Font<'static, 'static>> = None;
 static mut TEXT_FONT: Option<Font<'static, 'static>> = None;
 static mut MENU_FONT: Option<Font<'static, 'static>> = None;
 
-const FONT_DUMP: &[u8] = include_bytes!("../../res/nova.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
+const FONT_DUMP: &[u8] = include_bytes!("./LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
 fn load_font(context: &'static Sdl2TtfContext, point_size: u16) -> Result<Font<'static, 'static>> {
     let ops = RWops::from_bytes(FONT_DUMP).map_err(err_msg)?;
