@@ -1,7 +1,6 @@
 #include <vector>
 #include "utils.h"
 #include "widgets.h"
-#include "descr.h"
 #include "messages.h"
 #include "config.h"
 
@@ -100,6 +99,8 @@ class TopScoresCommand: public Command
         };
 };
 
+extern "C" int ein_show_description(SDL_Surface *surface_ptr);
+
 
 class RulesCommand: public Command
 {
@@ -110,7 +111,10 @@ class RulesCommand: public Command
         RulesCommand(Area *a) { area = a; };
 
         virtual void doAction() {
-            showDescription(area);
+            int quit = ein_show_description(area->screen->screen);
+            if (quit) {
+                exit(0);
+            }
             area->updateMouse();
             area->draw();
         };
