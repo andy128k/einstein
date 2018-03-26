@@ -28,13 +28,11 @@ fn new_pause_dialog() -> Result<Container<()>> {
     container.add(Box::new(Window::new(Rect::new(280, 275, 240, 50), GREEN_PATTERN)?));
 
     container.add(Box::new(Label {
-        font: text_font()?,
         text: "Paused".to_string(), // i18n msg(L"paused")
         rect: Rect::new(280, 275, 240, 50),
         color: Color::RGB(255, 255, 0),
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(AnyKey::new(|| Some(Effect::Terminate))));

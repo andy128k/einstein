@@ -69,13 +69,11 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<Container<PlayerNa
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
     container.add(Box::new(Label {
-        font: text_font()?,
         text: messages.title.to_string(),
         rect: Rect::new(180, 300, 150, 26),
         color: yellow,
         horizontal_align: HorizontalAlign::Left,
         vertical_align: VerticalAlign::Middle,
-        shadow: true,
     }));
 
     container.add(Box::new(InputField::new(Rect::new(340, 300, 280, 26), BLUE_PATTERN, player_name.clone(), 20)?));

@@ -39,13 +39,11 @@ fn create_message(screen_rect: Rect, message_type: MessageType, message: &str) -
     let mut container = Container::new(rect, ());
     container.add(Box::new(Window::new(rect, bg)?));
     container.add(Box::new(Label {
-        font,
         text: message.to_string(),
         rect,
         color,
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
     container.add(Box::new(AnyKey::new(|| Some(Effect::Terminate))));
 

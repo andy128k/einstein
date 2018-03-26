@@ -198,8 +198,8 @@ fn real_main() -> Result<()> {
     let surface = Rc::new(set_video_mode(800, 600, 24, &[SurfaceFlag::SWSurface], flags).map_err(err_msg)?);
 
     {
-        mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
-        let audio = audio::Audio::new()?;
+        // mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
+        // let audio = audio::Audio::new()?;
         menu(surface.clone(), state.clone())?;
     }
 

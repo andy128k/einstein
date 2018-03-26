@@ -10,6 +10,7 @@ use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
+use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::fonts::*;
@@ -50,54 +51,41 @@ fn create_about(messages: &Messages) -> Result<Container<()>> {
 
     container.add(Box::new(Window::new(rect.clone(), BLUE_PATTERN)?));
 
-    container.add(Box::new(Label {
-        font: title_font()?,
+    container.add(Box::new(Title {
         text: messages.title.to_string(),
         rect: Rect::new(250, 165, 300, 40),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Label {
-        font: text_font()?,
         text: messages.name.to_string(),
         rect: Rect::new(220, 240, 360, 20),
         color: Color::RGB(255, 255, 255),
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Label {
-        font: text_font()?,
         text: format!("{}{}", messages.version, VERSION),
         rect: Rect::new(220, 260, 360, 20),
         color: Color::RGB(255, 255, 255),
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Label {
-        font: text_font()?,
         text: messages.copyright.to_string(),
         rect: Rect::new(220, 280, 360, 20),
         color: Color::RGB(255, 255, 255),
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Label {
-        font: text_font()?,
         text: "http://games.flowix.com".to_string(),
         rect: Rect::new(220, 330, 360, 20),
         color: Color::RGB(255, 255, 0),
         horizontal_align: HorizontalAlign::Center,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     let close = Button::new(Rect::new(360, 400, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.ok,

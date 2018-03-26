@@ -1,6 +1,7 @@
 pub mod widget;
 pub mod image;
 pub mod window;
+pub mod title;
 pub mod label;
 pub mod button;
 pub mod any_key;

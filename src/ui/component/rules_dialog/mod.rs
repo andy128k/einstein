@@ -11,6 +11,7 @@ use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
+use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
@@ -179,17 +180,12 @@ impl DescriptionPrivate {
 
         let mut ptr = Container::new(rect, state.clone());
 
-        let window = Window::new(rect.clone(), BLUE_PATTERN)?;
+        ptr.add(Box::new(Window::new(rect.clone(), BLUE_PATTERN)?));
 
-        let title = Label {
-            font: title_font()?,
+        ptr.add(Box::new(Title {
             text: messages.rules.to_string(),
             rect: Rect::new(250, 60, 300, 40),
-            color: Color::RGB(255, 255, 0),
-            horizontal_align: HorizontalAlign::Center,
-            vertical_align: VerticalAlign::Middle,
-            shadow: true
-        };
+        }));
 
         let page_view = PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page);
 
@@ -226,8 +222,6 @@ impl DescriptionPrivate {
             || Some(Effect::Terminate)
         )?;
 
-        ptr.add(Box::new(window));
-        ptr.add(Box::new(title));
         ptr.add(Box::new(page_view));
         ptr.add(Box::new(prev));
         ptr.add(Box::new(next));

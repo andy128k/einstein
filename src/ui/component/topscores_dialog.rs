@@ -10,6 +10,7 @@ use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
+use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::fonts::*;
@@ -39,20 +40,12 @@ fn create_topscores(scores: &Scores, messages: &Messages, highlight: Option<usiz
 
     let mut container = Container::new(rect, ());
 
-    let window = Window::new(rect.clone(), BLUE_PATTERN)?;
+    container.add(Box::new(Window::new(rect.clone(), BLUE_PATTERN)?));
 
-    let title = Label {
-        font: title_font()?,
+    container.add(Box::new(Title {
         text: messages.title.to_string(),
         rect: Rect::new(250, 135, 300, 40),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-        shadow: true
-    };
-
-    container.add(Box::new(window));
-    container.add(Box::new(title));
+    }));
 
     let mut pos = 175;
     for (i, score) in scores.0.iter().enumerate() {
@@ -63,33 +56,27 @@ fn create_topscores(scores: &Scores, messages: &Messages, highlight: Option<usiz
         };
 
         container.add(Box::new(Label {
-            font: text_font()?,
             text: format!("{}.", i + 1),
             rect: Rect::new(250, pos, 30, 25),
             color,
             horizontal_align: HorizontalAlign::Right,
             vertical_align: VerticalAlign::Middle,
-            shadow: true
         }));
 
         container.add(Box::new(Label {
-            font: text_font()?,
             text: score.name.clone(),
             rect: Rect::new(290, pos, 160, 25),
             color,
             horizontal_align: HorizontalAlign::Left,
             vertical_align: VerticalAlign::Middle,
-            shadow: true
         }));
 
         container.add(Box::new(Label {
-            font: text_font()?,
             text: sec_to_str(score.score),
             rect: Rect::new(460, pos, 80, 25),
             color,
             horizontal_align: HorizontalAlign::Right,
             vertical_align: VerticalAlign::Middle,
-            shadow: true
         }));
 
         pos += 25;

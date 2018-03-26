@@ -11,6 +11,7 @@ use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
+use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
@@ -46,14 +47,9 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], title: &str, selecte
     let mut container = Container::new(rect, state.clone());
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
-    container.add(Box::new(Label {
-        font: title_font()?,
+    container.add(Box::new(Title {
         text: title.to_string(),
         rect: Rect::new(250, 95, 300, 40),
-        color: yellow,
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-        shadow: true,
     }));
 
     let close = Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, "close", // TODO i18n

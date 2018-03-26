@@ -11,11 +11,11 @@ use puzzle_gen::generate_puzzle;
 use ui::widget::widget::*;
 use ui::widget::container::Container;
 use ui::widget::window::Window;
+use ui::widget::title::Title;
 use ui::widget::button::Button;
 use ui::widget::image::Image;
 use ui::widget::label::Label;
 use ui::utils::{load_image, tiled_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
-use ui::fonts::title_font;
 use ui::main_loop::main_loop;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
 use ui::component::puzzle::horizontal_rules::HorizontalRules;
@@ -306,14 +306,9 @@ where
 
     container.add(Box::new(Image::new(screen_rect, RAIN_TILE)?));
     container.add(Box::new(Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?));
-    container.add(Box::new(Label {
-        font: title_font()?,
+    container.add(Box::new(Title {
         text: "Einstein Puzzle".to_string(), // i18n msg(L"einsteinPuzzle")
         rect: Rect::new(20, 10, 500, 47),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Left,
-        vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Watch::new(state.clone())));

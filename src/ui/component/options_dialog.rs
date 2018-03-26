@@ -13,6 +13,7 @@ use ui::widget::button::*;
 use ui::widget::checkbox::*;
 use ui::widget::slider::*;
 use ui::widget::window::*;
+use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::fonts::*;
@@ -39,36 +40,27 @@ fn new_options_dialog(storage: &Storage) -> Result<Container<Rc<Options>>> {
     let mut container = Container::new(rect, state.clone());
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
-    container.add(Box::new(Label {
-        font: title_font()?,
+    container.add(Box::new(Title {
         text: "Options".to_string(), // msg(L"options")
         rect: Rect::new(250, 175, 300, 40),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Checkbox::new(Rect::new(265, 260, 20, 20), BLUE_PATTERN, state.fullscreen.clone())?));
 
     container.add(Box::new(Label {
-        font: button_font()?,
         text: "fullscreen".to_string(), // msg(L"fullscreen")
         rect: Rect::new(300, 260, 300, 20),
         color: Color::RGB(255, 255, 255),
         horizontal_align: HorizontalAlign::Left,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Label {
-        font: button_font()?,
         text: "volume".to_string(), // msg(L"volume")
         rect: Rect::new(265, 330, 300, 20),
         color: Color::RGB(255, 255, 255),
         horizontal_align: HorizontalAlign::Left,
         vertical_align: VerticalAlign::Middle,
-        shadow: true
     }));
 
     container.add(Box::new(Slider::new(Rect::new(360, 332, 160, 16), BLUE_PATTERN, state.volume.clone())?));

@@ -5,22 +5,21 @@ use sdl2::ttf::Font;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
+use ui::fonts::text_font;
 
-pub struct Label<'font> {
-    pub font: &'font Font<'font, 'font>,
+pub struct Label {
     pub text: String,
     pub rect: Rect,
     pub color: Color,
     pub horizontal_align: HorizontalAlign,
     pub vertical_align: VerticalAlign,
-    pub shadow: bool,
 }
 
-impl<'font> Widget for Label<'font> {
+impl Widget for Label {
     fn get_rect(&self) -> Rect { self.rect }
 
     fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_text(surface, &self.text, self.font, self.color, self.shadow, self.rect, self.horizontal_align, self.vertical_align)?;
+        draw_text(surface, &self.text, text_font()?, self.color, true, self.rect, self.horizontal_align, self.vertical_align)?;
         Ok(())
     }
 }

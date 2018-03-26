@@ -35,7 +35,7 @@ pub fn adjust_brightness(image: &Surface, k: f64) -> Surface {
     Surface { raw: s, owned: true }
 }
 
-pub fn adjust_brightness_pixel(image: &mut Surface, x: u16, y: u16, k: f64) {
+pub fn adjust_brightness_pixel(image: &Surface, x: u16, y: u16, k: f64) {
     unsafe { cpp::adjust_brightness_pixel(image.raw, x as i32, y as i32, k) };
 }
 
@@ -69,7 +69,25 @@ pub fn tiled_image(data: &[u8], width: u16, height: u16) -> Result<Surface> {
     Ok(image)
 }
 
-pub fn draw_bevel(s: &mut Surface, rect: Rect, raised: bool, size: u16) {
+pub fn draw_tiles(dest: &Surface, dest_rect: Rect, tile: &Surface) {
+    dest.set_clip_rect(Some(&rect2_to_rect(dest_rect)));
+
+    let tile_width = tile.get_width();
+    let tile_height = tile.get_height();
+
+    let cw = (dest_rect.width() as u16 + tile_width - 1) / tile_width;
+    let ch = (dest_rect.height() as u16 + tile_height - 1) / tile_height;
+
+    for j in 0..ch {
+        for i in 0..cw {
+            dest.blit_at(&tile, dest_rect.left() as i16 + (i * tile_width) as i16, dest_rect.top() as i16 + (j * tile_height) as i16);
+        }
+    }
+
+    dest.set_clip_rect(None);
+}
+
+pub fn draw_bevel(s: &Surface, rect: Rect, raised: bool, size: u16) {
     let mut k;
     let mut f;
     let k_adv;
