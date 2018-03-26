@@ -12,9 +12,9 @@ use ui::widget::any_key::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign, rect_to_rect2};
-use ui::fonts::*;
+use resources::fonts::*;
 use ui::main_loop::main_loop;
-use ui::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
+use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
 use locale::get_language;
 
 pub enum MessageType {

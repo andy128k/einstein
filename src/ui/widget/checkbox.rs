@@ -7,7 +7,7 @@ use sdl2::rect::{Rect, Point};
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{tiled_image, adjust_brightness, draw_bevel, draw_text, HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
+use resources::fonts::*;
 
 pub struct Checkbox {
     rect: Rect,

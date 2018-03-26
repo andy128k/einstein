@@ -17,6 +17,7 @@ pub mod locale;
 pub mod converge;
 pub mod rules;
 pub mod puzzle_gen;
+pub mod resources;
 pub mod ui;
 pub mod storage;
 pub mod audio;
@@ -188,7 +189,7 @@ fn real_main() -> Result<()> {
     };
 
     unsafe {
-        ui::fonts::init_fonts(::std::mem::transmute(&app_context.ttf))?;
+        resources::fonts::init_fonts(::std::mem::transmute(&app_context.ttf))?;
     }
 
     let fullscreen = state.borrow().fullscreen;

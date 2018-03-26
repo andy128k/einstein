@@ -3,7 +3,7 @@ use debug_cell::RefCell;
 use sdl2::rect::{Rect};
 use rules::{PUZZLE_SIZE};
 use ui::widget::container::Container;
-use ui::thing::ThingImages;
+use resources::thing::ThingImages;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::PuzzleCell;
 use error::*;

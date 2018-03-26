@@ -1,6 +1,6 @@
 use rules::{Rule};
 use sdl::video::{Surface, SurfaceFlag, Color};
-use ui::thing::ThingImages;
+use resources::thing::ThingImages;
 use super::utils::adjust_brightness;
 use error::*;
 use ui::utils::load_image;

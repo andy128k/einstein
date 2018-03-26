@@ -7,7 +7,7 @@ use sdl2::rect::{Rect, Point};
 use rules::{Rule, SolvedPuzzle, Possibilities, Thing};
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
-use ui::thing::ThingImages;
+use resources::thing::ThingImages;
 use ui::utils::load_image;
 use ui::component::game::{GamePrivate, HorizontalRule};
 use error::*;

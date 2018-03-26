@@ -4,7 +4,7 @@ use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::Widget;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
-use ui::fonts::title_font;
+use resources::fonts::title_font;
 
 pub struct Title {
     pub text: String,

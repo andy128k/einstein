@@ -6,7 +6,7 @@ use sdl::event::{Key, Mouse};
 use sdl2::rect::{Rect, Point};
 use rules::{SolvedPuzzle, Possibilities, Thing};
 use ui::widget::widget::*;
-use ui::thing::ThingImages;
+use resources::thing::ThingImages;
 use ui::utils::load_image;
 use ui::component::game::GamePrivate;
 use error::*;

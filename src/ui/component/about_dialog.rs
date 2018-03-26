@@ -1,6 +1,5 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;
@@ -13,9 +12,8 @@ use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
 use ui::main_loop::main_loop;
-use ui::background::BLUE_PATTERN;
+use resources::background::BLUE_PATTERN;
 use locale::get_language;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

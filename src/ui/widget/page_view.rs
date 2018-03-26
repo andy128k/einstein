@@ -6,7 +6,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
+use resources::fonts::*;
 use ui::page_layout::*;
 
 pub struct PageView {

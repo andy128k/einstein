@@ -11,7 +11,7 @@ use ui::widget::widget::*;
 use ui::widget::container::*;
 use ui::widget::image::*;
 use ui::utils::{tiled_image, adjust_brightness, draw_bevel, draw_text, HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
+use resources::fonts::*;
 use ui::main_loop::main_loop;
 use ui::component::game::{game_run, GamePrivate};
 use ui::component::load_dialog::load_game;

@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{tiled_image, load_image, draw_text, HorizontalAlign, VerticalAlign};
-use ui::fonts::title_font;
+use resources::fonts::title_font;
 
 pub struct Background {
     rect: Rect,

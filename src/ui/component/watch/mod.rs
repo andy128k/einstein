@@ -7,7 +7,7 @@ use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
-use ui::fonts::text_font;
+use resources::fonts::text_font;
 use error::*;
 use util::time::sec_to_str;
 use ui::component::game::GamePrivate;

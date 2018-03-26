@@ -16,9 +16,9 @@ use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
+use resources::fonts::*;
 use ui::main_loop::main_loop;
-use ui::background::BLUE_PATTERN;
+use resources::background::BLUE_PATTERN;
 use locale::get_language;
 use storage::Storage;
 

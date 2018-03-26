@@ -15,10 +15,10 @@ use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::fonts::*;
+use resources::fonts::*;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
-use ui::background::BLUE_PATTERN;
+use resources::background::BLUE_PATTERN;
 use locale::get_language;
 
 const WIDTH: u16 = 600;
