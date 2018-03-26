@@ -21,6 +21,7 @@ pub mod ui;
 pub mod storage;
 pub mod audio;
 
+use std::process::exit;
 use std::rc::Rc;
 use debug_cell::RefCell;
 use std::ffi::{CStr, CString};
@@ -210,5 +211,8 @@ fn real_main() -> Result<()> {
 }
 
 fn main() {
-    real_main().unwrap();
+    if let Err(err) = real_main() {
+        eprintln!("{:#?}", err);
+        exit(1);
+    }
 }
