@@ -17,5 +17,8 @@ regex = "*"
 lazy_static = "*"
 debug-cell = "0.1.0"
 
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winnls"] }
+
 [build-dependencies]
 cc = "*"

@@ -14,6 +14,7 @@ fn main() {
         .flag("-Wno-unused-but-set-variable")
         .include(Path::new("/usr/include/SDL"))
         .include(Path::new("/usr/local/include/SDL"))  // osx brew
+        .include(Path::new("C:\\Users\\user1\\Documents\\SDL-1.2.15\\include"))
         .file("utils.c")
         .compile("foo");
 

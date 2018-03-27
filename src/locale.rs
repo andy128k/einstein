@@ -33,29 +33,26 @@ fn detect_language() -> Option<String> {
 }
 
 #[cfg(windows)]
-fn detect_language() -> String {
-  // TODO
-/*
-    setlocale(LC_ALL, "");
+fn detect_language() -> Option<String> {
+    use winapi::um::winnls::GetLocaleInfoW;
+    use winapi::um::winnt::LOCALE_USER_DEFAULT;
+    use winapi::um::winnt::WCHAR;
 
-    char buf[100];
-    int len;
+    safe_setlocale_lc_all()?;
 
-    len = GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, buf, 99);
-    if (len > 0) {
-        /* according to MSDN:
-           LOCALE_SABBREVLANGNAME   Abbreviated name of the language, 
-           created by taking the 2-letter language abbreviation from the 
-           ISO Standard 639 and adding a third letter, as appropriate, 
-           to indicate the sublanguage.
-         */
-         if (len == 4)       // exclude subvariant letter
-            buf[2] = 0;
-        return toLowerCase(fromMbcs(buf));
+    let mut buf: [WCHAR; 100] = [0; 100];
+    let len = unsafe { GetLocaleInfoW(LOCALE_USER_DEFAULT, /*LOCALE_SABBREVLANGNAME*/3, buf.as_mut_ptr(), 99) };
+    if len <= 0 {
+        return None;
     }
 
-    return "";
-*/
+    /* according to MSDN:
+       LOCALE_SABBREVLANGNAME   Abbreviated name of the language,
+       created by taking the 2-letter language abbreviation from the
+       ISO Standard 639 and adding a third letter, as appropriate,
+       to indicate the sublanguage.
+    */
+    String::from_utf16(&buf[0..2]).map(|s| s.to_lowercase()).ok()
 }
 
 pub fn get_language() -> Option<String> {

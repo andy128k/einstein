@@ -77,6 +77,7 @@ dependencies = [
  "serde 1.0.35 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.35 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winapi 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

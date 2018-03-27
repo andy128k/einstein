@@ -10,6 +10,8 @@ extern crate serde_json;
 extern crate regex;
 #[macro_use] extern crate lazy_static;
 extern crate debug_cell;
+#[cfg(windows)]
+extern crate winapi;
 
 pub mod error;
 pub mod util;
