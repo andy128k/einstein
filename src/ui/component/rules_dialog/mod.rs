@@ -15,10 +15,12 @@ use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
+use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
+use resources::rules::get_rules;
+use resources::rules::TextItem;
 use locale::get_language;
 
 const WIDTH: u16 = 600;
@@ -48,98 +50,6 @@ const MESSAGES_RU: Messages = Messages {
     next: "Вперед",
     close: "Закрыть",
 };
-
-enum TextItem {
-    Text(&'static str),
-    Image(&'static [u8]),
-}
-
-const RULES_EN: &[TextItem] = &[
-    TextItem::Text("The game goal is to open all cards in square of 6x6 cards.
-        When every card is open, field looks like this:"),
-    TextItem::Image(include_bytes!("./opensquare.bmp")),
-    TextItem::Text("Every row of square contains cards of one type only.  For example,
-        first row contains arabic digits, second - letters, third - rome digits,
-        fouths - dices, fifth - geometric figures, sixs - mathematic symbols."),
-    TextItem::Text("Use logic and open cards with method of exclusion.  If card doesn't
-        opened, cell contains every possible cards. For example,"),
-    TextItem::Image(include_bytes!("./closed.bmp")),
-    TextItem::Text("means that this cell may contain every rome digit with exception of 
-        III (because card with III image is absent).  To open card click on
-        small image with left mouse button.  To exclude card click with right
-        mouse button."),
-    TextItem::Text("Use tips to solve this puzzle.  There is two types of tips:
-        horizontal and vertical.  Vertical tips located at screen bottom.
-        For example, vertical tip"),
-    TextItem::Image(include_bytes!("./verthint.bmp")),
-    TextItem::Text("means that letter 'B' and '+' sign located in the same column."),
-    TextItem::Text("Horizontal tips located at the right side of the puzzle square.
-        There is few type of horizontal tips.  First type of horizontal
-        tip says that two cards located at neighbour columns, but it is
-        unknown, which one is at the right side and thich is at the left:"),
-    TextItem::Image(include_bytes!("./hornearhint.bmp")),
-    TextItem::Text("Second tip type means that one cards is at the left of another.
-        It says nothing about distance between that cards.  They may be
-        neighbour columns or at the opposite sides of puzzle field:"),
-    TextItem::Image(include_bytes!("./horposhint.bmp")),
-    TextItem::Text("The last type of tip means that one card is located between
-        two another cards:"),
-    TextItem::Image(include_bytes!("./horbetweenhint.bmp")),
-    TextItem::Text("All three cards must be located in neighbour columns, central
-        card is always between other two, but it is unknown, which card is located
-        at the right side and which at the left."),
-    TextItem::Text("If you no longer need some tip, remove it by right mouse button click.
-        You can always see removed tips by pressing 'Switch' button."),
-];
-
-const RULES_RU: &[TextItem] = &[
-    TextItem::Text("Правила игры очень простые: надо открыть все фишки в квадрате 
-        6x6 фишек. После того как все фишки будут открыты, 
-        квадрат будет выглядить следующим образом:"),
-    TextItem::Image(include_bytes!("./opensquare.bmp")),
-    TextItem::Text("В каждой строке квадрата находятся фишки одного типа. Например, 
-        в первой строке квадрата находятся арабские цифры,
-        во второй - латинские буквы, в третьей - римские цифры,
-        в четвертой - игральные кости, в пятой - геометрические фигуры,
-        в шестой - математические символы."),
-    TextItem::Text("Открывать фишки надо методом исключения. Когда фишка не 
-        открыта на ее месте показываются все возможные варианты.
-        Например, изображение"),
-    TextItem::Image(include_bytes!("./closed.bmp")),
-    TextItem::Text("обозначает что в данном месте могут находится любые римские 
-        цифры кроме III (квадратик с изображением III отсутствует).
-        Чтобы открыть фишку надо нажать на ее уменьшенное изображение 
-        левой кнопкой мыши, чтобы исключить фишку - нажмите на ней 
-        правой кнопкой мыши."),
-    TextItem::Text("Для того, чтобы решить головоломку нужно использовать подсказки.
-        Подсказки бывают двух типов: вертикальные и горизонтальные.
-        Вертикальные подсказки находятся внизу экрана и выглядят так:"),
-    TextItem::Image(include_bytes!("./verthint.bmp")),
-    TextItem::Text("Такая подсказка обозначает что буква 'B' и знак '+' находятся 
-        в одной колонке, при этом не важно, какой из этих символов находится
-        выше, а какой - ниже."),
-    TextItem::Text("Горизонтальные подсказки расположены в правой части экрана. 
-        Они делятся на несколько типов. Самая простая подсказка говорит 
-        о том что две фишки находятся в соседних колонках, при этом не 
-        известно, какая из фишек находится левее а какая правее:"),
-    TextItem::Image(include_bytes!("./hornearhint.bmp")),
-    TextItem::Text("Подсказка следующего типа говорит о том что одна фишка 
-        находится в колонке левее другой. Эта подсказка ничего 
-        не говорит о том на каком расстоянии друг от друга находятся фишки. 
-        Они могут оказаться как в соседних колонках так и находится 
-        на значительном расстоянии друг от друга:"),
-    TextItem::Image(include_bytes!("./horposhint.bmp")),
-    TextItem::Text("Последний тип подсказки указывает что одна фишка находится между 
-        двумя другими:"),
-    TextItem::Image(include_bytes!("./horbetweenhint.bmp")),
-    TextItem::Text("Все три фишки всегда находятся в соседних колонках, фишка 
-        указанная в центре всегда находится между двумя другими, но какая 
-        фишка правее центральной а какая левее - неизвестно."),
-    TextItem::Text("Использованные подсказки удобно удалять пользуясь правой кнопкой мыши. 
-        Удаленные подсказки можно посмотреть нажав на кнопку 'Скрытые'. 
-        Повторное нажатие на эту кнопку снова покажет неудаленные подсказки."),
-];
-
 
 fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Vec<Page>> {
     let font = text_font()?;
@@ -252,11 +162,11 @@ impl DescriptionPrivate {
 }
 
 pub fn show_description(surface: &Surface) -> Result<bool> {
-    let (messages, rules) = if get_language() == Some("ru".to_string()) {
-        (&MESSAGES_RU, RULES_RU)
+    let messages = if get_language() == Some("ru".to_string()) {
+        &MESSAGES_RU
     } else {
-        (&MESSAGES_EN, RULES_EN)
+        &MESSAGES_EN
     };
-    let description = DescriptionPrivate::new(messages, rules)?;
+    let description = DescriptionPrivate::new(messages, get_rules())?;
     main_loop(surface, &description)
 }
