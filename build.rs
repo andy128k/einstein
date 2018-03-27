@@ -4,7 +4,6 @@ use std::path::Path;
 
 fn main() {
     cc::Build::new()
-        .cpp(true)
         .define("PREFIX", "L\"/usr/local\"")
         .define("_GNU_SOURCE", "1")
         .define("_REENTRANT", None)
@@ -15,7 +14,7 @@ fn main() {
         .flag("-Wno-unused-but-set-variable")
         .include(Path::new("/usr/include/SDL"))
         .include(Path::new("/usr/local/include/SDL"))  // osx brew
-        .file("utils.cpp")
+        .file("utils.c")
         .compile("foo");
 
     println!("cargo:rustc-link-lib=SDL_ttf");

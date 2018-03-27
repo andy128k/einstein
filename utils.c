@@ -1,7 +1,7 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
-#include <iostream>
-#include "utils.h"
+#include <SDL.h>
 
 void setPixel(SDL_Surface *s, int x, int y, int r, int g, int b)
 {
@@ -93,7 +93,7 @@ SDL_Surface* adjust_brightness(SDL_Surface *image, double k)
     
     SDL_Surface *s = SDL_DisplayFormat(image);
     if (! s) {
-        std::cerr << "Error converting image to display format" << std::endl;
+        fprintf(stderr, "Error converting image to display format.\n");
         abort();
     }
     
