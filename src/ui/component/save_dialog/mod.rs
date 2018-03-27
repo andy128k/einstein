@@ -14,14 +14,14 @@ use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
-use resources::background::BLUE_PATTERN;
 use ui::component::game::GamePrivate;
 use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
-use locale::get_language;
+use resources::fonts::*;
+use resources::background::BLUE_PATTERN;
+use resources::messages::{get_messages, Messages};
 use storage::{Storage, MAX_SLOTS, SavedGame};
 
 struct ListWindowState {
@@ -31,7 +31,7 @@ struct ListWindowState {
 
 type ListWindowStatePtr = Rc<RefCell<ListWindowState>>;
 
-fn create_list_window<F>(saved_games: &[Option<SavedGame>], title: &str, selected: F) -> Result<Container<ListWindowStatePtr>>
+fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages, selected: F) -> Result<Container<ListWindowStatePtr>>
     where
         F: Fn(&str) -> DialogResult<String> + 'static
 {
@@ -47,11 +47,11 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], title: &str, selecte
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
     container.add(Box::new(Title {
-        text: title.to_string(),
+        text: messages.save_game.to_string(),
         rect: Rect::new(250, 95, 300, 40),
     }));
 
-    let close = Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, "close", // TODO i18n
+    let close = Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?;
@@ -60,8 +60,8 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], title: &str, selecte
         let (label, default_name): (String, String) = match *game {
             Some(ref g) => (g.name.to_string(), g.name.to_string()),
             None => (
-                "-- empty --".to_string(), // msg(L"empty")
-                format!("game {}", i + 1)
+                messages.empty.to_string(),
+                format!("{} {}", messages.default_game_name, i + 1)
             )
         };
 
@@ -86,9 +86,11 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], title: &str, selecte
 }
 
 pub fn save_game(surface: Rc<Surface>, storage: &mut Storage, game: &GamePrivate) -> Result<()> {
+    let messages = get_messages();
+
     let container = {
         let surface_weak = Rc::downgrade(&surface);
-        create_list_window(&storage.saved_games, "Save Game" /*msg(L"saveGame")*/,
+        create_list_window(&storage.saved_games, messages,
             move |default_name| {
                 let surface = surface_weak.upgrade().unwrap();
                 ask_game_name(&surface, &default_name).unwrap()

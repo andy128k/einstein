@@ -20,6 +20,7 @@ pub const MESSAGES: Messages<'static> = Messages {
     anonymous: "Anonymous",
     enter_name: "Enter your name:",
     empty: "-- Empty Slot --",
+    default_game_name: "Game",
     enter_game: "Enter game name:",
     save_error: "Error saving game",
     save_game: "Save Game",

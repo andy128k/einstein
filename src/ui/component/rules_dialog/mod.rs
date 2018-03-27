@@ -19,8 +19,8 @@ use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
-use resources::rules::get_rules;
-use resources::rules::TextItem;
+use resources::rules::{get_rules, TextItem};
+use resources::messages::{get_messages, Messages};
 use locale::get_language;
 
 const WIDTH: u16 = 600;
@@ -29,27 +29,6 @@ const CLIENT_WIDTH: u16 = 570;
 const CLIENT_HEIGHT: u16 = 390;
 const START_X: u16 = 115;
 const START_Y: u16 = 100;
-
-struct Messages {
-    rules: &'static str,
-    prev: &'static str,
-    next: &'static str,
-    close: &'static str,
-}
-
-const MESSAGES_EN: Messages = Messages {
-    rules: "Game Rules",
-    prev: "Prev",
-    next: "Next",
-    close: "Close",
-};
-
-const MESSAGES_RU: Messages = Messages {
-    rules: "Правила игры",
-    prev: "Назад",
-    next: "Вперед",
-    close: "Закрыть",
-};
 
 fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Vec<Page>> {
     let font = text_font()?;
@@ -162,11 +141,6 @@ impl DescriptionPrivate {
 }
 
 pub fn show_description(surface: &Surface) -> Result<bool> {
-    let messages = if get_language() == Some("ru".to_string()) {
-        &MESSAGES_RU
-    } else {
-        &MESSAGES_EN
-    };
-    let description = DescriptionPrivate::new(messages, get_rules())?;
+    let description = DescriptionPrivate::new(get_messages(), get_rules())?;
     main_loop(surface, &description)
 }

@@ -17,30 +17,12 @@ use ui::widget::window::*;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::component::dialog::DialogResult;
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::background::BLUE_PATTERN;
+use resources::messages::{get_messages, Messages};
 use locale::get_language;
-
-struct Messages {
-    title: &'static str,
-    ok: &'static str,
-    cancel: &'static str,
-}
-
-const MESSAGES_EN: Messages = Messages {
-    title: "Enter game name:",
-    ok: "OK",
-    cancel: "Cancel",
-};
-
-const MESSAGES_RU: Messages = Messages {
-    title: "Название игры:",
-    ok: "OK",
-    cancel: "Отмена",
-};
 
 struct GameNameState {
     ok: bool,
@@ -64,7 +46,7 @@ fn new_game_name(name: &str, messages: &Messages) -> Result<Container<GameNameSt
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
     container.add(Box::new(Label {
-        text: messages.title.to_string(),
+        text: messages.enter_game.to_string(),
         rect: Rect::new(180, 300, 150, 26),
         color: yellow,
         horizontal_align: HorizontalAlign::Left,
@@ -95,12 +77,7 @@ fn new_game_name(name: &str, messages: &Messages) -> Result<Container<GameNameSt
 }
 
 pub fn ask_game_name(surface: &Surface, default_name: &str) -> Result<DialogResult<String>> {
-    let messages = if get_language() == Some("ru".to_string()) {
-        &MESSAGES_RU
-    } else {
-        &MESSAGES_EN
-    };
-    let container = new_game_name(default_name, &messages)?;
+    let container = new_game_name(default_name, get_messages())?;
     let quit = main_loop(surface, &container)?;
     if quit {
         return Ok(DialogResult::Quit);

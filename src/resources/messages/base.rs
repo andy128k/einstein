@@ -18,6 +18,7 @@ pub struct Messages<'a> {
     pub anonymous: &'a str,
     pub enter_name: &'a str,
     pub empty: &'a str,
+    pub default_game_name: &'a str,
     pub enter_game: &'a str,
     pub save_error: &'a str,
     pub save_game: &'a str,
