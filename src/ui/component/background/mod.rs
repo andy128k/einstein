@@ -24,11 +24,9 @@ impl Background {
     }
 }
 
-impl Widget for Background {
-    fn get_rect(&self) -> Rect { self.rect }
-
+impl Widget<()> for Background {
     fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_tiles(surface, self.get_rect(), &self.background);
+        draw_tiles(surface, self.rect, &self.background);
         surface.blit_at(&self.title_background, 8, 10);
         let text = "Einstein Puzzle"; // i18n msg(L"einsteinPuzzle")
         draw_text(surface, text, title_font()?, Color::RGB(255, 255, 0), true, Rect::new(20, 10, 500, 47), HorizontalAlign::Left, VerticalAlign::Middle)?;

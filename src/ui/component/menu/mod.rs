@@ -8,27 +8,40 @@ use error::*;
 use storage::*;
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
-use ui::widget::container::*;
+use ui::widget::dialog::*;
 use ui::widget::image::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
-use ui::main_loop::main_loop;
-use ui::component::game::{game_run, GamePrivate};
-use ui::component::load_dialog::load_game;
-use ui::component::topscores_dialog::show_scores;
-use ui::component::rules_dialog::show_description;
-use ui::component::options_dialog::show_options_window;
-use ui::component::about_dialog::show_about;
+use ui::main_loop::{main_loop, ModalResult};
+use ui::component::dialog::*;
+use ui::component::game::{game_run, new_game_widget, GamePrivate};
+use ui::component::load_dialog::{load_game, new_load_game_dialog};
+use ui::component::topscores_dialog::{show_scores, create_topscores_dialog};
+use ui::component::rules_dialog::{show_description, new_help_dialog};
+use ui::component::options_dialog::{show_options_window, new_options_dialog};
+use ui::component::about_dialog::{show_about, create_about_dialog};
 use resources::messages::{get_messages, Messages};
 
 const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
 
-fn make_menu(surface: Rc<Surface>, messages: &Messages, storage: Rc<RefCell<Storage>>) -> Result<Container<()>> {
+fn make_menu(surface: Rc<Surface>, messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
     let rect = Rect::new(0, 0, 800, 600);
 
-    let mut container = Container::new(rect, ());
+    let new_game_trigger = Rc::new(RefCell::new(None));
+    let load_game_trigger = Rc::new(RefCell::new(None));
+    let show_scores_trigger = Rc::new(RefCell::new(None));
+    let show_help_trigger = Rc::new(RefCell::new(None));
+    let show_opts_trigger = Rc::new(RefCell::new(None));
+    let show_about_trigger = Rc::new(RefCell::new(None));
 
-    container.add(Box::new(Image::new(rect, MENU_BG)?));
+    let mut container: Vec<WidgetPtr<ModalResult<()>>> = vec![];
+
+    container.push(Box::new(
+        InterceptWidget::default()
+    ));
+    container.push(Box::new(WidgetMapAction::no_action(
+        Image::new(rect, MENU_BG)?
+    )));
 
     // Font font(L"nova.ttf", 28);
     // std::wstring s(msg(L"einsteinFlowix"));
@@ -40,93 +53,191 @@ fn make_menu(surface: Rc<Surface>, messages: &Messages, storage: Rc<RefCell<Stor
     // width = urlFont.getWidth(s);
     // urlFont.draw(screen->getSurface(), (screen->getWidth() - width) / 2, 60, 255,255,0, true, s);
 
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        let storage2 = storage.clone();
-        new_menu_button(Rect::new(550, 340, 220, 30), messages.new_game, None,
-            move || {
+    container.push(Box::new({
+        let new_game_trigger2 = new_game_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 340, 220, 30), messages.new_game, None, ()),
+            move |_| {
                 let game = GamePrivate::new().unwrap();
-                let quit = game_run(surface2.clone(), game, storage2.clone()).unwrap();
-                if quit {
-                    Some(Effect::Quit)
-                } else {
-                    Some(Effect::Redraw(vec![rect]))
-                }
+                *new_game_trigger2.borrow_mut() = Some(game);
+                EventReaction::Redraw
             }
         )
     }));
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        let storage2 = storage.clone();
-        new_menu_button(Rect::new(550, 370, 220, 30), messages.load_game, None,
-            move || {
-                let game = load_game(surface2.clone(), &storage2.borrow()).unwrap()?;
-                let quit = game_run(surface2.clone(), Rc::new(RefCell::new(game)), storage2.clone()).unwrap();
-                if quit {
-                    Some(Effect::Quit)
-                } else {
-                    Some(Effect::Redraw(vec![rect]))
-                }
+    container.push(Box::new({
+        let load_game_trigger2 = load_game_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 370, 220, 30), messages.load_game, None, ()),
+            move |_| {
+                *load_game_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
             }
         )
     }));
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        let storage2 = storage.clone();
-        new_menu_button(Rect::new(550, 400, 220, 30), messages.top_scores, None,
-            move || {
-                let quit = show_scores(&surface2, &storage2.borrow().scores, None).unwrap();
-                if quit {
-                    Some(Effect::Quit)
-                } else {
-                    Some(Effect::Redraw(vec![rect]))
-                }
+    container.push(Box::new({
+        let show_scores_trigger2 = show_scores_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 400, 220, 30), messages.top_scores, None, ()),
+            move |_| {
+                *show_scores_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
             }
         )
     }));
-    container.add(Box::new({
+    container.push(Box::new({
         let surface2 = surface.clone();
-        new_menu_button(Rect::new(550, 430, 220, 30), messages.rules, None,
-            move || {
-                let quit = show_description(&surface2).unwrap();
-                if quit {
-                    Some(Effect::Quit)
-                } else {
-                    Some(Effect::Redraw(vec![rect]))
-                }
+        let show_help_trigger2 = show_help_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 430, 220, 30), messages.rules, None, ()),
+            move |_| {
+                *show_help_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
             }
         )
     }));
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        let storage2 = storage.clone();
-        new_menu_button(Rect::new(550, 460, 220, 30), messages.options, None,
-            move || {
-                let quit = show_options_window(&surface2, &mut storage2.borrow_mut()).unwrap();
-                if quit {
-                    Some(Effect::Quit)
-                } else {
-                    Some(Effect::Redraw(vec![rect]))
-                }
+    container.push(Box::new({
+        let show_opts_trigger2 = show_opts_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 460, 220, 30), messages.options, None, ()),
+            move |_| {
+                *show_opts_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
             }
         )
     }));
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        new_menu_button(Rect::new(550, 490, 220, 30), messages.about, None,
-        move || {
-            show_about(&surface2).unwrap();
-            Some(Effect::Redraw(vec![rect]))
-        })
+    container.push(Box::new({
+        let show_about_trigger2 = show_about_trigger.clone();
+        WidgetMapAction::new(
+            new_menu_button(Rect::new(550, 490, 220, 30), messages.about, None, ()),
+            move |_| {
+                *show_about_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
+            }
+        )
     }));
-    container.add(Box::new(new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Key::Escape),
-        || Some(Effect::Quit)
-    )));
+    container.push(Box::new(
+        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Key::Escape), ModalResult(()))
+    ));
 
-    Ok(container)
+    container.push(Box::new({
+        let storage2 = storage.clone();
+        let new_game_trigger2 = new_game_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                new_game_trigger.clone(),
+                move |game| {
+                    game.borrow_mut().start();
+                    let game_widget = new_game_widget(storage2.clone(), game.clone(), messages)?;
+                    Ok(game_widget)
+                }
+            ),
+            move |_| {
+                *new_game_trigger2.borrow_mut() = None;
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let storage2 = storage.clone();
+        let load_game_trigger2 = load_game_trigger.clone();
+        let new_game_trigger2 = new_game_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                load_game_trigger.clone(),
+                move |_| {
+                    let load_dialog = new_load_game_dialog(&storage2.borrow().saved_games, messages)?;
+                    Ok(load_dialog)
+                }
+            ),
+            move |result| {
+                *load_game_trigger2.borrow_mut() = None;
+                match *result {
+                    ModalResult(DialogResult::Ok(ref game_data)) => {
+                        let game = Rc::new(RefCell::new(game_data.clone()));
+                        *new_game_trigger2.borrow_mut() = Some(game);
+                    },
+                    ModalResult(DialogResult::Cancel) => {},
+                }
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let storage2 = storage.clone();
+        let show_scores_trigger2 = show_scores_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_scores_trigger.clone(),
+                move |_| create_topscores_dialog(&storage2.borrow().scores, messages, None)
+            ),
+            move |_| {
+                *show_scores_trigger2.borrow_mut() = None;
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let show_help_trigger2 = show_help_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_help_trigger.clone(),
+                move |_| new_help_dialog(messages)
+            ),
+            move |_| {
+                *show_help_trigger2.borrow_mut() = None;
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let storage1 = storage.clone();
+        let storage2 = storage.clone();
+        let show_opts_trigger2 = show_opts_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_opts_trigger.clone(),
+                move |_| new_options_dialog(&storage1.borrow(), messages)
+            ),
+            move |result| {
+                *show_opts_trigger2.borrow_mut() = None;
+                match *result {
+                    ModalResult(DialogResult::Ok(ref options)) => {
+                        storage2.borrow_mut().fullscreen = options.fullscreen;
+                        storage2.borrow_mut().volume = options.volume;
+                        // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
+                        // sound->setVolume(options.volume);
+                    },
+                    ModalResult(DialogResult::Cancel) => {},
+                }
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let show_about_trigger2 = show_about_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_about_trigger.clone(),
+                move |_| create_about_dialog(messages)
+            ),
+            move |_| {
+                *show_about_trigger2.borrow_mut() = None;
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    Ok(Box::new(container))
 }
 
 pub fn menu(surface: Rc<Surface>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
+    let rect = Rect::new(0, 0, 800, 600);
     let menu = make_menu(surface.clone(), get_messages(), storage.clone())?;
-    main_loop(&surface, &menu)
+    let quit = main_loop(&surface, rect, &*menu)?.is_none();
+    Ok(quit)
 }

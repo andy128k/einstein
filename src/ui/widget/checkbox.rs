@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use std::cell::Cell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
@@ -13,12 +12,12 @@ pub struct Checkbox {
     rect: Rect,
     image: Surface,
     highlighted: Surface,
-    checked: Rc<Cell<bool>>,
+    checked: Cell<bool>,
     mouse_inside: Cell<bool>,
 }
 
 impl Checkbox {
-    pub fn new(rect: Rect, bg: &[u8], checked: Rc<Cell<bool>>) -> Result<Self> {
+    pub fn new(rect: Rect, bg: &[u8], checked: bool) -> Result<Self> {
         let image = load_image(bg)?;
         let highlighted = adjust_brightness(&image, 1.5);
 
@@ -26,32 +25,30 @@ impl Checkbox {
             rect,
             image,
             highlighted,
-            checked,
+            checked: Cell::new(checked),
             mouse_inside: Cell::new(false),
         })
     }
 }
 
-impl Widget for Checkbox {
-    fn get_rect(&self) -> Rect { self.rect }
-
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl Widget<bool> for Checkbox {
+    fn on_event(&self, event: &Event) -> EventReaction<bool> {
         match *event {
             Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
                 self.checked.set(!self.checked.get());
-                Some(Effect::Redraw(vec![self.rect]))
+                EventReaction::Action(self.checked.get())
             },
             Event::MouseMove(x, y) => {
                 let to_highlight = self.rect.contains_point((x, y));
                 if self.mouse_inside.get() != to_highlight {
                     self.mouse_inside.set(to_highlight);
-                    Some(Effect::Redraw(vec![self.rect]))
+                    EventReaction::Redraw
                 } else {
-                    None
+                    EventReaction::NoOp
                 }
             },
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 
@@ -64,7 +61,7 @@ impl Widget for Checkbox {
         draw_tiles(surface, self.rect, image);
         draw_etched_rect(surface, self.rect);
         if self.checked.get() {
-            draw_text(surface, "X", text_font()?, Color::RGB(255, 255, 255), true, self.get_rect(), HorizontalAlign::Center, VerticalAlign::Middle)?;
+            draw_text(surface, "X", text_font()?, Color::RGB(255, 255, 255), true, self.rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
         }
         Ok(())
     }

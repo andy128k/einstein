@@ -1,4 +1,5 @@
 pub mod widget;
+pub mod dialog;
 pub mod image;
 pub mod window;
 pub mod title;
@@ -12,4 +13,3 @@ pub mod input_field;
 pub mod checkbox;
 pub mod slider;
 pub mod page_view;
-pub mod container;

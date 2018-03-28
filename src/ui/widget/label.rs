@@ -14,9 +14,7 @@ pub struct Label {
     pub vertical_align: VerticalAlign,
 }
 
-impl Widget for Label {
-    fn get_rect(&self) -> Rect { self.rect }
-
+impl Widget<Nothing> for Label {
     fn draw(&self, surface: &Surface) -> Result<()> {
         draw_text(surface, &self.text, text_font()?, self.color, true, self.rect, self.horizontal_align, self.vertical_align)?;
         Ok(())

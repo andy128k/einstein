@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use std::cell::Cell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
@@ -11,13 +10,13 @@ pub struct Slider {
     rect: Rect,
     background: Surface,
     background_highlighted: Surface,
-    value: Rc<Cell<f32>>,
+    value: Cell<f32>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
 }
 
 impl Slider {
-    pub fn new(rect: Rect, bg: &[u8], value: Rc<Cell<f32>>) -> Result<Self> {
+    pub fn new(rect: Rect, bg: &[u8], value: f32) -> Result<Self> {
         let background = load_image(bg)?;
         let background_highlighted = adjust_brightness(&background, 1.5);
 
@@ -25,94 +24,90 @@ impl Slider {
             rect,
             background,
             background_highlighted,
-            value,
+            value: Cell::new(value),
             highlight: Cell::new(false),
             dragging: Cell::new(None),
         })
     }
 
     fn value_to_x(&self, value: f32) -> i16 {
-        let rect = self.get_rect();
-        let width = rect.width();
-        let slider_width = rect.height();
+        let width = self.rect.width();
+        let slider_width = self.rect.height();
         let x_range = width - slider_width;
         (value.max(0f32).min(1f32) * (x_range as f32)) as i16
     }
 
     fn x_to_value(&self, pos: i16) -> f32 {
-        let rect = self.get_rect();
-        let width = rect.width();
-        let slider_width = rect.height();
+        let width = self.rect.width();
+        let slider_width = self.rect.height();
         let x_range = width - slider_width;
         (pos.max(0).min(x_range as i16) as f32) / (x_range as f32)
     }
 
     fn get_slider_rect(&self) -> Rect {
-        let rect = self.get_rect();
         let slider_x = self.value_to_x(self.value.get());
-        Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height())
+        Rect::new(self.rect.left() + slider_x as i32, self.rect.top(), self.rect.height(), self.rect.height())
     }
 
     fn drag_start(&self, x: i32, y: i32) {
-        let rect = self.get_rect();
         let slider_x = self.value_to_x(self.value.get());
-        self.dragging.set(Some(x - rect.left() - (slider_x as i32)));
+        self.dragging.set(Some(x - self.rect.left() - (slider_x as i32)));
     }
 
     fn drag_stop(&self) {
         self.dragging.set(None);
     }
 
-    fn on_mouse_move(&self, x: i32, y: i32) -> Option<Effect> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> EventReaction<f32> {
         if let Some(drag_x) = self.dragging.get() {
-            let val = self.x_to_value((x - self.get_rect().left() - drag_x) as i16);
+            let val = self.x_to_value((x - self.rect.left() - drag_x) as i16);
             if val != self.value.get() {
                 self.value.set(val);
-                return Some(Effect::Redraw(vec![self.rect]));
+                EventReaction::Redraw
+            } else {
+                EventReaction::NoOp
             }
         } else {
-            let rect = self.get_rect();
-            let p = (x as i32, y as i32);
-            let inside = rect.contains_point(p);
+            let p = (x, y);
+            let inside = self.rect.contains_point(p);
             if inside {
                 let slider_x = self.value_to_x(self.value.get());
-                let slider_rect = Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height());
+                let slider_rect = Rect::new(self.rect.left() + slider_x as i32, self.rect.top(), self.rect.height(), self.rect.height());
                 let highlight = slider_rect.contains_point(p);
                 if highlight != self.highlight.get() {
                     self.highlight.set(highlight);
                 }
-                return Some(Effect::Redraw(vec![self.rect]));
+                EventReaction::Redraw
             } else {
                 if self.highlight.get() {
                     self.highlight.set(false);
-                    return Some(Effect::Redraw(vec![self.rect]));
+                    EventReaction::Redraw
+                } else {
+                    EventReaction::NoOp
                 }
             }
         }
-        None
     }
 }
 
-impl Widget for Slider {
-    fn get_rect(&self) -> Rect { self.rect }
-
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl Widget<f32> for Slider {
+    fn on_event(&self, event: &Event) -> EventReaction<f32> {
         match *event {
             Event::MouseButtonDown(Mouse::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
                 self.drag_start(x, y);
-                None
+                EventReaction::NoOp
             },
             Event::MouseButtonUp(..) => {
                 self.drag_stop();
-                None
+                EventReaction::Action(self.value.get())
             },
             Event::MouseMove(x, y) => self.on_mouse_move(x, y),
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 
     fn draw(&self, surface: &Surface) -> Result<()> {
-        let rect = self.get_rect();
+        let rect = self.rect;
 
         draw_bevel(surface, Rect::new(rect.left(), rect.top() + rect.height() as i32 / 2 - 2, rect.width(), 4), false, 1);
 

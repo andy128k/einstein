@@ -6,100 +6,69 @@ use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
+use ui::widget::dialog::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::main_loop::main_loop;
+use ui::main_loop::{ModalResult, main_loop};
 use resources::background::BLUE_PATTERN;
+use resources::messages::{Messages, get_messages};
 use locale::get_language;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-struct Messages {
-    title: &'static str,
-    name: &'static str,
-    version: &'static str,
-    copyright: &'static str,
-    ok: &'static str,
-}
-
-const MESSAGES_EN: Messages = Messages {
-    title: "About",
-    name: "Einstein Puzzle",
-    version: "version ",
-    copyright: "Copyright (c) 2003-2005 Flowix Games",
-    ok: "OK",
-};
-
-const MESSAGES_RU: Messages = Messages {
-    title: "Об авторах",
-    name: "Головоломка Эйнштейна",
-    version: "версия ",
-    copyright: "Copyright (c) 2003-2005 Flowix Games",
-    ok: "OK",
-};
-
-fn create_about(messages: &Messages) -> Result<Container<()>> {
+pub fn create_about_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
     let rect = Rect::new(220, 160, 360, 280);
-
-    let mut container = Container::new(rect, ());
-
-    container.add(Box::new(Window::new(rect.clone(), BLUE_PATTERN)?));
-
-    container.add(Box::new(Title {
-        text: messages.title.to_string(),
-        rect: Rect::new(250, 165, 300, 40),
-    }));
-
-    container.add(Box::new(Label {
-        text: messages.name.to_string(),
-        rect: Rect::new(220, 240, 360, 20),
-        color: Color::RGB(255, 255, 255),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-    }));
-
-    container.add(Box::new(Label {
-        text: format!("{}{}", messages.version, VERSION),
-        rect: Rect::new(220, 260, 360, 20),
-        color: Color::RGB(255, 255, 255),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-    }));
-
-    container.add(Box::new(Label {
-        text: messages.copyright.to_string(),
-        rect: Rect::new(220, 280, 360, 20),
-        color: Color::RGB(255, 255, 255),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-    }));
-
-    container.add(Box::new(Label {
-        text: "http://games.flowix.com".to_string(),
-        rect: Rect::new(220, 330, 360, 20),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-    }));
-
-    let close = new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
-        Some(Key::Escape), // Return also
-        || Some(Effect::Terminate)
-    )?;
-
-    container.add(Box::new(close));
-
-    Ok(container)
+    let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+        Box::new(
+            InterceptWidget::default()
+        ),
+        Box::new(WidgetMapAction::no_action(
+            Window::new(rect.clone(), BLUE_PATTERN)?
+        )),
+        Box::new(WidgetMapAction::no_action(Title {
+            text: messages.about.to_string(),
+            rect: Rect::new(250, 165, 300, 40),
+        })),
+        Box::new(WidgetMapAction::no_action(Label {
+            text: messages.einstein_puzzle.to_string(),
+            rect: Rect::new(220, 240, 360, 20),
+            color: Color::RGB(255, 255, 255),
+            horizontal_align: HorizontalAlign::Center,
+            vertical_align: VerticalAlign::Middle,
+        })),
+        Box::new(WidgetMapAction::no_action(Label {
+            text: format!("{}{}", messages.version, VERSION),
+            rect: Rect::new(220, 260, 360, 20),
+            color: Color::RGB(255, 255, 255),
+            horizontal_align: HorizontalAlign::Center,
+            vertical_align: VerticalAlign::Middle,
+        })),
+        Box::new(WidgetMapAction::no_action(Label {
+            text: messages.copyright.to_string(),
+            rect: Rect::new(220, 280, 360, 20),
+            color: Color::RGB(255, 255, 255),
+            horizontal_align: HorizontalAlign::Center,
+            vertical_align: VerticalAlign::Middle,
+        })),
+        Box::new(WidgetMapAction::no_action(Label {
+            text: "http://games.flowix.com".to_string(),
+            rect: Rect::new(220, 330, 360, 20),
+            color: Color::RGB(255, 255, 0),
+            horizontal_align: HorizontalAlign::Center,
+            vertical_align: VerticalAlign::Middle,
+        })),
+        Box::new(new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
+            Some(Key::Escape), // Return also
+            ModalResult(())
+        )?),
+    ];
+    Ok(Box::new(container))
 }
 
 pub fn show_about(surface: &Surface) -> Result<bool> {
-    let messages = if get_language() == Some("ru".to_string()) {
-        &MESSAGES_RU
-    } else {
-        &MESSAGES_EN
-    };
-    let about = create_about(messages)?;
-    main_loop(surface, &about)
+    let rect = Rect::new(220, 160, 360, 280);
+    let about = create_about_dialog(get_messages())?;
+    let quit = main_loop(surface, rect, &*about)?.is_none();
+    Ok(quit)
 }

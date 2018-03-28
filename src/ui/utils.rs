@@ -1,5 +1,5 @@
 use failure::err_msg;
-use sdl::video::{Surface, SurfaceFlag};
+use sdl::video::Surface;
 use sdl::video::ll::{SDL_LoadBMP_RW, SDL_RWFromConstMem};
 use sdl::video::ll::SDL_Surface;
 use sdl2;

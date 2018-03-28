@@ -9,9 +9,9 @@ use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::widget::container::*;
 use ui::widget::page_view::*;
-use ui::main_loop::main_loop;
+use ui::widget::dialog::*;
+use ui::main_loop::{main_loop, ModalResult};
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
@@ -40,14 +40,14 @@ fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Ve
 struct DescriptionPrivate {
     rect: Rect,
     pages: Vec<Rc<Page>>,
-    current_page_index: Cell<usize>,
+    current_page_index: usize,
     current_page: Rc<RefCell<Rc<Page>>>
 }
 
 type DescriptionPtr = Rc<RefCell<DescriptionPrivate>>;
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<Container<DescriptionPtr>> {
+    fn new(messages: &Messages, text: &[TextItem]) -> Result<WidgetPtr<ModalResult<()>>> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
             .into_iter().map(Rc::new).collect();
 
@@ -58,84 +58,77 @@ impl DescriptionPrivate {
         let state = Rc::new(RefCell::new(DescriptionPrivate {
             rect,
             pages,
-            current_page_index: Cell::new(0),
+            current_page_index: 0,
             current_page: current_page.clone()
         }));
 
-        let mut ptr = Container::new(rect, state.clone());
-
-        ptr.add(Box::new(Window::new(rect.clone(), BLUE_PATTERN)?));
-
-        ptr.add(Box::new(Title {
-            text: messages.rules.to_string(),
-            rect: Rect::new(250, 60, 300, 40),
-        }));
-
-        let page_view = PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page);
-
-        let prev = {
-            let this = Rc::downgrade(&state);
-            new_dialog_button(Rect::new(110, 515, 80, 25), BLUE_PATTERN, messages.prev,
-                None,
-                move || {
-                    if let Some(this) = this.upgrade() {
-                        this.borrow_mut().prev()
-                    } else {
-                        None
-                    }
+        let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+            Box::new(
+                InterceptWidget::default()
+            ),
+            Box::new(WidgetMapAction::no_action(
+                Window::new(rect.clone(), BLUE_PATTERN)?
+            )),
+            Box::new(WidgetMapAction::no_action(
+                Title {
+                    text: messages.rules.to_string(),
+                    rect: Rect::new(250, 60, 300, 40),
                 }
-            )?
-        };
-
-        let next = {
-            let this = Rc::downgrade(&state);
-            new_dialog_button(Rect::new(200, 515, 80, 25), BLUE_PATTERN, messages.next,
-                None,
-                move || {
-                    if let Some(this) = this.upgrade() {
-                        this.borrow_mut().next()
-                    } else {
-                        None
+            )),
+            Box::new(WidgetMapAction::no_action(
+                PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)
+            )),
+            Box::new({
+                let state2 = state.clone();
+                WidgetMapAction::new(
+                    new_dialog_button(Rect::new(110, 515, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
+                    move |_| {
+                        state2.borrow_mut().prev();
+                        EventReaction::Redraw
                     }
-                }
-            )?
-        };
+                )
+            }),
+            Box::new({
+                let state2 = state.clone();
+                WidgetMapAction::new(
+                    new_dialog_button(Rect::new(200, 515, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
+                    move |_| {
+                        state2.borrow_mut().next();
+                        EventReaction::Redraw
+                    }
+                )
+            }),
+            Box::new(
+                new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ModalResult(()))?
+            ),
+        ];
 
-        let close = new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close,
-            Some(Key::Escape),
-            || Some(Effect::Terminate)
-        )?;
-
-        ptr.add(Box::new(page_view));
-        ptr.add(Box::new(prev));
-        ptr.add(Box::new(next));
-        ptr.add(Box::new(close));
-
-        Ok(ptr)
+        Ok(Box::new(container))
     }
 
-    fn prev(&mut self) -> Option<Effect> {
-        let mut current_page_index = self.current_page_index.get();
-        if current_page_index > 0 {
-            current_page_index -= 1;
-            self.current_page_index.set(current_page_index);
-            *self.current_page.borrow_mut() = self.pages[current_page_index].clone();
+    fn prev(&mut self) {
+        if self.current_page_index > 0 {
+            self.current_page_index -= 1;
+            *self.current_page.borrow_mut() = self.pages[self.current_page_index].clone();
         }
-        Some(Effect::Redraw(vec![self.rect]))
     }
 
-    fn next(&mut self) -> Option<Effect> {
-        let mut current_page_index = self.current_page_index.get();
-        if current_page_index + 1 < self.pages.len() {
-            current_page_index += 1;
-            self.current_page_index.set(current_page_index);
-            *self.current_page.borrow_mut() = self.pages[current_page_index].clone();
+    fn next(&mut self) {
+        if self.current_page_index + 1 < self.pages.len() {
+            self.current_page_index += 1;
+            *self.current_page.borrow_mut() = self.pages[self.current_page_index].clone();
         }
-        Some(Effect::Redraw(vec![self.rect]))
     }
 }
 
+pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
+    DescriptionPrivate::new(messages, get_rules())
+}
+
 pub fn show_description(surface: &Surface) -> Result<bool> {
+    let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
+
     let description = DescriptionPrivate::new(get_messages(), get_rules())?;
-    main_loop(surface, &description)
+    let quit = main_loop(surface, rect, &*description)?.is_none();
+    Ok(quit)
 }

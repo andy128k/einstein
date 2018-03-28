@@ -16,9 +16,7 @@ impl Image {
     }
 }
 
-impl Widget for Image {
-    fn get_rect(&self) -> Rect { self.rect }
-
+impl Widget<Nothing> for Image {
     fn draw(&self, surface: &Surface) -> Result<()> {
         draw_tiles(surface, self.rect, &self.image);
         Ok(())

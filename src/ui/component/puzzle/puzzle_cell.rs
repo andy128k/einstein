@@ -45,6 +45,11 @@ fn local_find_choice(x: i32, y: i32) -> Option<u8> {
 
 const EMPTY_FIELD_ICON: &[u8] = include_bytes!("./tile.bmp");
 
+pub enum PuzzleAction {
+    Victory,
+    Failure,
+}
+
 pub struct PuzzleCell {
     state: Rc<RefCell<GamePrivate>>,
     row: u8,
@@ -52,12 +57,10 @@ pub struct PuzzleCell {
     bg: Surface,
     thing_images: Rc<ThingImages>,
     highlighted: Cell<Option<Option<u8>>>,
-    on_win: Rc<Fn()>,
-    on_fail: Rc<Fn()>,
 }
 
 impl PuzzleCell {
-    pub fn new<V: Fn() + 'static, F: Fn() + 'static>(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>, on_win: Rc<V>, on_fail: Rc<F>) -> Result<Self> {
+    pub fn new(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>) -> Result<Self> {
         let bg = load_image(EMPTY_FIELD_ICON)?;
         Ok(Self {
             state,
@@ -66,19 +69,23 @@ impl PuzzleCell {
             bg,
             thing_images,
             highlighted: Cell::new(None),
-            on_win,
-            on_fail,
         })
     }
 
-    fn on_mouse_button_down(&self, button: Mouse, x: i32, y: i32) -> Option<Effect> {
+    fn on_mouse_button_down(&self, button: Mouse, x: i32, y: i32) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
-            return None;
+            return EventReaction::NoOp;
         }
 
-        let lp = local_point(self.get_rect(), x, y)?;
+        let lp = match local_point(self.get_rect(), x, y) {
+            Some(v) => v,
+            None => return EventReaction::NoOp
+        };
 
-        let value = local_find_choice(lp.0, lp.1)?;
+        let value = match local_find_choice(lp.0, lp.1) {
+            Some(v) => v,
+            None => return EventReaction::NoOp
+        };
         let thing = Thing { row: self.row, value };
 
         match button {
@@ -100,19 +107,19 @@ impl PuzzleCell {
         }
 
         if !self.state.borrow().is_valid() {
-            (self.on_fail)();
+            EventReaction::Action(PuzzleAction::Failure)
         } else if self.state.borrow().possibilities.is_solved() {
-            // onVictory();
+            EventReaction::Action(PuzzleAction::Victory)
+        } else {
+            EventReaction::Redraw
         }
-
-        Some(Effect::Redraw(vec![self.get_rect()]))
     }
 
-    fn on_mouse_move(&self, x: i32, y: i32) -> Option<Effect> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> EventReaction<PuzzleAction> {
         let rect = self.get_rect();
         let lp = local_point(rect, x, y);
         if lp.is_none() && self.highlighted.get().is_none() {
-            return None;
+            return EventReaction::NoOp;
         }
 
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
@@ -123,11 +130,9 @@ impl PuzzleCell {
             );
         }
 
-        Some(Effect::Redraw(vec![rect]))
+        EventReaction::Redraw
     }
-}
 
-impl Widget for PuzzleCell {
     fn get_rect(&self) -> Rect {
         Rect::new(
             (FIELD_OFFSET_X as i32) + (self.col as i32) * ((FIELD_TILE_WIDTH + FIELD_GAP_X) as i32),
@@ -136,12 +141,14 @@ impl Widget for PuzzleCell {
             FIELD_TILE_HEIGHT as u32
         )
     }
+}
 
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl Widget<PuzzleAction> for PuzzleCell {
+    fn on_event(&self, event: &Event) -> EventReaction<PuzzleAction> {
         match *event {
             Event::MouseButtonDown(button, x, y) => self.on_mouse_button_down(button, x, y),
             Event::MouseMove(x, y) => self.on_mouse_move(x, y),
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 

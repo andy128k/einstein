@@ -3,7 +3,6 @@ use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::widget::widget::*;
 use ui::widget::button::*;
 use ui::utils::{load_image, adjust_brightness, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
@@ -45,8 +44,8 @@ impl ButtonRenderer for GameButton {
     }
 }
 
-pub fn new_game_button<A: Fn() -> Option<Effect> + 'static>(rect: Rect, text: &str, key: Option<Key>, action: A) -> Button<GameButton> {
-    Button::<GameButton>::new(
+pub fn new_game_button<A>(rect: Rect, text: &str, key: Option<Key>, action: A) -> Button<GameButton, A> {
+    Button::<GameButton, A>::new(
         rect,
         key,
         action,

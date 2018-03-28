@@ -1,30 +1,25 @@
 use sdl::video::Surface;
-use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 
-pub struct AnyKey {
-    action: Box<Fn() -> Option<Effect>>
+pub struct AnyKey<A> {
+    action: A
 }
 
-impl AnyKey {
-    pub fn new<A: Fn() -> Option<Effect> + 'static>(action: A) -> AnyKey {
-        Self {
-            action: Box::new(action)
-        }
+impl<A> AnyKey<A> {
+    pub fn new(action: A) -> Self {
+        Self { action }
     }
 }
 
-impl Widget for AnyKey {
-    fn get_rect(&self) -> Rect { Rect::new(0, 0, 1, 1) }
-
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl<A> Widget<A> for AnyKey<A> where A: Clone {
+    fn on_event(&self, event: &Event) -> EventReaction<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
                 // sound->play(L"click.wav");
-                (*self.action)()
+                EventReaction::Action(self.action.clone())
             },
-            _ => None
+            _ => EventReaction::NoOp,
         }
     }
 

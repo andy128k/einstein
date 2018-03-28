@@ -8,84 +8,71 @@ use error::*;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
+use ui::widget::dialog::*;
 use ui::widget::title::Title;
-use ui::widget::container::*;
-use ui::main_loop::main_loop;
+use ui::main_loop::{main_loop, ModalResult};
 use ui::component::game::GamePrivate;
 use ui::component::dialog::DialogResult;
 use resources::background::BLUE_PATTERN;
+use resources::messages::{get_messages, Messages};
 use storage::{Storage, SavedGame};
 
-struct ListWindowState {
-    result: DialogResult<GamePrivate>,
-}
-
-type ListWindowStatePtr = Rc<RefCell<ListWindowState>>;
-
-fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<Container<ListWindowStatePtr>> {
+pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<WidgetPtr<ModalResult<DialogResult<GamePrivate>>>> {
     let rect = Rect::new(250, 90, 300, 420);
 
-    let state = Rc::new(RefCell::new(ListWindowState {
-        result: DialogResult::Cancel,
-    }));
+    let mut container: Vec<WidgetPtr<ModalResult<DialogResult<GamePrivate>>>> = vec![];
 
-    let mut container = Container::new(rect, state.clone());
-
-    container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
-    container.add(Box::new(Title {
-        text: title.to_string(),
-        rect: Rect::new(250, 95, 300, 40),
-    }));
-
-    let close = new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, "close", // TODO i18n
-        Some(Key::Escape),
-        || Some(Effect::Terminate)
-    )?;
+    container.push(Box::new(
+        InterceptWidget::default()
+    ));
+    container.push(Box::new(WidgetMapAction::no_action(
+        Window::new(rect, BLUE_PATTERN)?
+    )));
+    container.push(Box::new(WidgetMapAction::no_action(
+        Title {
+            text: messages.load_game.to_string(),
+            rect: Rect::new(250, 95, 300, 40),
+        }
+    )));
 
     for (i, game) in saved_games.iter().enumerate() {
         let label: String = match *game {
             Some(ref g) => g.name.to_string(),
-            None => (
-                "-- empty --".to_string() // msg(L"empty")
-            )
+            None => messages.empty.to_string(),
         };
 
-        let game2: Option<SavedGame> = (*game).clone();
-        let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label,
-            None,
-            move || {
-                if let Some(ref game3) = game2 {
-                    if let Some(state) = state_weak.upgrade() {
-                        state.borrow_mut().result = DialogResult::Ok(game3.game.clone());
+        container.push(Box::new({
+            let game2: Option<SavedGame> = (*game).clone();
+            WidgetMapAction::new(
+                new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label, None, ())?,
+                move |_| {
+                    if let Some(ref game3) = game2 {
+                        EventReaction::Action(ModalResult(DialogResult::Ok(game3.game.clone())))
+                    } else {
+                        EventReaction::NoOp
                     }
-                    Some(Effect::Terminate)
-                } else {
-                    None
                 }
-            }
-        )?));
+            )
+        }));
     }
 
-    Ok(container)
+    container.push(Box::new(
+        new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), ModalResult(DialogResult::Cancel))?
+    ));
+
+    Ok(Box::new(container))
 }
 
 pub fn load_game(surface: Rc<Surface>, storage: &Storage) -> Result<Option<GamePrivate>> {
-    let container = create_list_window(&storage.saved_games, "Load Game" /*msg(L"loadGame")*/)?;
+    let rect = Rect::new(250, 90, 300, 420);
+    let container = new_load_game_dialog(&storage.saved_games, get_messages())?;
 
-    let quit = main_loop(&surface, &container)?;
-    if quit {
-        ::std::process::exit(0);
-    }
-
-    let result = mem::replace(&mut container.private.borrow_mut().result, DialogResult::Cancel);
+    let result = main_loop(&surface, rect, &*container)?;
     match result {
-        DialogResult::Ok(game) => {
-            Ok(Some(game))
-        },
-        DialogResult::Cancel => Ok(None),
-        DialogResult::Quit => {
+        None => {
             ::std::process::exit(0);
-        }
+        },
+        Some(DialogResult::Ok(ref game)) => Ok(Some(game.clone())),
+        Some(DialogResult::Cancel) => Ok(None),
     }
 }

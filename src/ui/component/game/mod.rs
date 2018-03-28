@@ -9,7 +9,7 @@ use sdl2::pixels::Color;
 use rules::{Rule, SolvedPuzzle, Possibilities, Thing, apply};
 use puzzle_gen::generate_puzzle;
 use ui::widget::widget::*;
-use ui::widget::container::Container;
+use ui::widget::dialog::*;
 use ui::widget::window::Window;
 use ui::widget::title::Title;
 use ui::widget::button::*;
@@ -17,17 +17,19 @@ use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
 use ui::widget::label::Label;
 use ui::utils::{load_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
-use ui::main_loop::main_loop;
+use ui::main_loop::{main_loop, ModalResult};
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
+use ui::component::puzzle::puzzle_cell::PuzzleAction;
 use ui::component::puzzle::horizontal_rules::HorizontalRules;
 use ui::component::puzzle::vertical_rules::VerticalRules;
 use ui::component::watch::Watch;
-use ui::component::rules_dialog::show_description;
-use ui::component::save_dialog::save_game;
-use ui::component::options_dialog::show_options_window;
-use ui::component::pause_dialog::*;
-use ui::component::failure_dialog::{show_failure_dialog, Choice};
+use ui::component::rules_dialog::{show_description, new_help_dialog};
+use ui::component::save_dialog::{save_game, new_save_game_dialog};
+use ui::component::options_dialog::{new_options_dialog, show_options_window};
+use ui::component::pause_dialog::new_pause_dialog;
+use ui::component::failure_dialog::{new_failure_dialog, show_failure_dialog, FailureChoice};
+use resources::messages::{get_messages, Messages};
 use error::*;
 use storage::*;
 
@@ -124,6 +126,25 @@ impl GamePrivate {
         })))
     }
 
+    pub fn restart(&mut self) {
+        let mut possibilities = Possibilities::new();
+        for rule in &self.rules {
+            if let Rule::Open(..) = *rule {
+                possibilities = apply(&possibilities, rule);
+            }
+        }
+        self.possibilities = possibilities;
+        for mut rule in &mut self.horizontal_rules {
+            rule.is_excluded = false;
+        }
+        for mut rule in &mut self.vertical_rules {
+            rule.is_excluded = false;
+        }
+        self.show_excluded = false;
+        // self.hinted = true;
+        self.reset();
+    }
+
     pub fn is_valid(&self) -> bool {
         self.possibilities.is_valid(&self.solved_puzzle)
     }
@@ -176,219 +197,290 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget<FnHelp, FnOpts, FnSave, FnPause>(surface: Rc<Surface>, state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave, show_pause: FnPause) -> Result<Container<()>>
-where
-    FnHelp: Fn() -> bool + 'static,
-    FnOpts: Fn() -> bool + 'static,
-    FnSave: Fn() -> bool + 'static,
-    FnPause: Fn() -> bool + 'static,
-{
+pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<WidgetPtr<ModalResult<()>>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
-    let mut container = Container::new(screen_rect, ());
+    let save_game_trigger = Rc::new(RefCell::new(None));
+    let show_opts_trigger = Rc::new(RefCell::new(None));
+    let show_help_trigger = Rc::new(RefCell::new(None));
+    let pause_trigger = Rc::new(RefCell::new(None));
+    let victory_trigger = Rc::new(RefCell::new(None));
+    let failure_trigger = Rc::new(RefCell::new(None));
 
-    container.add(Box::new(Image::new(screen_rect, RAIN_TILE)?));
-    container.add(Box::new(Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?));
-    container.add(Box::new(Title {
-        text: "Einstein Puzzle".to_string(), // i18n msg(L"einsteinPuzzle")
-        rect: Rect::new(20, 10, 500, 47),
-    }));
+    let mut container: Vec<WidgetPtr<ModalResult<()>>> = Vec::new();
 
-    container.add(Box::new(Watch::new(state.clone())));
-    container.add(Box::new({
-        let surface2 = surface.clone();
-        let surface3 = surface.clone();
-        new_puzzle_widget(state.clone(),
-            Rc::new(move || {
-        /*
-        class WinCommand: public Command
-        {
-            private:
-                Area *gameArea;
-                Watch *watch;
-                Game *game;
-                TopScores* top_scores;
-                Config* config;
+    container.push(Box::new(
+        InterceptWidget::default()
+    ));
 
-            public:
-                WinCommand(Area *a, Watch *w, Game *g, Config* config, TopScores* top_scores) { 
-                    gameArea = a; 
-                    watch = w;
-                    game = g;
-                    this->config = config;
-                    this->top_scores = top_scores;
-                };
-
-                virtual void doAction() {
-                    sound->play(L"applause.wav");
-                    watch->stop();
-                    Font font(L"laudcn2.ttf", 20);
-                    showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 500, 70, &font, 255,0,0, msg(L"won"));
-                    gameArea->draw();
-
-                    int score = watch->getElapsed() / 1000;
-                    int pos = -1;
-                    if (! game->isHinted()) {
-                        if (storage.scores.is_deserving(score)) {
-                            const char* lastname = ein_config_get_last_name(config);
-                            if (lastname == NULL) {
-                                lastname = "anonymous";
-                            }
-                            auto wlastname = fromUtf8(lastname);
-
-                            match ask_player_name(&surface, &last_name).unwrap() {
-                                DialogResult::Ok(name) => {
-                                    storage.last_name = Some(name);
-                                    pos = storage.scores.add_score_entry(storage::Score { name, score });
-                                },
-                                DialogResult::Cancel => {},
-                                DialogResult::Quit =>
-                                    exit(0),
-                            }
-                        }
-                    }
-
-                    let quit = show_scores(&surface, scores, pos)?;
-                    if quit {
-                        exit(0);
-                    }
-
-                    gameArea->finishEventLoop();
-                };
-        */
-            }),
-            Rc::new(move || {
-                // sound->play(L"glasbk2.wav");
-                match show_failure_dialog(&*surface2).unwrap() {
-                    DialogResult::Ok(Choice::StartNew) => {
-                        // game->newGame();
-                        Some(Effect::Terminate)
-                    },
-                    DialogResult::Ok(Choice::TryAgain) => {
-
-                        // let possibilities = Possibilities::new();
-                        // possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
-
-                        // rules = savedRules;
-
-                        // hinted = true;
-                        Some(Effect::Terminate)
-                    },
-                    DialogResult::Cancel => Some(Effect::Terminate),
-                    DialogResult::Quit => Some(Effect::Quit),
-                };
-            })
-        )?
-    }));
-    container.add(Box::new(HorizontalRules::new(state.clone())?));
-    container.add(Box::new(VerticalRules::new(state.clone())?));
-
-    container.add(Box::new({
-        let this_state = Rc::downgrade(&state);
-        new_game_button(
-            Rect::new(12, 440, 94, 30),
-            "Save", // TODO i18n
-            None,
-            move || {
-                let state = this_state.upgrade()?;
-                state.borrow_mut().stop();
-
-                let quit = save();
-                if quit {
-                    return Some(Effect::Quit);
-                }
-
-                state.borrow_mut().start();
-                Some(Effect::Redraw(vec![screen_rect]))
-            }
-        )
-    }));
-
-    container.add(Box::new({
-        let this_state = Rc::downgrade(&state);
-        new_game_button(
-            Rect::new(119, 400, 94, 30),
-            "switch", // TODO i18n
-            None,
-            move || {
-                let state = this_state.upgrade()?;
-                state.borrow_mut().toggle_show_excluded();
-                Some(Effect::Redraw(vec![screen_rect]))
-            }
-        )
-    }));
-
-    container.add(Box::new(new_game_button(
-        Rect::new(226, 400, 94, 30),
-        "Exit", // TODO i18n
-        Some(Key::Escape),
-        || Some(Effect::Terminate)
+    container.push(Box::new(WidgetMapAction::no_action(
+        Image::new(screen_rect, RAIN_TILE)?
     )));
 
-    container.add(Box::new({
-        let this_state = Rc::downgrade(&state);
-        new_game_button(
-            Rect::new(226, 440, 94, 30),
-            "Help", // TODO i18n
-            None,
-            move || {
-                let state = this_state.upgrade()?;
-                state.borrow_mut().stop();
+    container.push(Box::new(WidgetMapAction::no_action(
+        Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?
+    )));
 
-                let quit = show_help();
-                if quit {
-                    return Some(Effect::Quit);
+    container.push(Box::new(WidgetMapAction::no_action(
+        Title {
+            text: messages.einstein_puzzle.to_string(),
+            rect: Rect::new(20, 10, 500, 47),
+        }
+    )));
+
+    container.push(Box::new(WidgetMapAction::no_action(
+        Watch::new(state.clone())
+    )));
+
+    container.push(Box::new({
+        let victory_trigger2 = victory_trigger.clone();
+        let failure_trigger2 = failure_trigger.clone();
+        WidgetMapAction::new(
+            new_puzzle_widget(state.clone())?,
+            move |puzzle_action| {
+                match *puzzle_action {
+                    PuzzleAction::Victory => {
+                        // sound->play(L"applause.wav");
+                        *victory_trigger2.borrow_mut() = Some(());
+                    },
+                    PuzzleAction::Failure => {
+                        // sound->play(L"glasbk2.wav");
+                        *failure_trigger2.borrow_mut() = Some(());
+                    }
                 }
-
-                state.borrow_mut().start();
-                Some(Effect::Redraw(vec![screen_rect]))
+                EventReaction::Redraw
             }
         )
     }));
 
-    container.add(Box::new({
-        let this_state = Rc::downgrade(&state);
-        new_game_button(
-            Rect::new(119, 440, 94, 30),
-            "Options", // TODO i18n
-            None,
-            move || {
-                let state = this_state.upgrade()?;
-                state.borrow_mut().stop();
+    container.push(Box::new(WidgetMapAction::no_action(
+        HorizontalRules::new(state.clone())?
+    )));
+    container.push(Box::new(WidgetMapAction::no_action(
+        VerticalRules::new(state.clone())?
+    )));
 
-                let quit = show_options();
-                if quit {
-                    return Some(Effect::Quit);
-                }
-
-                state.borrow_mut().start();
-                Some(Effect::Redraw(vec![screen_rect]))
+    container.push(Box::new({
+        let this_state = state.clone();
+        let save_game_trigger2 = save_game_trigger.clone();
+        WidgetMapAction::new(
+            new_game_button(Rect::new(12, 440, 94, 30), messages.save, None, ()),
+            move |_| {
+                this_state.borrow_mut().stop();
+                *save_game_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
             }
         )
     }));
 
-    container.add(Box::new({
-        let this_state = Rc::downgrade(&state);
-        new_game_button(
-            Rect::new(12, 400, 94, 30),
-            "Pause", // TODO i18n
-            None,
-            move || {
-                let state = this_state.upgrade()?;
-                state.borrow_mut().stop();
-
-                let quit = show_pause();
-                if quit {
-                    return Some(Effect::Quit);
-                }
-
-                state.borrow_mut().start();
-                Some(Effect::Redraw(vec![screen_rect]))
+    container.push(Box::new({
+        let this_state = state.clone();
+        WidgetMapAction::new(
+            new_game_button(Rect::new(119, 400, 94, 30), messages.switch, None, ()),
+            move |_| {
+                this_state.borrow_mut().toggle_show_excluded();
+                EventReaction::Redraw
             }
         )
     }));
 
-    Ok(container)
+    container.push(Box::new(
+        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Key::Escape), ModalResult(()))
+    ));
+
+    container.push(Box::new({
+        let this_state = state.clone();
+        let show_help_trigger2 = show_help_trigger.clone();
+        WidgetMapAction::new(
+            new_game_button(Rect::new(226, 440, 94, 30), messages.help, None, ()),
+            move |_| {
+                this_state.borrow_mut().stop();
+                *show_help_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let this_state = state.clone();
+        let show_opts_trigger2 = show_opts_trigger.clone();
+        WidgetMapAction::new(
+            new_game_button(Rect::new(119, 440, 94, 30), messages.options, None, ()),
+            move |_| {
+                this_state.borrow_mut().stop();
+                *show_opts_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let this_state = state.clone();
+        let pause_trigger2 = pause_trigger.clone();
+        WidgetMapAction::new(
+            new_game_button(Rect::new(12, 400, 94, 30), messages.pause, None, ()),
+            move |_| {
+                this_state.borrow_mut().stop();
+                *pause_trigger2.borrow_mut() = Some(());
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let this_state = state.clone();
+        let pause_trigger2 = pause_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                pause_trigger.clone(),
+                move |_| new_pause_dialog(messages)
+            ),
+            move |_| {
+                *pause_trigger2.borrow_mut() = None;
+                this_state.borrow_mut().start();
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let this_state = state.clone();
+        let show_help_trigger2 = show_help_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_help_trigger.clone(),
+                move |_| new_help_dialog(messages)
+            ),
+            move |_| {
+                *show_help_trigger2.borrow_mut() = None;
+                this_state.borrow_mut().start();
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let storage1 = storage.clone();
+        let storage2 = storage.clone();
+        let this_state = state.clone();
+        let show_opts_trigger2 = show_opts_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_opts_trigger.clone(),
+                move |_| new_options_dialog(&storage1.borrow(), messages)
+            ),
+            move |result| {
+                *show_opts_trigger2.borrow_mut() = None;
+                this_state.borrow_mut().start();
+                match *result {
+                    ModalResult(DialogResult::Ok(ref options)) => {
+                        storage2.borrow_mut().fullscreen = options.fullscreen;
+                        storage2.borrow_mut().volume = options.volume;
+                        // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
+                        // sound->setVolume(options.volume);
+                    },
+                    ModalResult(DialogResult::Cancel) => {},
+                }
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+    container.push(Box::new({
+        let storage1 = storage.clone();
+        let storage2 = storage.clone();
+        let this_state = state.clone();
+        let save_game_trigger2 = save_game_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                save_game_trigger.clone(),
+                move |_| new_save_game_dialog(&storage1.borrow().saved_games, messages)
+            ),
+            move |result| {
+                *save_game_trigger2.borrow_mut() = None;
+                match *result {
+                    ModalResult(DialogResult::Ok((index, ref name))) => {
+                        storage2.borrow_mut().saved_games[index] = Some(SavedGame {
+                            name: name.to_owned(),
+                            game: this_state.borrow().clone()
+                        });
+                    },
+                    ModalResult(DialogResult::Cancel) => {}
+                }
+                this_state.borrow_mut().start();
+                EventReaction::Redraw
+            }
+        )
+    }));
+
+
+                        /*
+                        class WinCommand: public Command
+                        {
+                        virtual void doAction() {
+                            watch->stop();
+                            Font font(L"laudcn2.ttf", 20);
+                            showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 500, 70, &font, 255,0,0, msg(L"won"));
+                            gameArea->draw();
+
+                            int score = watch->getElapsed() / 1000;
+                            int pos = -1;
+                            if (! game->isHinted()) {
+                                if (storage.scores.is_deserving(score)) {
+                                    const char* lastname = ein_config_get_last_name(config);
+                                    if (lastname == NULL) {
+                                        lastname = "anonymous";
+                                    }
+                                    auto wlastname = fromUtf8(lastname);
+
+                                    match ask_player_name(&surface, &last_name).unwrap() {
+                                        DialogResult::Ok(name) => {
+                                            storage.last_name = Some(name);
+                                            pos = storage.scores.add_score_entry(storage::Score { name, score });
+                                        },
+                                        DialogResult::Cancel => {},
+                                        DialogResult::Quit =>
+                                            exit(0),
+                                    }
+                                }
+                            }
+
+                            let quit = show_scores(&surface, scores, pos)?;
+                            if quit {
+                                exit(0);
+                            }
+
+                            gameArea->finishEventLoop();
+                        };
+                        */
+
+    container.push(Box::new({
+        let failure_trigger2 = failure_trigger.clone();
+        let state2 = state.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                failure_trigger.clone(),
+                move |_| new_failure_dialog(messages)
+            ),
+            move |result| {
+                *failure_trigger2.borrow_mut() = None;
+                match *result {
+                    ModalResult(FailureChoice::StartNew) => {
+                        let g = GamePrivate::new().unwrap();
+                        *state2.borrow_mut() = g.borrow().clone();
+                        EventReaction::Redraw
+                    },
+                    ModalResult(FailureChoice::TryAgain) => {
+                        state2.borrow_mut().restart();
+                        EventReaction::Redraw
+                    },
+                    ModalResult(FailureChoice::Cancel) => EventReaction::Action(ModalResult(())),
+                }
+            }
+        )
+    }));
+
+    Ok(Box::new(container))
 }
 
 
@@ -515,36 +607,9 @@ void Game::run(Config* config, TopScores *top_scores)
 */
 
 pub fn game_run(surface: Rc<Surface>, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
-    let game_widget = new_game_widget(surface.clone(), game.clone(),
-        {
-            let surface2 = surface.clone();
-            move || {
-                show_description(&surface2).expect("No errors")
-            }
-        },
-        {
-            let surface2 = surface.clone();
-            let storage2 = storage.clone();
-            move || {
-                show_options_window(&*surface2, &mut storage2.borrow_mut()).expect("No errors")
-            }
-        },
-        {
-            let surface2 = surface.clone();
-            let storage2 = storage.clone();
-            let game2 = game.clone();
-            move || {
-                save_game(surface2.clone(), &mut storage2.borrow_mut(), &game2.borrow()).expect("No errors");
-                false
-            }
-        },
-        {
-            let surface2 = surface.clone();
-            move || {
-                pause(&*surface2).expect("No errors")
-            }
-        }
-    )?;
+    let game_widget = new_game_widget(storage.clone(), game.clone(), get_messages())?;
     game.borrow_mut().start();
-    main_loop(&surface, &game_widget)
+    let screen_rect = Rect::new(0, 0, 800, 600);
+    let result = main_loop(&surface, screen_rect, &*game_widget)?;
+    Ok(result.is_none())
 }

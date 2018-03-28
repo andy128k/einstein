@@ -3,7 +3,6 @@ use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::widget::widget::*;
 use ui::widget::button::*;
 use ui::utils::{load_image, draw_bevel, draw_tiles, adjust_brightness, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
@@ -33,10 +32,10 @@ impl ButtonRenderer for DialogButton {
     }
 }
 
-pub fn new_dialog_button<A: Fn() -> Option<Effect> + 'static>(rect: Rect, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton>> {
+pub fn new_dialog_button<A>(rect: Rect, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton, A>> {
     let bg = load_image(image)?;
     let highlighted_bg = adjust_brightness(&bg, 1.5);
-    Ok(Button::<DialogButton>::new(
+    Ok(Button::<DialogButton, A>::new(
         rect,
         key,
         action,

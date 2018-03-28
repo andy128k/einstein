@@ -32,9 +32,7 @@ impl Watch {
             last_duration: Cell::new(None)
         }
     }
-}
 
-impl Widget for Watch {
     fn get_rect(&self) -> Rect {
         Rect::new(
             (APP_WIDTH - TITLE_RIGHT - TITLE_PADDING_RIGHT - WATCH_WIDTH) as i32,
@@ -43,17 +41,19 @@ impl Widget for Watch {
             WATCH_HEIGHT
         )
     }
+}
 
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl Widget<Nothing> for Watch {
+    fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
-                    Some(Effect::Redraw(vec![self.get_rect()]))
+                    EventReaction::Redraw
                 } else {
-                    None
+                    EventReaction::NoOp
                 }
             },
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 

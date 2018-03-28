@@ -20,9 +20,7 @@ impl PageView {
     }
 }
 
-impl Widget for PageView {
-    fn get_rect(&self) -> Rect { self.rect }
-
+impl Widget<Nothing> for PageView {
     fn draw(&self, surface: &Surface) -> Result<()> {
         for item in (*self.page.borrow()).iter() {
             match *item {

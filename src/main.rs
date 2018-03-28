@@ -14,6 +14,7 @@ extern crate debug_cell;
 extern crate winapi;
 
 pub mod error;
+pub mod algebra;
 pub mod util;
 pub mod locale;
 pub mod converge;

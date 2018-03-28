@@ -1,7 +1,7 @@
 use std::cell::Cell;
 use sdl::video::Surface;
 use sdl::event::{Key, Mouse};
-use sdl2::rect::{Rect, Point};
+use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 
@@ -9,53 +9,51 @@ pub trait ButtonRenderer {
     fn draw(&self, surface: &Surface, rect: Rect, highlighted: bool) -> Result<()>;
 }
 
-pub struct Button<R: ButtonRenderer> {
+pub struct Button<R: ButtonRenderer, A> {
     rect: Rect,
     highlighted: Cell<bool>,
     key: Option<Key>,
-    action: Box<Fn() -> Option<Effect>>,
+    action: A,
     renderer: R,
 }
 
-impl<R: ButtonRenderer> Button<R> {
-    pub fn new<A: Fn() -> Option<Effect> + 'static>(rect: Rect, key: Option<Key>, action: A, renderer: R) -> Button<R> {
-        Button::<R> {
+impl<R: ButtonRenderer, A> Button<R, A> {
+    pub fn new(rect: Rect, key: Option<Key>, action: A, renderer: R) -> Button<R, A> {
+        Button::<R, A> {
             rect,
             highlighted: Cell::new(false),
             key,
-            action: Box::new(action),
+            action,
             renderer,
         }
     }
 }
 
-impl<R: ButtonRenderer> Widget for Button<R> {
-    fn get_rect(&self) -> Rect { self.rect }
-
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
+    fn on_event(&self, event: &Event) -> EventReaction<A> {
         match *event {
             Event::KeyDown(key, _) if Some(key) == self.key => {
                 // sound->play(L"click.wav"); TODO
-                (*self.action)()
+                EventReaction::Action(self.action.clone())
             },
             Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
-                (*self.action)()
+                EventReaction::Action(self.action.clone())
             },
             Event::MouseMove(x, y) => {
                 let to_highlight = self.rect.contains_point((x, y));
                 if self.highlighted.get() != to_highlight {
                     self.highlighted.set(to_highlight);
-                    Some(Effect::Redraw(vec![self.rect]))
+                    EventReaction::Redraw
                 } else {
-                    None
+                    EventReaction::NoOp
                 }
             },
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 
     fn draw(&self, surface: &Surface) -> Result<()> {
-        self.renderer.draw(surface, self.get_rect(), self.highlighted.get())
+        self.renderer.draw(surface, self.rect, self.highlighted.get())
     }
 }

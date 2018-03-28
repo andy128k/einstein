@@ -16,9 +16,7 @@ impl Window {
     }
 }
 
-impl Widget for Window {
-    fn get_rect(&self) -> Rect { self.rect }
-
+impl Widget<Nothing> for Window {
     fn draw(&self, surface: &Surface) -> Result<()> {
         draw_tiles(&surface, self.rect, &self.background);
         draw_bevel(&surface, self.rect, true, 1);

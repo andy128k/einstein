@@ -5,36 +5,48 @@ use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::window::*;
-use ui::widget::container::*;
+use ui::widget::dialog::*;
 use ui::widget::any_key::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::main_loop::main_loop;
+use ui::main_loop::{main_loop, ModalResult};
+use resources::messages::{Messages, get_messages};
 use resources::background::{GREEN_PATTERN};
 use ui::component::background::*;
 
-fn new_pause_dialog() -> Result<Container<()>> {
+pub fn new_pause_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
     let rect = Rect::new(0, 0, 800, 600);
 
-    let mut container = Container::new(rect, ());
+    let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+        Box::new(
+            InterceptWidget::default()
+        ),
+        Box::new(WidgetMapAction::no_action(
+            Background::new()?
+        )),
+        Box::new(WidgetMapAction::no_action(
+            Window::new(Rect::new(280, 275, 240, 50), GREEN_PATTERN)?
+        )),
+        Box::new(WidgetMapAction::no_action(
+            Label {
+                text: messages.paused.to_string(),
+                rect: Rect::new(280, 275, 240, 50),
+                color: Color::RGB(255, 255, 0),
+                horizontal_align: HorizontalAlign::Center,
+                vertical_align: VerticalAlign::Middle,
+            }
+        )),
+        Box::new(
+            AnyKey::new(ModalResult(()))
+        ),
+    ];
 
-    container.add(Box::new(Background::new()?));
-    container.add(Box::new(Window::new(Rect::new(280, 275, 240, 50), GREEN_PATTERN)?));
-
-    container.add(Box::new(Label {
-        text: "Paused".to_string(), // i18n msg(L"paused")
-        rect: Rect::new(280, 275, 240, 50),
-        color: Color::RGB(255, 255, 0),
-        horizontal_align: HorizontalAlign::Center,
-        vertical_align: VerticalAlign::Middle,
-    }));
-
-    container.add(Box::new(AnyKey::new(|| Some(Effect::Terminate))));
-
-    Ok(container)
+    Ok(Box::new(container))
 }
 
 pub fn pause(surface: &Surface) -> Result<bool> {
-    let pause_dialog = new_pause_dialog()?;
-    let quit = main_loop(surface, &pause_dialog)?;
+    let rect = Rect::new(0, 0, 800, 600);
+
+    let pause_dialog = new_pause_dialog(get_messages())?;
+    let quit = main_loop(surface, rect, &*pause_dialog)?.is_none();
     Ok(quit)
 }

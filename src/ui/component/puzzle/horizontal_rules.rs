@@ -100,9 +100,7 @@ impl HorizontalRules {
             TILE_HEIGHT as u32
         )
     }
-}
 
-impl Widget for HorizontalRules {
     fn get_rect(&self) -> Rect {
         Rect::new(
             TILE_X,
@@ -111,14 +109,23 @@ impl Widget for HorizontalRules {
             ((TILE_HEIGHT + TILE_GAP_Y) as u32) * (HINTS_ROWS as u32)
         )
     }
+}
 
-    fn on_event(&self, event: &Event) -> Option<Effect> {
+impl Widget<Nothing> for HorizontalRules {
+    fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
             Event::MouseButtonDown(Mouse::Right, x, y) => {
-                let no = self.get_rule_index(x, y)?;
-                self.state.borrow_mut().toggle_horizontal_rule(no)?;
-                // sound->play(L"whizz.wav");
-                Some(Effect::Redraw(vec![self.rect(no)]))
+                match self.get_rule_index(x, y) {
+                    Some(no) => {
+                        if self.state.borrow_mut().toggle_horizontal_rule(no).is_some() {
+                            // sound->play(L"whizz.wav");
+                            EventReaction::Redraw // self.rect(no)
+                        } else {
+                            EventReaction::NoOp
+                        }
+                    },
+                    None => EventReaction::NoOp
+                }
             },
             Event::MouseMove(x, y) => {
                 let no = self.get_rule_index(x, y);
@@ -133,12 +140,12 @@ impl Widget for HorizontalRules {
                     } else {
                         self.highlighted.set(None);
                     }
-                    Some(Effect::Redraw(rects))
+                    EventReaction::Redraw // Some(Effect::Redraw(rects))
                 } else {
-                    None
+                    EventReaction::NoOp
                 }
             },
-            _ => None,
+            _ => EventReaction::NoOp,
         }
     }
 
