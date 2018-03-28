@@ -6,6 +6,7 @@ use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
+use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
@@ -78,7 +79,7 @@ fn create_topscores(scores: &Scores, messages: &Messages, highlight: Option<usiz
         pos += 25;
     }
 
-    let close = Button::new(Rect::new(355, 435, 90, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.ok,
+    let close = new_dialog_button(Rect::new(355, 435, 90, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.ok,
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?;

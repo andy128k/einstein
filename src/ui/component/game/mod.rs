@@ -12,7 +12,8 @@ use ui::widget::widget::*;
 use ui::widget::container::Container;
 use ui::widget::window::Window;
 use ui::widget::title::Title;
-use ui::widget::button::Button;
+use ui::widget::button::*;
+use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
 use ui::widget::label::Label;
 use ui::utils::{load_image, tiled_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
@@ -77,7 +78,6 @@ pub struct GamePrivate {
 
 const RAIN_TILE: &[u8] = include_bytes!("./rain.bmp");
 const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
-const BUTTON_BG: &[u8] = include_bytes!("./btn.bmp");
 
 /*
 class WinCommand: public Command
@@ -317,23 +317,11 @@ where
     container.add(Box::new(VerticalRules::new(state.clone())?));
 
     let yellow = Color::RGB(255, 255, 0);
-    let button_bg = load_image(BUTTON_BG)?;
-    let highlighted_button_bg = adjust_brightness(&button_bg, 1.5);
-    let button_bg2 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg2 = adjust_brightness(&button_bg, 1.5);
-    let button_bg3 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg3 = adjust_brightness(&button_bg, 1.5);
-    let button_bg4 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg4 = adjust_brightness(&button_bg, 1.5);
-    let button_bg5 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg5 = adjust_brightness(&button_bg, 1.5);
-    let button_bg6 = load_image(BUTTON_BG)?;
-    let highlighted_button_bg6 = adjust_brightness(&button_bg, 1.5);
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
-        Button::new1(
-            Rect::new(12, 440, 94, 30), button_bg3, highlighted_button_bg3, yellow,
+        new_game_button(
+            Rect::new(12, 440, 94, 30),
             "Save", // TODO i18n
             None,
             move || {
@@ -353,8 +341,8 @@ where
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
-        Button::new1(
-            Rect::new(119, 400, 94, 30), button_bg4, highlighted_button_bg4, yellow,
+        new_game_button(
+            Rect::new(119, 400, 94, 30),
             "switch", // TODO i18n
             None,
             move || {
@@ -365,8 +353,8 @@ where
         )
     }));
 
-    container.add(Box::new(Button::new1(
-        Rect::new(226, 400, 94, 30), button_bg, highlighted_button_bg, yellow,
+    container.add(Box::new(new_game_button(
+        Rect::new(226, 400, 94, 30),
         "Exit", // TODO i18n
         Some(Key::Escape),
         || Some(Effect::Terminate)
@@ -374,8 +362,8 @@ where
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
-        Button::new1(
-            Rect::new(226, 440, 94, 30), button_bg2, highlighted_button_bg2, yellow,
+        new_game_button(
+            Rect::new(226, 440, 94, 30),
             "Help", // TODO i18n
             None,
             move || {
@@ -395,8 +383,8 @@ where
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
-        Button::new1(
-            Rect::new(119, 440, 94, 30), button_bg5, highlighted_button_bg5, yellow,
+        new_game_button(
+            Rect::new(119, 440, 94, 30),
             "Options", // TODO i18n
             None,
             move || {
@@ -416,8 +404,8 @@ where
 
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
-        Button::new1(
-            Rect::new(12, 400, 94, 30), button_bg6, highlighted_button_bg6, yellow,
+        new_game_button(
+            Rect::new(12, 400, 94, 30),
             "Pause", // TODO i18n
             None,
             move || {

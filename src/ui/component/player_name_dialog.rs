@@ -8,6 +8,7 @@ use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::button::*;
+use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
@@ -50,7 +51,7 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<Container<PlayerNa
 
     {
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(Button::new(Rect::new(348, 340, 90, 25), yellow, BLUE_PATTERN, messages.ok,
+        container.add(Box::new(new_dialog_button(Rect::new(348, 340, 90, 25), yellow, BLUE_PATTERN, messages.ok,
             Some(Key::Return),
             move || {
                 if let Some(state) = state_weak.upgrade() {

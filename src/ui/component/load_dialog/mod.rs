@@ -8,6 +8,7 @@ use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::button::*;
+use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
@@ -39,7 +40,7 @@ fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<
         rect: Rect::new(250, 95, 300, 40),
     }));
 
-    let close = Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, "close", // TODO i18n
+    let close = new_dialog_button(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, "close", // TODO i18n
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?;
@@ -54,7 +55,7 @@ fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<
 
         let game2: Option<SavedGame> = (*game).clone();
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(Button::new(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
+        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
             None,
             move || {
                 if let Some(ref game3) = game2 {

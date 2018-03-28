@@ -7,6 +7,7 @@ use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::button::*;
+use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
@@ -55,7 +56,7 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         };
 
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(Button::new(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
+        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
             None,
             move || {
                 if let Some(state) = state_weak.upgrade() {
@@ -71,7 +72,7 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         )?));
     }
 
-    container.add(Box::new(Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
+    container.add(Box::new(new_dialog_button(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?));
