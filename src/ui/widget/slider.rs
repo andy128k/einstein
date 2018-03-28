@@ -1,13 +1,11 @@
 use std::rc::Rc;
 use std::cell::Cell;
 use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
-use sdl2::pixels::Color;
-use sdl2::rect::{Rect, Point};
+use sdl::event::{Mouse};
+use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
-use ui::utils::{tiled_image, adjust_brightness, draw_bevel, draw_text, HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
+use ui::utils::{tiled_image, adjust_brightness, draw_bevel};
 
 pub struct Slider {
     rect: Rect,
@@ -72,7 +70,7 @@ impl Slider {
 impl Widget for Slider {
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
+    fn on_mouse_button_down(&self, _button: Mouse, x: u16, y: u16) -> Option<Effect> {
         let rect = self.get_rect();
         let p = (x as i32, y as i32);
         let inside = rect.contains_point(p);

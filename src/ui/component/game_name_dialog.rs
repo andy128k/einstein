@@ -1,9 +1,5 @@
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
-use std::ffi::{CStr, CString};
-use libc::memcpy;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
@@ -15,14 +11,11 @@ use ui::widget::button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
-use ui::widget::page_view::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::component::dialog::DialogResult;
 use ui::main_loop::main_loop;
-use ui::page_layout::{Page, PagesBuilder};
 use resources::background::BLUE_PATTERN;
 use resources::messages::{get_messages, Messages};
-use locale::get_language;
 
 struct GameNameState {
     ok: bool,

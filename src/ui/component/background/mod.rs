@@ -33,7 +33,7 @@ impl Widget for Background {
         surface.blit_at(&self.background, self.rect.left() as i16, self.rect.top() as i16);
         surface.blit_at(&self.title_background, 8, 10);
         let text = "Einstein Puzzle"; // i18n msg(L"einsteinPuzzle")
-        draw_text(surface, text, title_font()?, Color::RGB(255, 255, 0), true, Rect::new(20, 10, 500, 47), HorizontalAlign::Left, VerticalAlign::Middle);
+        draw_text(surface, text, title_font()?, Color::RGB(255, 255, 0), true, Rect::new(20, 10, 500, 47), HorizontalAlign::Left, VerticalAlign::Middle)?;
         Ok(())
     }
 }

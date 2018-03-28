@@ -1,5 +1,4 @@
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
 use sdl::video::{Surface};
 use sdl::event::Key;
@@ -7,22 +6,17 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
-use ui::widget::page_view::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::main_loop::main_loop;
-use ui::page_layout::{Page, PagesBuilder};
 use ui::component::game::GamePrivate;
 use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
-use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
 use resources::messages::{get_messages, Messages};
-use storage::{Storage, MAX_SLOTS, SavedGame};
+use storage::{Storage, SavedGame};
 
 struct ListWindowState {
     result: DialogResult<(usize, String)>,
@@ -51,11 +45,6 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         rect: Rect::new(250, 95, 300, 40),
     }));
 
-    let close = Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
-        Some(Key::Escape),
-        || Some(Effect::Terminate)
-    )?;
-
     for (i, game) in saved_games.iter().enumerate() {
         let (label, default_name): (String, String) = match *game {
             Some(ref g) => (g.name.to_string(), g.name.to_string()),
@@ -81,6 +70,11 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
             }
         )?));
     }
+
+    container.add(Box::new(Button::new(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
+        Some(Key::Escape),
+        || Some(Effect::Terminate)
+    )?));
 
     Ok(container)
 }

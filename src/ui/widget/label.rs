@@ -1,7 +1,6 @@
 use sdl::video::Surface;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
-use sdl2::ttf::Font;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};

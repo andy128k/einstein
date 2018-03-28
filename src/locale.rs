@@ -1,5 +1,5 @@
 use std::ffi::{CStr, CString};
-use libc::{setlocale, LC_ALL, c_char};
+use libc::{setlocale, LC_ALL};
 use regex::Regex;
 
 lazy_static! {

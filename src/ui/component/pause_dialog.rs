@@ -1,23 +1,16 @@
-use sdl;
 use sdl::video::{Surface};
-use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
-use ui::widget::button::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
 use ui::widget::any_key::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
-use resources::background::{BLUE_PATTERN, GREEN_PATTERN};
+use resources::background::{GREEN_PATTERN};
 use ui::component::background::*;
-use locale::get_language;
-use storage::Scores;
-use util::time::sec_to_str;
 
 fn new_pause_dialog() -> Result<Container<()>> {
     let rect = Rect::new(0, 0, 800, 600);

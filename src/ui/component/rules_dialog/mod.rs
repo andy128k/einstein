@@ -1,27 +1,23 @@
 use std::rc::Rc;
 use std::cell::{Cell};
 use debug_cell::RefCell;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::widget::page_view::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::main_loop::main_loop;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
 use resources::rules::{get_rules, TextItem};
 use resources::messages::{get_messages, Messages};
-use locale::get_language;
 
 const WIDTH: u16 = 600;
 const HEIGHT: u16 = 500;

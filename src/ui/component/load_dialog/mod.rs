@@ -1,30 +1,21 @@
 use std::mem;
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::label::*;
 use ui::widget::button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
-use ui::widget::page_view::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
-use ui::page_layout::{Page, PagesBuilder};
-use resources::background::BLUE_PATTERN;
 use ui::component::game::GamePrivate;
-use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
-use locale::get_language;
-use storage::{Storage, MAX_SLOTS, SavedGame};
+use resources::background::BLUE_PATTERN;
+use storage::{Storage, SavedGame};
 
 struct ListWindowState {
     result: DialogResult<GamePrivate>,
@@ -54,11 +45,10 @@ fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<
     )?;
 
     for (i, game) in saved_games.iter().enumerate() {
-        let (label, default_name): (String, String) = match *game {
-            Some(ref g) => (g.name.to_string(), g.name.to_string()),
+        let label: String = match *game {
+            Some(ref g) => g.name.to_string(),
             None => (
-                "-- empty --".to_string(), // msg(L"empty")
-                format!("game {}", i + 1)
+                "-- empty --".to_string() // msg(L"empty")
             )
         };
 

@@ -2,13 +2,13 @@ use std::rc::Rc;
 use std::cell::{Cell};
 use debug_cell::RefCell;
 use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
-use sdl2::rect::{Rect, Point};
-use rules::{SolvedPuzzle, Possibilities, Thing};
+use sdl::event::{Mouse};
+use sdl2::rect::{Rect};
+use rules::{Thing};
 use ui::widget::widget::*;
-use resources::thing::ThingImages;
 use ui::utils::load_image;
 use ui::component::game::GamePrivate;
+use resources::thing::ThingImages;
 use error::*;
 
 const PUZZLE_SIZE: u8 = 6;

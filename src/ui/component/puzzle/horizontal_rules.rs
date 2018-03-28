@@ -2,14 +2,13 @@ use std::rc::Rc;
 use std::cell::Cell;
 use debug_cell::RefCell;
 use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
+use sdl::event::{Mouse};
 use sdl2::rect::{Rect, Point};
-use rules::{Rule, SolvedPuzzle, Possibilities, Thing};
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
 use resources::thing::ThingImages;
 use ui::utils::load_image;
-use ui::component::game::{GamePrivate, HorizontalRule};
+use ui::component::game::{GamePrivate};
 use error::*;
 
 const TILE_BG: &[u8] = include_bytes!("./tile.bmp");

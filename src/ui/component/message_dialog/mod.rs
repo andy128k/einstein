@@ -1,13 +1,9 @@
-use std::ffi::CStr;
-use sdl;
 use sdl::video::{Surface};
-use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
-use ui::widget::button::*;
 use ui::widget::any_key::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
@@ -15,7 +11,6 @@ use ui::utils::{HorizontalAlign, VerticalAlign, rect_to_rect2};
 use resources::fonts::*;
 use ui::main_loop::main_loop;
 use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
-use locale::get_language;
 
 pub enum MessageType {
     Neutral,

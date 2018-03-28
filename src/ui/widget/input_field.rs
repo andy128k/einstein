@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::cell::{Cell};
 use debug_cell::RefCell;
 use failure::err_msg;
-use sdl::event::{Key, Mouse};
+use sdl::event::{Key};
 use sdl::video::{Surface, SurfaceFlag};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;

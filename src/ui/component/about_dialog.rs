@@ -1,5 +1,3 @@
-use std::rc::Rc;
-use debug_cell::RefCell;
 use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::Cell;
 use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
+use sdl::event::{Mouse};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
 use error::*;

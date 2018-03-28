@@ -1,6 +1,3 @@
-use std::rc::Rc;
-use debug_cell::RefCell;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;
@@ -13,11 +10,10 @@ use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::container::*;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
 use resources::background::BLUE_PATTERN;
 use locale::get_language;
-use storage::{Storage, Scores};
+use storage::{Scores};
 use util::time::sec_to_str;
 
 struct Messages {

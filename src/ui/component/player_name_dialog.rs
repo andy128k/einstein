@@ -1,9 +1,5 @@
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
-use std::ffi::{CStr, CString};
-use libc::memcpy;
-use sdl;
 use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
@@ -15,37 +11,11 @@ use ui::widget::button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
 use ui::widget::container::*;
-use ui::widget::page_view::*;
+use ui::component::dialog::DialogResult;
 use ui::utils::{HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
 use ui::main_loop::main_loop;
-use ui::page_layout::{Page, PagesBuilder};
 use resources::background::BLUE_PATTERN;
-use locale::get_language;
-
-struct Messages {
-    title: &'static str,
-    ok: &'static str,
-    cancel: &'static str,
-}
-
-const MESSAGES_EN: Messages = Messages {
-    title: "Enter your name:",
-    ok: "OK",
-    cancel: "Cancel",
-};
-
-const MESSAGES_RU: Messages = Messages {
-    title: "Введите ваше имя:",
-    ok: "OK",
-    cancel: "Отмена",
-};
-
-pub enum DialogResult<T> {
-    Ok(T),
-    Cancel,
-    Quit,
-}
+use resources::messages::{get_messages, Messages};
 
 struct PlayerNameState {
     ok: bool,
@@ -69,7 +39,7 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<Container<PlayerNa
 
     container.add(Box::new(Window::new(rect, BLUE_PATTERN)?));
     container.add(Box::new(Label {
-        text: messages.title.to_string(),
+        text: messages.enter_name.to_string(),
         rect: Rect::new(180, 300, 150, 26),
         color: yellow,
         horizontal_align: HorizontalAlign::Left,
@@ -94,13 +64,9 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<Container<PlayerNa
     Ok(container)
 }
 
-fn ask_player_name(surface: &Surface, default_name: &str) -> Result<DialogResult<String>> {
-    let messages = if get_language() == Some("ru".to_string()) {
-        &MESSAGES_RU
-    } else {
-        &MESSAGES_EN
-    };
-    let container = new_player_name(default_name, &messages)?;
+pub fn ask_player_name(surface: &Surface, default_name: &str) -> Result<DialogResult<String>> {
+    let messages = get_messages();
+    let container = new_player_name(default_name, messages)?;
     let quit = main_loop(surface, &container)?;
     if quit {
         return Ok(DialogResult::Quit);
