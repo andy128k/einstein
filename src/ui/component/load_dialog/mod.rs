@@ -3,11 +3,9 @@ use std::rc::Rc;
 use debug_cell::RefCell;
 use sdl::video::{Surface};
 use sdl::event::Key;
-use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
@@ -26,7 +24,6 @@ type ListWindowStatePtr = Rc<RefCell<ListWindowState>>;
 
 fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<Container<ListWindowStatePtr>> {
     let rect = Rect::new(250, 90, 300, 420);
-    let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(ListWindowState {
         result: DialogResult::Cancel,
@@ -40,7 +37,7 @@ fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<
         rect: Rect::new(250, 95, 300, 40),
     }));
 
-    let close = new_dialog_button(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, "close", // TODO i18n
+    let close = new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, "close", // TODO i18n
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?;
@@ -55,7 +52,7 @@ fn create_list_window(saved_games: &[Option<SavedGame>], title: &str) -> Result<
 
         let game2: Option<SavedGame> = (*game).clone();
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
+        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label,
             None,
             move || {
                 if let Some(ref game3) = game2 {

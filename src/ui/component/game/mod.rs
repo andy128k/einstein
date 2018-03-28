@@ -316,8 +316,6 @@ where
     container.add(Box::new(HorizontalRules::new(state.clone())?));
     container.add(Box::new(VerticalRules::new(state.clone())?));
 
-    let yellow = Color::RGB(255, 255, 0);
-
     container.add(Box::new({
         let this_state = Rc::downgrade(&state);
         new_game_button(

@@ -7,7 +7,6 @@ use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
@@ -51,7 +50,7 @@ fn new_game_name(name: &str, messages: &Messages) -> Result<Container<GameNameSt
 
     {
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(new_dialog_button(Rect::new(310, 340, 80, 25), yellow, BLUE_PATTERN, messages.ok,
+        container.add(Box::new(new_dialog_button(Rect::new(310, 340, 80, 25), BLUE_PATTERN, messages.ok,
             Some(Key::Return),
             move || {
                 if let Some(state) = state_weak.upgrade() {
@@ -62,7 +61,7 @@ fn new_game_name(name: &str, messages: &Messages) -> Result<Container<GameNameSt
         )?));
     }
 
-    container.add(Box::new(new_dialog_button(Rect::new(400, 340, 80, 25), yellow, BLUE_PATTERN, messages.cancel,
+    container.add(Box::new(new_dialog_button(Rect::new(400, 340, 80, 25), BLUE_PATTERN, messages.cancel,
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?));

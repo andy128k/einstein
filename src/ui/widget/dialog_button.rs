@@ -10,7 +10,6 @@ use resources::fonts::*;
 
 pub struct DialogButton {
     text: String,
-    color: Color,
     image: Surface,
     highlighted_image: Surface,
 }
@@ -28,13 +27,13 @@ impl ButtonRenderer for DialogButton {
         draw_bevel(surface, inner_rect, true, 1);
         draw_bevel(surface, rect, false, 1);
 
-        draw_text(surface, &self.text, button_font()?, self.color, true, rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
+        draw_text(surface, &self.text, button_font()?, Color::RGB(255, 255, 0), true, rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
 
         Ok(())
     }
 }
 
-pub fn new_dialog_button<A: Fn() -> Option<Effect> + 'static>(rect: Rect, color: Color, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton>> {
+pub fn new_dialog_button<A: Fn() -> Option<Effect> + 'static>(rect: Rect, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton>> {
     let bg = load_image(image)?;
     let highlighted_bg = adjust_brightness(&bg, 1.5);
     Ok(Button::<DialogButton>::new(
@@ -43,7 +42,6 @@ pub fn new_dialog_button<A: Fn() -> Option<Effect> + 'static>(rect: Rect, color:
         action,
         DialogButton {
             text: text.to_string(),
-            color,
             image: bg,
             highlighted_image: highlighted_bg,
         }

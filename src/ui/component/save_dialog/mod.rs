@@ -2,11 +2,9 @@ use std::rc::Rc;
 use debug_cell::RefCell;
 use sdl::video::{Surface};
 use sdl::event::Key;
-use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
@@ -31,7 +29,6 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         F: Fn(&str) -> DialogResult<String> + 'static
 {
     let rect = Rect::new(250, 90, 300, 420);
-    let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(ListWindowState {
         result: DialogResult::Cancel,
@@ -56,7 +53,7 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         };
 
         let state_weak = Rc::downgrade(&state);
-        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), yellow, BLUE_PATTERN, &label,
+        container.add(Box::new(new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label,
             None,
             move || {
                 if let Some(state) = state_weak.upgrade() {
@@ -72,7 +69,7 @@ fn create_list_window<F>(saved_games: &[Option<SavedGame>], messages: &Messages,
         )?));
     }
 
-    container.add(Box::new(new_dialog_button(Rect::new(360, 470, 80, 25), yellow, BLUE_PATTERN, messages.close,
+    container.add(Box::new(new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, messages.close,
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?));

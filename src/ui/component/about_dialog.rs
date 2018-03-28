@@ -5,7 +5,6 @@ use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
@@ -85,7 +84,7 @@ fn create_about(messages: &Messages) -> Result<Container<()>> {
         vertical_align: VerticalAlign::Middle,
     }));
 
-    let close = new_dialog_button(Rect::new(360, 400, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.ok,
+    let close = new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
         Some(Key::Escape), // Return also
         || Some(Effect::Terminate)
     )?;

@@ -7,7 +7,6 @@ use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::checkbox::*;
 use ui::widget::slider::*;
@@ -64,7 +63,7 @@ fn new_options_dialog(storage: &Storage) -> Result<Container<Rc<Options>>> {
 
     container.add(Box::new({
         let state_weak = Rc::downgrade(&state);
-        new_dialog_button(Rect::new(315, 390, 85, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, "ok", // i18n
+        new_dialog_button(Rect::new(315, 390, 85, 25), BLUE_PATTERN, "ok", // i18n
             Some(Key::Return),
             move || {
                 if let Some(state) = state_weak.upgrade() {
@@ -75,7 +74,7 @@ fn new_options_dialog(storage: &Storage) -> Result<Container<Rc<Options>>> {
         )?
     }));
 
-    container.add(Box::new(new_dialog_button(Rect::new(405, 390, 85, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, "cancel", // i18n
+    container.add(Box::new(new_dialog_button(Rect::new(405, 390, 85, 25), BLUE_PATTERN, "cancel", // i18n
         Some(Key::Escape),
         || Some(Effect::Terminate)
     )?));

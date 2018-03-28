@@ -3,11 +3,9 @@ use std::cell::{Cell};
 use debug_cell::RefCell;
 use sdl::video::{Surface};
 use sdl::event::Key;
-use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
-use ui::widget::button::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
@@ -77,7 +75,7 @@ impl DescriptionPrivate {
 
         let prev = {
             let this = Rc::downgrade(&state);
-            new_dialog_button(Rect::new(110, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.prev,
+            new_dialog_button(Rect::new(110, 515, 80, 25), BLUE_PATTERN, messages.prev,
                 None,
                 move || {
                     if let Some(this) = this.upgrade() {
@@ -91,7 +89,7 @@ impl DescriptionPrivate {
 
         let next = {
             let this = Rc::downgrade(&state);
-            new_dialog_button(Rect::new(200, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.next,
+            new_dialog_button(Rect::new(200, 515, 80, 25), BLUE_PATTERN, messages.next,
                 None,
                 move || {
                     if let Some(this) = this.upgrade() {
@@ -103,7 +101,7 @@ impl DescriptionPrivate {
             )?
         };
 
-        let close = new_dialog_button(Rect::new(610, 515, 80, 25), Color::RGB(255, 255, 0), BLUE_PATTERN, messages.close,
+        let close = new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close,
             Some(Key::Escape),
             || Some(Effect::Terminate)
         )?;
