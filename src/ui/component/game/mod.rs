@@ -18,6 +18,7 @@ use ui::widget::image::Image;
 use ui::widget::label::Label;
 use ui::utils::{load_image, tiled_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
 use ui::main_loop::main_loop;
+use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
 use ui::component::puzzle::horizontal_rules::HorizontalRules;
 use ui::component::puzzle::vertical_rules::VerticalRules;
@@ -26,6 +27,7 @@ use ui::component::rules_dialog::show_description;
 use ui::component::save_dialog::save_game;
 use ui::component::options_dialog::show_options_window;
 use ui::component::pause_dialog::*;
+use ui::component::failure_dialog::{show_failure_dialog, Choice};
 use error::*;
 use storage::*;
 
@@ -78,125 +80,6 @@ pub struct GamePrivate {
 
 const RAIN_TILE: &[u8] = include_bytes!("./rain.bmp");
 const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
-
-/*
-class WinCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Watch *watch;
-        Game *game;
-        TopScores* top_scores;
-        Config* config;
-
-    public:
-        WinCommand(Area *a, Watch *w, Game *g, Config* config, TopScores* top_scores) { 
-            gameArea = a; 
-            watch = w;
-            game = g;
-            this->config = config;
-            this->top_scores = top_scores;
-        };
-
-        virtual void doAction() {
-            sound->play(L"applause.wav");
-            watch->stop();
-            Font font(L"laudcn2.ttf", 20);
-            showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 
-                    500, 70, &font, 255,0,0, msg(L"won"));
-            gameArea->draw();
-
-            int score = watch->getElapsed() / 1000;
-            int pos = -1;
-            if (! game->isHinted()) {
-                if (storage.scores.is_deserving(score)) {
-                    const char* lastname = ein_config_get_last_name(config);
-                    if (lastname == NULL) {
-                        lastname = "anonymous";
-                    }
-                    auto wlastname = fromUtf8(lastname);
-
-                    match ask_player_name(&surface, &last_name).unwrap() {
-                        DialogResult::Ok(name) => {
-                            storage.last_name = Some(name);
-                            pos = storage.scores.add_score_entry(storage::Score { name, score });
-                        },
-                        DialogResult::Cancel => {},
-                        DialogResult::Quit =>
-                            exit(0),
-                    }
-                }
-            }
-
-            let quit = show_scores(&surface, scores, pos)?;
-            if quit {
-                exit(0);
-            }
-
-            gameArea->finishEventLoop();
-        };
-};
-
-class OkDlgCommand: public Command
-{
-    private:
-        bool &res;
-        Area *area;
-
-    public:
-        OkDlgCommand(Area *a, bool &r): res(r) { 
-            area = a; 
-        };
-        
-        virtual void doAction() { 
-            res = true; 
-            area->finishEventLoop();
-        };
-};
-
-class FailCommand: public Command
-{
-    private:
-        Area *gameArea;
-        Game *game;
-
-    public:
-        FailCommand(Area *a, Game *g) { gameArea = a;  game = g; };
-        
-        virtual void doAction() {
-            sound->play(L"glasbk2.wav");
-            bool restart = false;
-            bool newGame = false;
-            Font font(L"laudcn2.ttf", 24);
-            Font btnFont(L"laudcn2.ttf", 14);
-            Screen *screen = gameArea->screen;
-            Area area = Area(screen);
-            area.add(gameArea);
-            area.add(new Window(screen, 220, 240, 360, 140, L"redpattern.bmp", 6));
-            area.add(new Label(screen, &font, 250, 230, 300, 100, Label::ALIGN_CENTER,
-                        Label::ALIGN_MIDDLE, 255,255,0, msg(L"loose")));
-            OkDlgCommand newGameCmd(&area, newGame);
-            area.add(new Button(screen, 250, 340, 90, 25, &btnFont, 255,255,0, 
-                        L"redpattern.bmp", msg(L"startNew"), &newGameCmd));
-            OkDlgCommand restartCmd(&area, restart);
-            area.add(new Button(screen, 350, 340, 90, 25, &btnFont, 255,255,0, 
-                        L"redpattern.bmp", msg(L"tryAgain"), &restartCmd));
-            ExitCommand exitCmd(area);
-            area.add(new Button(screen, 450, 340, 90, 25, &btnFont, 255,255,0, 
-                        L"redpattern.bmp", msg(L"exit"), &exitCmd));
-            area.run();
-            if (restart || newGame) {
-                if (newGame)
-                    game->newGame();
-                else
-                    game->restart();
-                gameArea->draw();
-                gameArea->updateMouse();
-            } else
-                gameArea->finishEventLoop();
-        };
-};
-*/
 
 impl GamePrivate {
     pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
@@ -293,7 +176,7 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget<FnHelp, FnOpts, FnSave, FnPause>(state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave, show_pause: FnPause) -> Result<Container<()>>
+pub fn new_game_widget<FnHelp, FnOpts, FnSave, FnPause>(surface: Rc<Surface>, state: Rc<RefCell<GamePrivate>>, show_help: FnHelp, show_options: FnOpts, save: FnSave, show_pause: FnPause) -> Result<Container<()>>
 where
     FnHelp: Fn() -> bool + 'static,
     FnOpts: Fn() -> bool + 'static,
@@ -312,7 +195,91 @@ where
     }));
 
     container.add(Box::new(Watch::new(state.clone())));
-    container.add(Box::new(new_puzzle_widget(state.clone())?));
+    container.add(Box::new({
+        let surface2 = surface.clone();
+        let surface3 = surface.clone();
+        new_puzzle_widget(state.clone(),
+            Rc::new(move || {
+        /*
+        class WinCommand: public Command
+        {
+            private:
+                Area *gameArea;
+                Watch *watch;
+                Game *game;
+                TopScores* top_scores;
+                Config* config;
+
+            public:
+                WinCommand(Area *a, Watch *w, Game *g, Config* config, TopScores* top_scores) { 
+                    gameArea = a; 
+                    watch = w;
+                    game = g;
+                    this->config = config;
+                    this->top_scores = top_scores;
+                };
+
+                virtual void doAction() {
+                    sound->play(L"applause.wav");
+                    watch->stop();
+                    Font font(L"laudcn2.ttf", 20);
+                    showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 500, 70, &font, 255,0,0, msg(L"won"));
+                    gameArea->draw();
+
+                    int score = watch->getElapsed() / 1000;
+                    int pos = -1;
+                    if (! game->isHinted()) {
+                        if (storage.scores.is_deserving(score)) {
+                            const char* lastname = ein_config_get_last_name(config);
+                            if (lastname == NULL) {
+                                lastname = "anonymous";
+                            }
+                            auto wlastname = fromUtf8(lastname);
+
+                            match ask_player_name(&surface, &last_name).unwrap() {
+                                DialogResult::Ok(name) => {
+                                    storage.last_name = Some(name);
+                                    pos = storage.scores.add_score_entry(storage::Score { name, score });
+                                },
+                                DialogResult::Cancel => {},
+                                DialogResult::Quit =>
+                                    exit(0),
+                            }
+                        }
+                    }
+
+                    let quit = show_scores(&surface, scores, pos)?;
+                    if quit {
+                        exit(0);
+                    }
+
+                    gameArea->finishEventLoop();
+                };
+        */
+            }),
+            Rc::new(move || {
+                // sound->play(L"glasbk2.wav");
+                match show_failure_dialog(&*surface2).unwrap() {
+                    DialogResult::Ok(Choice::StartNew) => {
+                        // game->newGame();
+                        Some(Effect::Terminate)
+                    },
+                    DialogResult::Ok(Choice::TryAgain) => {
+
+                        // let possibilities = Possibilities::new();
+                        // possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
+
+                        // rules = savedRules;
+
+                        // hinted = true;
+                        Some(Effect::Terminate)
+                    },
+                    DialogResult::Cancel => Some(Effect::Terminate),
+                    DialogResult::Quit => Some(Effect::Quit),
+                };
+            })
+        )?
+    }));
     container.add(Box::new(HorizontalRules::new(state.clone())?));
     container.add(Box::new(VerticalRules::new(state.clone())?));
 
@@ -548,7 +515,7 @@ void Game::run(Config* config, TopScores *top_scores)
 */
 
 pub fn game_run(surface: Rc<Surface>, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
-    let game_widget = new_game_widget(game.clone(),
+    let game_widget = new_game_widget(surface.clone(), game.clone(),
         {
             let surface2 = surface.clone();
             move || {

@@ -15,7 +15,7 @@ const FIELD_GAP_Y: u16 =        4;
 const FIELD_TILE_WIDTH: u16 =  48;
 const FIELD_TILE_HEIGHT: u16 = 48;
 
-pub fn new_puzzle_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()>> {
+pub fn new_puzzle_widget<V: Fn() + 'static, F: Fn() + 'static>(state: Rc<RefCell<GamePrivate>>, on_win: Rc<V>, on_fail: Rc<F>) -> Result<Container<()>> {
     let rect = Rect::new(
         FIELD_OFFSET_X as i32,
         FIELD_OFFSET_Y as i32,
@@ -29,7 +29,7 @@ pub fn new_puzzle_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Container<()
 
     for row in 0..PUZZLE_SIZE {
         for col in 0..PUZZLE_SIZE {
-            let cell = PuzzleCell::new(state.clone(), row as u8, col as u8, thing_images.clone())?;
+            let cell = PuzzleCell::new(state.clone(), row as u8, col as u8, thing_images.clone(), on_win.clone(), on_fail.clone())?;
             container.add(Box::new(cell));
         }
     }

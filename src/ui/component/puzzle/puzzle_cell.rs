@@ -51,11 +51,13 @@ pub struct PuzzleCell {
     col: u8,
     bg: Surface,
     thing_images: Rc<ThingImages>,
-    highlighted: Cell<Option<Option<u8>>>
+    highlighted: Cell<Option<Option<u8>>>,
+    on_win: Rc<Fn()>,
+    on_fail: Rc<Fn()>,
 }
 
 impl PuzzleCell {
-    pub fn new(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>) -> Result<Self> {
+    pub fn new<V: Fn() + 'static, F: Fn() + 'static>(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>, on_win: Rc<V>, on_fail: Rc<F>) -> Result<Self> {
         let bg = load_image(EMPTY_FIELD_ICON)?;
         Ok(Self {
             state,
@@ -63,7 +65,9 @@ impl PuzzleCell {
             col,
             bg,
             thing_images,
-            highlighted: Cell::new(None)
+            highlighted: Cell::new(None),
+            on_win,
+            on_fail,
         })
     }
 }
@@ -107,7 +111,7 @@ impl Widget for PuzzleCell {
         }
 
         if !self.state.borrow().is_valid() {
-            // onFail();
+            (self.on_fail)();
         } else if self.state.borrow().possibilities.is_solved() {
             // onVictory();
         }
