@@ -16,7 +16,7 @@ use ui::widget::button::*;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
 use ui::widget::label::Label;
-use ui::utils::{load_image, tiled_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
+use ui::utils::{load_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
 use ui::main_loop::main_loop;
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
