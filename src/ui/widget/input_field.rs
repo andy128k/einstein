@@ -8,13 +8,12 @@ use sdl::video::{Surface, SurfaceFlag};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use ui::widget::widget::*;
-use ui::utils::{tiled_image, draw_bevel, draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
+use ui::utils::{draw_bevel, draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
 use resources::fonts::text_font;
 use error::*;
 
 pub struct InputField {
     rect: Rect,
-    background: Surface,
     cursor: Surface,
     max_len: usize,
     text: Rc<RefCell<String>>,
@@ -24,25 +23,14 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(rect: Rect, bg: &[u8], text: Rc<RefCell<String>>, max_len: usize) -> Result<Self> {
-        let cursor = Surface::new(&[SurfaceFlag::SWSurface], 2, rect.height() as isize - 4, 32, 0, 0, 0, 0).map_err(err_msg)?;
-        cursor.fill(::sdl::video::Color::RGB(255, 255, 0));
-
-        let mut win = tiled_image(bg, rect.width() as u16, rect.height() as u16)?;
-
-        win.lock();
-        let mut bounding_rect = rect;
-        bounding_rect.reposition((0, 0));
-        draw_bevel(&mut win, bounding_rect, false, 1);
-        win.unlock();
-
-        let background = win.display_format().map_err(err_msg)?;
+    pub fn new(rect: Rect, text: Rc<RefCell<String>>, max_len: usize) -> Result<Self> {
+        let cursor = Surface::new(&[SurfaceFlag::SWSurface], 2, rect.height() as isize - 8, 32, 0, 0, 0, 0).map_err(err_msg)?;
+        cursor.fill(::sdl::video::Color::RGB(33, 33, 33));
 
         let text_len = text.borrow().len();
 
         Ok(Self {
             rect,
-            background,
             cursor,
             max_len,
             text,
@@ -132,7 +120,7 @@ impl Widget for InputField {
     }
 
     fn draw(&self, surface: &Surface) -> Result<()> {
-        surface.blit_at(&self.background, self.rect.left() as i16, self.rect.top() as i16);
+        draw_bevel(surface, self.rect, false, 1);
 
         let window_rect = self.get_rect();
         let rect = Rect::new(window_rect.left() + 1, window_rect.top() + 1, window_rect.width() - 2, window_rect.height() - 2);
@@ -148,7 +136,7 @@ impl Widget for InputField {
             } else {
                 0
             };
-            surface.blit_at(&self.cursor, window_rect.left() as i16 + pos as i16, window_rect.top() as i16 + 2);
+            surface.blit_at(&self.cursor, window_rect.left() as i16 + pos as i16, window_rect.top() as i16 + 4);
         }
 
         surface.set_clip_rect(None);

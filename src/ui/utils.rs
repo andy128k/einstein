@@ -48,27 +48,6 @@ pub fn load_image(data: &[u8]) -> Result<Surface> {
     Ok(surface)
 }
 
-pub fn tiled_image(data: &[u8], width: u16, height: u16) -> Result<Surface> {
-    let win = Surface::new(&[SurfaceFlag::SWSurface], width as isize, height as isize, 32, 0, 0, 0, 0).map_err(err_msg)?;
-
-    let tile = load_image(data)?;
-
-    let tile_width = tile.get_width();
-    let tile_height = tile.get_height();
-
-    let cw = (width + tile_width - 1) / tile_width;
-    let ch = (height + tile_height - 1) / tile_height;
-
-    for j in 0..ch {
-        for i in 0..cw {
-            win.blit_at(&tile, (i * tile_width) as i16, (j * tile_height) as i16);
-        }
-    }
-
-    let image = win.display_format().map_err(err_msg)?;
-    Ok(image)
-}
-
 pub fn draw_tiles(dest: &Surface, dest_rect: Rect, tile: &Surface) {
     dest.set_clip_rect(Some(&rect2_to_rect(dest_rect)));
 
@@ -123,6 +102,12 @@ pub fn draw_bevel(s: &Surface, rect: Rect, raised: bool, size: u16) {
         k += k_adv;
         f += f_adv;
     }
+}
+
+pub fn draw_etched_rect(s: &Surface, rect: Rect) {
+    let inner_rect = Rect::new(rect.left() + 1, rect.top() + 1, rect.width() - 2, rect.height() - 2);
+    draw_bevel(s, inner_rect, true, 1);
+    draw_bevel(s, rect, false, 1);
 }
 
 #[derive(Clone, Copy)]

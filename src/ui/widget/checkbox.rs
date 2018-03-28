@@ -6,7 +6,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
 use error::*;
 use ui::widget::widget::*;
-use ui::utils::{tiled_image, adjust_brightness, draw_bevel, draw_text, HorizontalAlign, VerticalAlign};
+use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_etched_rect, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 
 pub struct Checkbox {
@@ -19,19 +19,8 @@ pub struct Checkbox {
 
 impl Checkbox {
     pub fn new(rect: Rect, bg: &[u8], checked: Rc<Cell<bool>>) -> Result<Self> {
-        let mut image = tiled_image(bg, rect.width() as u16, rect.height() as u16)?;
-
-        image.lock();
-        {
-            let inner_rect = Rect::new(1, 1, rect.width() - 2, rect.height() - 2);
-            draw_bevel(&mut image, inner_rect, true, 1);
-
-            let outer_rect = Rect::new(0, 0, rect.width(), rect.height());
-            draw_bevel(&mut image, outer_rect, false, 1);
-        }
-        image.unlock();
-
-        let highlighted = adjust_brightness(&mut image, 1.5);
+        let image = load_image(bg)?;
+        let highlighted = adjust_brightness(&image, 1.5);
 
         Ok(Self{
             rect,
@@ -72,7 +61,8 @@ impl Widget for Checkbox {
         } else {
             &self.image
         };
-        surface.blit_at(image, self.rect.left() as i16, self.rect.top() as i16);
+        draw_tiles(surface, self.rect, image);
+        draw_etched_rect(surface, self.rect);
         if self.checked.get() {
             draw_text(surface, "X", text_font()?, Color::RGB(255, 255, 255), true, self.get_rect(), HorizontalAlign::Center, VerticalAlign::Middle)?;
         }

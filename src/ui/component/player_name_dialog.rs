@@ -46,7 +46,7 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<Container<PlayerNa
         vertical_align: VerticalAlign::Middle,
     }));
 
-    container.add(Box::new(InputField::new(Rect::new(340, 300, 280, 26), BLUE_PATTERN, player_name.clone(), 20)?));
+    container.add(Box::new(InputField::new(Rect::new(340, 300, 280, 26), player_name.clone(), 20)?));
 
     {
         let state_weak = Rc::downgrade(&state);

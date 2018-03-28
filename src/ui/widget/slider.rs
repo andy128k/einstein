@@ -5,13 +5,12 @@ use sdl::event::{Mouse};
 use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
-use ui::utils::{tiled_image, adjust_brightness, draw_bevel};
+use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_bevel, draw_etched_rect};
 
 pub struct Slider {
     rect: Rect,
     background: Surface,
-    slider: Surface,
-    active_slider: Surface,
+    background_highlighted: Surface,
     value: Rc<Cell<f32>>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
@@ -19,31 +18,13 @@ pub struct Slider {
 
 impl Slider {
     pub fn new(rect: Rect, bg: &[u8], value: Rc<Cell<f32>>) -> Result<Self> {
-        let mut background = tiled_image(bg, rect.width() as u16, rect.height() as u16)?;
-
-        background.lock();
-        draw_bevel(&mut background, Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4), false, 1);
-        background.unlock();
-
-        let mut slider = tiled_image(bg, rect.height() as u16, rect.height() as u16)?;
-
-        slider.lock();
-        {
-            let inner_rect = Rect::new(1, 1, rect.height() - 2, rect.height() - 2);
-            draw_bevel(&mut slider, inner_rect, true, 1);
-
-            let outer_rect = Rect::new(0, 0, rect.height(), rect.height());
-            draw_bevel(&mut slider, outer_rect, false, 1);
-        }
-        slider.unlock();
-
-        let active_slider = adjust_brightness(&mut slider, 1.5);
+        let background = load_image(bg)?;
+        let background_highlighted = adjust_brightness(&background, 1.5);
 
         Ok(Self {
             rect,
             background,
-            slider,
-            active_slider,
+            background_highlighted,
             value,
             highlight: Cell::new(false),
             dragging: Cell::new(None),
@@ -120,14 +101,17 @@ impl Widget for Slider {
 
     fn draw(&self, surface: &Surface) -> Result<()> {
         let rect = self.get_rect();
-        surface.blit_at(&self.background, rect.left() as i16, rect.top() as i16);
+
+        draw_bevel(surface, Rect::new(rect.left(), rect.top() + rect.height() as i32 / 2 - 2, rect.width(), 4), false, 1);
+
         let x = self.value_to_x(self.value.get());
-        let slider = if self.highlight.get() {
-            &self.active_slider
+        let slider_rect = Rect::new(rect.left() + x as i32, rect.top(), rect.height(), rect.height());
+        if self.highlight.get() {
+            draw_tiles(surface, slider_rect, &self.background_highlighted);
         } else {
-            &self.slider
-        };
-        surface.blit_at(slider, rect.left() as i16 + x, rect.top() as i16);
+            draw_tiles(surface, slider_rect, &self.background);
+        }
+        draw_etched_rect(surface, slider_rect);
         Ok(())
     }
 }
