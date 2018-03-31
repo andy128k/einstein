@@ -70,24 +70,13 @@ impl PuzzleCell {
             on_fail,
         })
     }
-}
 
-impl Widget for PuzzleCell {
-    fn get_rect(&self) -> Rect {
-        Rect::new(
-            (FIELD_OFFSET_X as i32) + (self.col as i32) * ((FIELD_TILE_WIDTH + FIELD_GAP_X) as i32),
-            (FIELD_OFFSET_Y as i32) + (self.row as i32) * ((FIELD_TILE_HEIGHT + FIELD_GAP_Y) as i32),
-            FIELD_TILE_WIDTH as u32,
-            FIELD_TILE_HEIGHT as u32
-        )
-    }
-
-    fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
+    fn on_mouse_button_down(&self, button: Mouse, x: i32, y: i32) -> Option<Effect> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             return None;
         }
 
-        let lp = local_point(self.get_rect(), x as i32, y as i32)?;
+        let lp = local_point(self.get_rect(), x, y)?;
 
         let value = local_find_choice(lp.0, lp.1)?;
         let thing = Thing { row: self.row, value };
@@ -119,9 +108,9 @@ impl Widget for PuzzleCell {
         Some(Effect::Redraw(vec![self.get_rect()]))
     }
 
-    fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> Option<Effect> {
         let rect = self.get_rect();
-        let lp = local_point(rect, x as i32, y as i32);
+        let lp = local_point(rect, x, y);
         if lp.is_none() && self.highlighted.get().is_none() {
             return None;
         }
@@ -135,6 +124,25 @@ impl Widget for PuzzleCell {
         }
 
         Some(Effect::Redraw(vec![rect]))
+    }
+}
+
+impl Widget for PuzzleCell {
+    fn get_rect(&self) -> Rect {
+        Rect::new(
+            (FIELD_OFFSET_X as i32) + (self.col as i32) * ((FIELD_TILE_WIDTH + FIELD_GAP_X) as i32),
+            (FIELD_OFFSET_Y as i32) + (self.row as i32) * ((FIELD_TILE_HEIGHT + FIELD_GAP_Y) as i32),
+            FIELD_TILE_WIDTH as u32,
+            FIELD_TILE_HEIGHT as u32
+        )
+    }
+
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::MouseButtonDown(button, x, y) => self.on_mouse_button_down(button, x, y),
+            Event::MouseMove(x, y) => self.on_mouse_move(x, y),
+            _ => None,
+        }
     }
 
     fn draw(&self, surface: &Surface) -> Result<()> {

@@ -112,34 +112,33 @@ impl Widget for HorizontalRules {
         )
     }
 
-    fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
-        if button != Mouse::Right {
-            return None;
-        }
-        let no = self.get_rule_index(x as i32, y as i32)?;
-        self.state.borrow_mut().toggle_horizontal_rule(no)?;
-        // sound->play(L"whizz.wav");
-
-        Some(Effect::Redraw(vec![self.rect(no)]))
-    }
-
-    fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
-        let no = self.get_rule_index(x as i32, y as i32);
-
-        if no != self.highlighted.get() {
-            let mut rects = Vec::new();
-            if let Some(index) = self.highlighted.get() {
-                rects.push(self.rect(index));
-            }
-            if let Some(index) = no {
-                self.highlighted.set(Some(index));
-                rects.push(self.rect(index));
-            } else {
-                self.highlighted.set(None);
-            }
-            Some(Effect::Redraw(rects))
-        } else {
-            None
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::MouseButtonDown(Mouse::Right, x, y) => {
+                let no = self.get_rule_index(x, y)?;
+                self.state.borrow_mut().toggle_horizontal_rule(no)?;
+                // sound->play(L"whizz.wav");
+                Some(Effect::Redraw(vec![self.rect(no)]))
+            },
+            Event::MouseMove(x, y) => {
+                let no = self.get_rule_index(x, y);
+                if no != self.highlighted.get() {
+                    let mut rects = Vec::new();
+                    if let Some(index) = self.highlighted.get() {
+                        rects.push(self.rect(index));
+                    }
+                    if let Some(index) = no {
+                        self.highlighted.set(Some(index));
+                        rects.push(self.rect(index));
+                    } else {
+                        self.highlighted.set(None);
+                    }
+                    Some(Effect::Redraw(rects))
+                } else {
+                    None
+                }
+            },
+            _ => None,
         }
     }
 

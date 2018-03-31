@@ -46,33 +46,26 @@ impl Slider {
         let x_range = width - slider_width;
         (pos.max(0).min(x_range as i16) as f32) / (x_range as f32)
     }
-}
 
-impl Widget for Slider {
-    fn get_rect(&self) -> Rect { self.rect }
-
-    fn on_mouse_button_down(&self, _button: Mouse, x: u16, y: u16) -> Option<Effect> {
+    fn get_slider_rect(&self) -> Rect {
         let rect = self.get_rect();
-        let p = (x as i32, y as i32);
-        let inside = rect.contains_point(p);
-        if inside {
-            let slider_x = self.value_to_x(self.value.get());
-            let slider_rect = Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height());
-            if slider_rect.contains_point(p) {
-                self.dragging.set(Some((x as i32) - rect.left() - (slider_x as i32)));
-            }
-        }
-        None
+        let slider_x = self.value_to_x(self.value.get());
+        Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height())
     }
 
-    fn on_mouse_button_up(&self, _button: Mouse, _x: u16, _y: u16) -> Option<Effect> {
+    fn drag_start(&self, x: i32, y: i32) {
+        let rect = self.get_rect();
+        let slider_x = self.value_to_x(self.value.get());
+        self.dragging.set(Some(x - rect.left() - (slider_x as i32)));
+    }
+
+    fn drag_stop(&self) {
         self.dragging.set(None);
-        None
     }
 
-    fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> Option<Effect> {
         if let Some(drag_x) = self.dragging.get() {
-            let val = self.x_to_value(((x as i32) - self.get_rect().left() - drag_x) as i16);
+            let val = self.x_to_value((x - self.get_rect().left() - drag_x) as i16);
             if val != self.value.get() {
                 self.value.set(val);
                 return Some(Effect::Redraw(vec![self.rect]));
@@ -97,6 +90,25 @@ impl Widget for Slider {
             }
         }
         None
+    }
+}
+
+impl Widget for Slider {
+    fn get_rect(&self) -> Rect { self.rect }
+
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::MouseButtonDown(Mouse::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
+                self.drag_start(x, y);
+                None
+            },
+            Event::MouseButtonUp(..) => {
+                self.drag_stop();
+                None
+            },
+            Event::MouseMove(x, y) => self.on_mouse_move(x, y),
+            _ => None,
+        }
     }
 
     fn draw(&self, surface: &Surface) -> Result<()> {

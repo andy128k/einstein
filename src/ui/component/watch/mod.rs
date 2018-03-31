@@ -44,11 +44,16 @@ impl Widget for Watch {
         )
     }
 
-    fn on_tick(&self) -> Option<Effect> {
-        if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
-            Some(Effect::Redraw(vec![self.get_rect()]))
-        } else {
-            None
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::Tick => {
+                if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
+                    Some(Effect::Redraw(vec![self.get_rect()]))
+                } else {
+                    None
+                }
+            },
+            _ => None,
         }
     }
 

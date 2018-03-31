@@ -32,30 +32,26 @@ impl<R: ButtonRenderer> Button<R> {
 impl<R: ButtonRenderer> Widget for Button<R> {
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_key_down(&self, key: Key, _ch: u16) -> Option<Effect> {
-        if self.key == Some(key) {
-            (*self.action)()
-        } else {
-            None
-        }
-    }
-
-    fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
-        if self.rect.contains_point(Point::new(x as i32, y as i32)) && button == Mouse::Left {
-            // sound->play(L"click.wav"); TODO
-            (*self.action)()
-        } else {
-            None
-        }
-    }
-
-    fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
-        let to_highlight = self.rect.contains_point(Point::new(x as i32, y as i32));
-        if self.highlighted.get() != to_highlight {
-            self.highlighted.set(to_highlight);
-            Some(Effect::Redraw(vec![self.rect]))
-        } else {
-            None
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::KeyDown(key, _) if Some(key) == self.key => {
+                // sound->play(L"click.wav"); TODO
+                (*self.action)()
+            },
+            Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
+                // sound->play(L"click.wav"); TODO
+                (*self.action)()
+            },
+            Event::MouseMove(x, y) => {
+                let to_highlight = self.rect.contains_point((x, y));
+                if self.highlighted.get() != to_highlight {
+                    self.highlighted.set(to_highlight);
+                    Some(Effect::Redraw(vec![self.rect]))
+                } else {
+                    None
+                }
+            },
+            _ => None,
         }
     }
 

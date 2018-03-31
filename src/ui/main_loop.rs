@@ -5,7 +5,7 @@ use sdl::video::Surface;
 use sdl::event::{Event, poll_event};
 use sdl2::rect::Rect;
 use error::*;
-use ui::widget::widget::*;
+use ui::widget::widget::{Widget, Event as WidgetEvent, Effect};
 
 fn rect2_to_rect(rect: &Rect) -> sdl::sdl::Rect {
     sdl::sdl::Rect::new(rect.left() as i16, rect.top() as i16, rect.width() as u16, rect.height() as u16)
@@ -19,11 +19,11 @@ pub fn main_loop(surface: &Surface, widget: &Widget) -> Result<bool> {
         sleep(Duration::from_millis(5));
         let event = poll_event();
         let effect = match event {
-            Event::None => widget.on_tick(),
-            Event::Key(key, _, _, ch) => widget.on_key_down(key, ch),
-            Event::MouseMotion(_, x, y, _, _) => widget.on_mouse_move(x, y),
-            Event::MouseButton(mouse, true, x, y) => widget.on_mouse_button_down(mouse, x, y),
-            Event::MouseButton(mouse, false, x, y) => widget.on_mouse_button_up(mouse, x, y),
+            Event::None => widget.on_event(&WidgetEvent::Tick),
+            Event::Key(key, _, _, ch) => widget.on_event(&WidgetEvent::KeyDown(key, ch)),
+            Event::MouseMotion(_, x, y, _, _) => widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32)),
+            Event::MouseButton(mouse, true, x, y) => widget.on_event(&WidgetEvent::MouseButtonDown(mouse, x as i32, y as i32)),
+            Event::MouseButton(mouse, false, x, y) => widget.on_event(&WidgetEvent::MouseButtonUp(mouse, x as i32, y as i32)),
             Event::Quit => return Ok(true),
             _ => None
         };

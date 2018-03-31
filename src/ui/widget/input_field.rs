@@ -45,21 +45,6 @@ impl InputField {
         self.last_cursor.set(Instant::now());
         self.cursor_visible.set(true);
     }
-}
-
-impl Widget for InputField {
-    fn get_rect(&self) -> Rect { self.rect }
-
-    fn on_tick(&self) -> Option<Effect> {
-        let now = Instant::now();
-        if now - self.last_cursor.get() > Duration::from_millis(1000) {
-            self.cursor_visible.set(!self.cursor_visible.get());
-            self.last_cursor.set(now);
-            Some(Effect::Redraw(vec![self.get_rect()]))
-        } else {
-            None
-        }
-    }
 
     fn on_key_down(&self, key: Key, ch: u16) -> Option<Effect> {
         let redraw_all = Some(Effect::Redraw(vec![self.get_rect()]));
@@ -116,6 +101,29 @@ impl Widget for InputField {
                 redraw_all
             },
             _ => None
+        }
+    }
+
+    fn on_tick(&self) -> Option<Effect> {
+        let now = Instant::now();
+        if now - self.last_cursor.get() > Duration::from_millis(1000) {
+            self.cursor_visible.set(!self.cursor_visible.get());
+            self.last_cursor.set(now);
+            Some(Effect::Redraw(vec![self.get_rect()]))
+        } else {
+            None
+        }
+    }
+}
+
+impl Widget for InputField {
+    fn get_rect(&self) -> Rect { self.rect }
+
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::KeyDown(key, ch) => self.on_key_down(key, ch),
+            Event::Tick => self.on_tick(),
+            _ => None,
         }
     }
 

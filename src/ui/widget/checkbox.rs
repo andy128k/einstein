@@ -3,7 +3,7 @@ use std::cell::Cell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
 use sdl2::pixels::Color;
-use sdl2::rect::{Rect, Point};
+use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_etched_rect, draw_text, HorizontalAlign, VerticalAlign};
@@ -35,23 +35,23 @@ impl Checkbox {
 impl Widget for Checkbox {
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_mouse_button_down(&self, button: Mouse, x: u16, y: u16) -> Option<Effect> {
-        if self.rect.contains_point(Point::new(x as i32, y as i32)) && button == Mouse::Left {
-            // sound->play(L"click.wav"); TODO
-            self.checked.set(!self.checked.get());
-            Some(Effect::Redraw(vec![self.rect]))
-        } else {
-            None
-        }
-    }
-
-    fn on_mouse_move(&self, x: u16, y: u16) -> Option<Effect> {
-        let to_highlight = self.rect.contains_point(Point::new(x as i32, y as i32));
-        if self.mouse_inside.get() != to_highlight {
-            self.mouse_inside.set(to_highlight);
-            Some(Effect::Redraw(vec![self.rect]))
-        } else {
-            None
+    fn on_event(&self, event: &Event) -> Option<Effect> {
+        match *event {
+            Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
+                // sound->play(L"click.wav"); TODO
+                self.checked.set(!self.checked.get());
+                Some(Effect::Redraw(vec![self.rect]))
+            },
+            Event::MouseMove(x, y) => {
+                let to_highlight = self.rect.contains_point((x, y));
+                if self.mouse_inside.get() != to_highlight {
+                    self.mouse_inside.set(to_highlight);
+                    Some(Effect::Redraw(vec![self.rect]))
+                } else {
+                    None
+                }
+            },
+            _ => None,
         }
     }
 
