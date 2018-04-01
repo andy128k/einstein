@@ -506,51 +506,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     Ok(Box::new(container))
 }
 
-
 /*
-Game::Game(Screen *screen)
-{
-    genPuzzle();
-
-    possibilities = ein_possibilities_new();
-    possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
-    
-    puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
-    verHints = new VertHints(screen, iconSet, rules);
-    horHints = new HorHints(screen, iconSet, rules);
-    watch = new Watch(screen);
-}
-
-Game::Game(Screen *screen, std::istream &stream)
-    : screen(screen)
-{
-    pleaseWait();
-
-    loadPuzzle(solvedPuzzle, stream);
-    loadRules(rules, stream);
-
-    ein_solved_puzzle_free(solvedPuzzle);
-    solvedPuzzle = ein_solved_puzzle_clone(savedSolvedPuzzle);
-
-    savedRules = rules;
-    possibilities = ein_possibilities_new(/*stream*/);
-    puzzle = new Puzzle(screen, iconSet, solvedPuzzle, possibilities);
-    verHints = new VertHints(screen, iconSet, rules, stream);
-    horHints = new HorHints(screen, iconSet, rules, stream);
-    watch = new Watch(screen, stream);
-    hinted = true;
-}
-
-void Game::save(std::ostream &stream)
-{
-    savePuzzle(solvedPuzzle, stream);
-    saveRules(rules, stream);
-    // possibilities->save(stream);
-    verHints->save(stream);
-    horHints->save(stream);
-    watch->save(stream);
-}
-
 void Game::pleaseWait()
 {
     drawWallpaper(screen, L"rain.bmp");
@@ -562,70 +518,6 @@ void Game::pleaseWait()
     label.draw();
     screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
     screen->flush();
-}
-
-void Game::genPuzzle()
-{
-    pleaseWait();
-    
-    rules.resize(500);
-    size_t rules_arr_size;
-    ein_generate_puzzle(&solvedPuzzle, &rules[0], &rules_arr_size);
-    rules.resize(rules_arr_size);
-
-    savedSolvedPuzzle = ein_solved_puzzle_clone(solvedPuzzle);
-    savedRules = rules;
-
-    hinted = false;
-}
-
-void Game::resetVisuals()
-{
-    ein_possibilities_free(possibilities);
-
-    possibilities = ein_possibilities_new();
-    possibilities = ein_possibilities_open_initials(possibilities, &rules[0], rules.size());
-
-    puzzle->reset();
-    verHints->reset(rules);
-    horHints->reset(rules);
-    watch->reset();
-}
-
-void Game::newGame()
-{
-    genPuzzle();
-    resetVisuals();
-}
-
-void Game::restart()
-{
-    ein_solved_puzzle_free(solvedPuzzle);
-    solvedPuzzle = ein_solved_puzzle_clone(savedSolvedPuzzle);
-
-    rules = savedRules;
-    
-    resetVisuals();
-    hinted = true;
-}
-
-void Game::run(Config* config, TopScores *top_scores)
-{
-    Area area = Area(screen);
-    Font btnFont(L"laudcn2.ttf", 14);
-
-    WinCommand winCmd(&area, watch, this, config, top_scores);
-    FailCommand failCmd(&area, this);
-    puzzle->setCommands(&winCmd, &failCmd);
-
-    area.add(puzzle, false);
-    area.add(verHints, false);
-    area.add(horHints, false);
-
-    area.add(watch, false);
-
-    watch->start();
-    area.run();
 }
 */
 
