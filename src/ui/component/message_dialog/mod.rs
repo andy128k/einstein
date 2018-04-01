@@ -18,7 +18,15 @@ pub enum MessageType {
     Failure
 }
 
-fn create_message(rect: Rect, message_type: MessageType, message: &str) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<WidgetPtr<ModalResult<()>>> {
+    let screen_rect = Rect::new(0, 0, 800, 600);
+
+    let font = text_font()?;
+    let (text_width, text_height) = font.size_of(message)?;
+
+    let mut rect = Rect::new(0, 0, text_width + 100, text_height + 100);
+    rect.center_on(screen_rect.center());
+
     let (bg, color) = match message_type {
         MessageType::Neutral => (MARBLE_PATTERN, Color::RGB(255, 0, 0)),
         MessageType::Success => (GREEN_PATTERN, Color::RGB(255, 255, 0)),
@@ -45,18 +53,4 @@ fn create_message(rect: Rect, message_type: MessageType, message: &str) -> Resul
     ];
 
     Ok(Box::new(container))
-}
-
-pub fn show_message(surface: &Surface, message_type: MessageType, message: &str) -> Result<bool> {
-    let screen_rect = rect_to_rect2(surface.get_rect());
-
-    let font = text_font()?;
-    let (text_width, text_height) = font.size_of(message)?;
-
-    let mut rect = Rect::new(0, 0, text_width + 20, text_height + 20);
-    rect.center_on(screen_rect.center());
-
-    let message_box = create_message(rect, message_type, message)?;
-    let quit = main_loop(surface, rect, &*message_box)?.is_none();
-    Ok(quit)
 }

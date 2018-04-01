@@ -155,6 +155,7 @@ fn make_menu(surface: Rc<Surface>, messages: &'static Messages, storage: Rc<RefC
                 match *result {
                     ModalResult(DialogResult::Ok(ref game_data)) => {
                         let game = Rc::new(RefCell::new(game_data.clone()));
+                        game.borrow_mut().hinted = true;
                         *new_game_trigger2.borrow_mut() = Some(game);
                     },
                     ModalResult(DialogResult::Cancel) => {},

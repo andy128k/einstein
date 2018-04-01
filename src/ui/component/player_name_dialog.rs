@@ -16,7 +16,7 @@ use ui::main_loop::{main_loop, ModalResult};
 use resources::background::BLUE_PATTERN;
 use resources::messages::{get_messages, Messages};
 
-fn new_player_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalResult<String>>> {
+pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);
     let yellow = Color::RGB(255, 255, 0);
 
@@ -66,7 +66,7 @@ fn new_player_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalRes
 pub fn ask_player_name(surface: &Surface, default_name: &str) -> Result<Option<String>> {
     let rect = Rect::new(170, 280, 460, 100);
     let messages = get_messages();
-    let container = new_player_name(default_name, messages)?;
+    let container = new_player_name_dialog(default_name, messages)?;
     let result = main_loop(surface, rect, &*container)?;
     match result {
         None => Ok(None), // quit

@@ -29,6 +29,9 @@ use ui::component::save_dialog::{save_game, new_save_game_dialog};
 use ui::component::options_dialog::{new_options_dialog, show_options_window};
 use ui::component::pause_dialog::new_pause_dialog;
 use ui::component::failure_dialog::{new_failure_dialog, show_failure_dialog, FailureChoice};
+use ui::component::message_dialog::{create_message_dialog, MessageType};
+use ui::component::player_name_dialog::new_player_name_dialog;
+use ui::component::topscores_dialog::create_topscores_dialog;
 use resources::messages::{get_messages, Messages};
 use error::*;
 use storage::*;
@@ -61,24 +64,8 @@ pub struct GamePrivate {
     #[serde(skip)]
     pub started: Option<Instant>,
 
-    // VertHints *verHints;
-    // HorHints *horHints;
-    // IconSet iconSet;
-    // Puzzle *puzzle;
-    // Watch *watch;
-    // bool hinted;
-    // SolvedPuzzle *savedSolvedPuzzle;
-    // RulesArr savedRules;
-    // Screen *screen;
+    pub hinted: bool,
 }
-
-//////////////////////////////////////////////////////////////////////////
-// DUMMY
-// fn savePuzzle(puzzle: &SolvedPuzzle) {}
-// fn loadPuzzle() -> SolvedPuzzle {}
-// fn saveRules(rules: &[Rule]) {}
-// fn loadRules() -> Vec<Rule> {}
-//////////////////////////////////////////////////////////////////////////
 
 const RAIN_TILE: &[u8] = include_bytes!("./rain.bmp");
 const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
@@ -123,6 +110,7 @@ impl GamePrivate {
             vertical_rules,
             horizontal_rules,
             show_excluded: false,
+            hinted: false,
         })))
     }
 
@@ -141,7 +129,7 @@ impl GamePrivate {
             rule.is_excluded = false;
         }
         self.show_excluded = false;
-        // self.hinted = true;
+        self.hinted = true;
         self.reset();
     }
 
@@ -159,6 +147,7 @@ impl GamePrivate {
         if let Some(started_at) = self.started {
             self.elapsed += Instant::now() - started_at;
             self.started = None;
+            self.hinted = true;
         }
     }
 
@@ -205,6 +194,8 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_help_trigger = Rc::new(RefCell::new(None));
     let pause_trigger = Rc::new(RefCell::new(None));
     let victory_trigger = Rc::new(RefCell::new(None));
+    let save_score_trigger = Rc::new(RefCell::new(None));
+    let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
     let mut container: Vec<WidgetPtr<ModalResult<()>>> = Vec::new();
@@ -233,11 +224,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     )));
 
     container.push(Box::new({
+        let state2 = state.clone();
         let victory_trigger2 = victory_trigger.clone();
         let failure_trigger2 = failure_trigger.clone();
         WidgetMapAction::new(
             new_puzzle_widget(state.clone())?,
             move |puzzle_action| {
+                state2.borrow_mut().stop();
                 match *puzzle_action {
                     PuzzleAction::Victory => {
                         // sound->play(L"applause.wav");
@@ -413,46 +406,76 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     }));
 
+    container.push(Box::new({
+        let victory_trigger2 = victory_trigger.clone();
+        let save_score_trigger2 = save_score_trigger.clone();
+        let show_scores_trigger2 = show_scores_trigger.clone();
+        let state2 = state.clone();
+        let storage2 = storage.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                victory_trigger.clone(),
+                move |_| create_message_dialog(MessageType::Neutral, messages.won)
+            ),
+            move |result| {
+                *victory_trigger2.borrow_mut() = None;
+                let score = state2.borrow().elapsed.as_secs() as u32;
+                if !state2.borrow().hinted && storage2.borrow().scores.is_deserving(score) {
+                    *save_score_trigger2.borrow_mut() = Some(score);
+                } else {
+                    *show_scores_trigger2.borrow_mut() = Some(None);
+                }
+                EventReaction::Redraw
+            }
+        )
+    }));
 
-                        /*
-                        class WinCommand: public Command
-                        {
-                        virtual void doAction() {
-                            watch->stop();
-                            Font font(L"laudcn2.ttf", 20);
-                            showMessageWindow(gameArea->screen, gameArea, L"marble1.bmp", 500, 70, &font, 255,0,0, msg(L"won"));
-                            gameArea->draw();
+    container.push(Box::new({
+        let save_score_trigger2 = save_score_trigger.clone();
+        let show_scores_trigger2 = show_scores_trigger.clone();
+        let state2 = state.clone();
+        let storage1 = storage.clone();
+        let storage2 = storage.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                save_score_trigger.clone(),
+                move |score| {
+                    let last_name = match storage1.borrow().last_name {
+                        Some(ref n) => n.clone(),
+                        None => "anonymous".to_string()
+                    };
+                    new_player_name_dialog(&last_name, messages)
+                }
+            ),
+            move |result| {
+                let score = save_score_trigger2.borrow().unwrap_or(0);
+                *save_score_trigger2.borrow_mut() = None;
+                match *result {
+                    ModalResult(ref name) => {
+                        storage2.borrow_mut().last_name = Some(name.to_string());
+                        let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score });
+                        *show_scores_trigger2.borrow_mut() = Some(pos);
+                    },
+                };
+                EventReaction::Redraw
+            }
+        )
+    }));
 
-                            int score = watch->getElapsed() / 1000;
-                            int pos = -1;
-                            if (! game->isHinted()) {
-                                if (storage.scores.is_deserving(score)) {
-                                    const char* lastname = ein_config_get_last_name(config);
-                                    if (lastname == NULL) {
-                                        lastname = "anonymous";
-                                    }
-                                    auto wlastname = fromUtf8(lastname);
-
-                                    match ask_player_name(&surface, &last_name).unwrap() {
-                                        DialogResult::Ok(name) => {
-                                            storage.last_name = Some(name);
-                                            pos = storage.scores.add_score_entry(storage::Score { name, score });
-                                        },
-                                        DialogResult::Cancel => {},
-                                        DialogResult::Quit =>
-                                            exit(0),
-                                    }
-                                }
-                            }
-
-                            let quit = show_scores(&surface, scores, pos)?;
-                            if quit {
-                                exit(0);
-                            }
-
-                            gameArea->finishEventLoop();
-                        };
-                        */
+    container.push(Box::new({
+        let storage2 = storage.clone();
+        let show_scores_trigger2 = show_scores_trigger.clone();
+        WidgetMapAction::new(
+            ConditionalWidget::new(
+                show_scores_trigger.clone(),
+                move |index| create_topscores_dialog(&storage2.borrow().scores, messages, *index)
+            ),
+            move |_| {
+                *show_scores_trigger2.borrow_mut() = None;
+                EventReaction::Action(ModalResult(()))
+            }
+        )
+    }));
 
     container.push(Box::new({
         let failure_trigger2 = failure_trigger.clone();
