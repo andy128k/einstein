@@ -107,8 +107,7 @@ impl PuzzleCell {
         }
 
         if !self.state.borrow().is_valid() {
-            EventReaction::Action(PuzzleAction::Victory)
-            // EventReaction::Action(PuzzleAction::Failure)
+            EventReaction::Action(PuzzleAction::Failure)
         } else if self.state.borrow().possibilities.is_solved() {
             EventReaction::Action(PuzzleAction::Victory)
         } else {
