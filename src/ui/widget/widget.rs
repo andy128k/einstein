@@ -115,29 +115,3 @@ impl<'w, A> Widget<A> for Vec<WidgetPtr<A>> {
         Ok(())
     }
 }
-
-impl<W1, W2, A1, A2> Widget<OneOf<A1, A2, Nothing>> for (W1, W2)
-    where
-        A1: Clone,
-        A2: Clone,
-        W1: Widget<A1>,
-        W2: Widget<A2>,
-{
-    fn on_event(&self, event: &Event) -> EventReaction<OneOf<A1, A2, Nothing>> {
-        let reaction = self.0.on_event(event);
-        if reaction.is_op() {
-            return reaction.map_action(|a| OneOf::v1(a.clone()));
-        }
-        let reaction = self.1.on_event(event);
-        if reaction.is_op() {
-            return reaction.map_action(|a| OneOf::v2(a.clone()));
-        }
-        EventReaction::NoOp
-    }
-
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        self.0.draw(surface)?;
-        self.1.draw(surface)?;
-        Ok(())
-    }
-}
