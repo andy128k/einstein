@@ -1,5 +1,4 @@
-use sdl2::rect::Rect;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use error::*;
 

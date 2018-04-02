@@ -1,9 +1,8 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::{Context, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use resources::fonts::*;
 use ui::page_layout::*;

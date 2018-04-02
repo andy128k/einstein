@@ -1,12 +1,11 @@
 use sdl2::pixels::Color;
-use sdl2::rect::{Rect};
 use error::*;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::any_key::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use ui::context::{HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
 
@@ -22,8 +21,12 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
     let font = text_font()?;
     let (text_width, text_height) = font.size_of(message)?;
 
-    let mut rect = Rect::new(0, 0, text_width + 100, text_height + 100);
-    rect.center_on(screen_rect.center());
+    let rect = Rect::new(
+        ((800 - (text_width + 100)) / 2) as i32,
+        ((600 - (text_height + 100)) / 2) as i32,
+        text_width + 100,
+        text_height + 100
+    );
 
     let (bg, color) = match message_type {
         MessageType::Neutral => (MARBLE_PATTERN, Color::RGB(255, 0, 0)),

@@ -1,8 +1,7 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl2::rect::{Rect};
 use rules::{PUZZLE_SIZE};
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};

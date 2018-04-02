@@ -1,7 +1,6 @@
 use sdl::event::{Key, Mouse};
-use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 pub use algebra::*;
 
 pub enum Event {
@@ -55,10 +54,8 @@ pub trait Widget<A> {
     fn get_rect(&self) -> Rect;
 
     fn get_client_rect(&self) -> Rect {
-        let mut client_rect = self.get_rect();
-        client_rect.set_x(0);
-        client_rect.set_y(0);
-        client_rect
+        let rect = self.get_rect();
+        Rect::new(0, 0, rect.width(), rect.height())
     }
 
     fn on_event(&self, _event: &Event) -> EventReaction<A> { EventReaction::NoOp } // TODO Result<EventReaction<A>>

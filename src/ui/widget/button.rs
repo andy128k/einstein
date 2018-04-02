@@ -1,8 +1,7 @@
 use std::cell::Cell;
 use sdl::event::{Key, Mouse};
-use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 
 pub trait ButtonRenderer {

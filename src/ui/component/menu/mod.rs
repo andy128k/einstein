@@ -1,9 +1,9 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
 use sdl::event::{Key};
-use sdl2::rect::{Rect};
 use error::*;
 use storage::*;
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
 use ui::widget::dialog::*;

@@ -1,8 +1,7 @@
 use sdl::video::Surface;
-use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::{Context, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::utils::load_image;
 use resources::fonts::title_font;

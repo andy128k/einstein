@@ -1,7 +1,6 @@
 use sdl2::pixels::Color;
-use sdl2::rect::Rect;
 use error::*;
-use ui::context::{Context, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use resources::fonts::text_font;
 

@@ -3,8 +3,7 @@ use std::cell::{Cell};
 use debug_cell::RefCell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
-use sdl2::rect::{Rect, Point};
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
 use ui::utils::load_image;
@@ -58,7 +57,7 @@ impl VerticalRules {
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.get_rect().contains_point(Point::new(x, y)) {
+        if !self.get_rect().contains_point((x, y)) {
             return None;
         }
         if (x - TILE_X) % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {

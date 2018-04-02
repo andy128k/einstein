@@ -1,6 +1,6 @@
 use sdl::event::Key;
-use sdl2::rect::Rect;
 use error::*;
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;

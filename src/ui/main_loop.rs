@@ -2,16 +2,15 @@ use std::thread::sleep;
 use std::time::Duration;
 use sdl::event::{Event, poll_event};
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, rect_to_rect1};
 use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
-use ui::utils::rect2_to_rect;
 
 #[derive(Clone)]
 pub struct MainLoopQuit;
 
 pub fn main_loop(context: &Context, widget: &Widget<MainLoopQuit>) -> Result<()> {
     widget.draw(context)?;
-    context.surface.update_rects(&[rect2_to_rect(context.rect)]);
+    context.surface.update_rects(&[rect_to_rect1(context.rect)]);
 
     loop {
         sleep(Duration::from_millis(5));
@@ -28,12 +27,12 @@ pub fn main_loop(context: &Context, widget: &Widget<MainLoopQuit>) -> Result<()>
         match reaction {
             EventReaction::Action(MainLoopQuit) => {
                 widget.draw(context)?;
-                context.surface.update_rects(&[rect2_to_rect(context.rect)]);
+                context.surface.update_rects(&[rect_to_rect1(context.rect)]);
                 return Ok(());
             },
             EventReaction::Redraw => {
                 widget.draw(context)?;
-                context.surface.update_rects(&[rect2_to_rect(context.rect)]);
+                context.surface.update_rects(&[rect_to_rect1(context.rect)]);
             },
             EventReaction::StopPropagation |
             EventReaction::NoOp => {},

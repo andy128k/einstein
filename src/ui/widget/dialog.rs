@@ -1,8 +1,7 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
-use sdl2::rect::Rect;
 use debug_cell::RefCell;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use error::*;
 

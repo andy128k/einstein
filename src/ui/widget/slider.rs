@@ -1,9 +1,8 @@
 use std::cell::Cell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
-use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness};
 

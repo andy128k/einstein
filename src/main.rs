@@ -38,13 +38,12 @@ use sdl::wm::set_caption;
 use sdl::event::{enable_key_repeat, RepeatDelay, RepeatInterval, enable_unicode};
 use sdl::video::{set_video_mode, SurfaceFlag, VideoFlag};
 use sdl2::ttf::Sdl2TtfContext;
-use sdl2::rect::Rect;
 use sdl2::mixer;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
 use resources::messages::get_messages;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::component::menu::make_menu;
 use ui::main_loop::main_loop;
 
