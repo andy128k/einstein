@@ -41,13 +41,6 @@ impl HorizontalRules {
         })
     }
 
-    fn is_active(&self, index: usize) -> bool {
-        let show_excluded = self.state.borrow().show_excluded;
-        self.state.borrow().horizontal_rules.get(index)
-            .map(|rule| show_excluded == rule.is_excluded)
-            .unwrap_or(false)
-    }
-
     fn draw_cell(&self, context: &Context, index: usize) -> Result<()> {
         let rect = self.rect(index);
         let c = context.relative(rect);

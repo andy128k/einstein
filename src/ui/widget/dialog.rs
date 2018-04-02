@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::{Surface};
 use ui::context::Context;
 use ui::widget::widget::*;
 use error::*;
@@ -15,11 +14,11 @@ impl<A> Default for InterceptWidget<A> {
 }
 
 impl<A> Widget<A> for InterceptWidget<A> {
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
+    fn on_event(&self, _event: &Event) -> EventReaction<A> {
         EventReaction::StopPropagation
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, _context: &Context) -> Result<()> {
         Ok(())
     }
 }

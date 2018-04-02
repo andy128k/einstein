@@ -1,19 +1,17 @@
-use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::main_loop::{ModalResult, main_loop};
 use resources::background::BLUE_PATTERN;
-use resources::messages::{Messages, get_messages};
+use resources::messages::Messages;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -64,11 +62,4 @@ pub fn create_about_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<
         )?),
     ];
     Ok(Box::new(container))
-}
-
-pub fn show_about(context: &Context) -> Result<bool> {
-    let rect = Rect::new(220, 160, 360, 280);
-    let about = create_about_dialog(get_messages())?;
-    let quit = main_loop(context, rect, &*about)?.is_none();
-    Ok(quit)
 }

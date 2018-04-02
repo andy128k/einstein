@@ -63,17 +63,3 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
 
     Ok(Box::new(container))
 }
-
-pub fn load_game(context: &Context, storage: &Storage) -> Result<Option<GamePrivate>> {
-    let rect = Rect::new(250, 90, 300, 420);
-    let container = new_load_game_dialog(&storage.saved_games, get_messages())?;
-
-    let result = main_loop(context, rect, &*container)?;
-    match result {
-        None => {
-            ::std::process::exit(0);
-        },
-        Some(DialogResult::Ok(ref game)) => Ok(Some(game.clone())),
-        Some(DialogResult::Cancel) => Ok(None),
-    }
-}

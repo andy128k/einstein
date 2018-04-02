@@ -1,7 +1,5 @@
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
-use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
@@ -39,13 +37,10 @@ fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Ve
 }
 
 struct DescriptionPrivate {
-    rect: Rect,
     pages: Vec<Rc<Page>>,
     current_page_index: usize,
     current_page: Rc<RefCell<Rc<Page>>>
 }
-
-type DescriptionPtr = Rc<RefCell<DescriptionPrivate>>;
 
 impl DescriptionPrivate {
     fn new(messages: &Messages, text: &[TextItem]) -> Result<WidgetPtr<ModalResult<()>>> {
@@ -57,7 +52,6 @@ impl DescriptionPrivate {
         let current_page = Rc::new(RefCell::new(pages[0].clone()));
 
         let state = Rc::new(RefCell::new(DescriptionPrivate {
-            rect,
             pages,
             current_page_index: 0,
             current_page: current_page.clone()
@@ -124,12 +118,4 @@ impl DescriptionPrivate {
 
 pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
     DescriptionPrivate::new(messages, get_rules())
-}
-
-pub fn show_description(context: &Context) -> Result<bool> {
-    let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
-
-    let description = DescriptionPrivate::new(get_messages(), get_rules())?;
-    let quit = main_loop(context, rect, &*description)?.is_none();
-    Ok(quit)
 }

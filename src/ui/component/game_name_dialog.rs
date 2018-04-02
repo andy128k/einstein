@@ -69,9 +69,3 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalR
 
     Ok(Box::new(container))
 }
-
-pub fn ask_game_name(context: &Context, default_name: &str) -> Result<Option<DialogResult<String>>> {
-    let rect = Rect::new(170, 280, 460, 100);
-    let container = new_game_name(default_name, get_messages())?;
-    main_loop(context, rect, &*container)
-}

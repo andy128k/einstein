@@ -73,13 +73,6 @@ impl VerticalRules {
         Rect::new(TILE_X + (index as i32) * (TILE_WIDTH + TILE_GAP), TILE_Y, TILE_WIDTH as u32, TILE_HEIGHT as u32 * 2)
     }
 
-    fn is_active(&self, index: usize) -> bool {
-        let show_excluded = self.state.borrow().show_excluded;
-        self.state.borrow().vertical_rules.get(index)
-            .map(|rule| show_excluded == rule.is_excluded)
-            .unwrap_or(false)
-    }
-
     fn get_rect(&self) -> Rect {
         Rect::new(
             TILE_X,

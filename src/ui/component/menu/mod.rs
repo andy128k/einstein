@@ -15,17 +15,17 @@ use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 use ui::main_loop::{main_loop, ModalResult};
 use ui::component::dialog::*;
-use ui::component::game::{game_run, new_game_widget, GamePrivate};
-use ui::component::load_dialog::{load_game, new_load_game_dialog};
-use ui::component::topscores_dialog::{show_scores, create_topscores_dialog};
-use ui::component::rules_dialog::{show_description, new_help_dialog};
-use ui::component::options_dialog::{show_options_window, new_options_dialog};
-use ui::component::about_dialog::{show_about, create_about_dialog};
+use ui::component::game::{new_game_widget, GamePrivate};
+use ui::component::load_dialog::{new_load_game_dialog};
+use ui::component::topscores_dialog::{create_topscores_dialog};
+use ui::component::rules_dialog::{new_help_dialog};
+use ui::component::options_dialog::{new_options_dialog};
+use ui::component::about_dialog::{create_about_dialog};
 use resources::messages::{get_messages, Messages};
 
 const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
 
-fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
     let rect = Rect::new(0, 0, 800, 600);
 
     let new_game_trigger = Rc::new(RefCell::new(None));
@@ -234,11 +234,4 @@ fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Resu
     }));
 
     Ok(Box::new(container))
-}
-
-pub fn menu(context: &Context, storage: Rc<RefCell<Storage>>) -> Result<bool> {
-    let rect = Rect::new(0, 0, 800, 600);
-    let menu = make_menu(get_messages(), storage.clone())?;
-    let quit = main_loop(context, rect, &*menu)?.is_none();
-    Ok(quit)
 }

@@ -11,9 +11,9 @@ use ui::utils::rect2_to_rect;
 #[derive(Clone)]
 pub struct ModalResult<T>(pub T);
 
-pub fn main_loop<T>(context: &Context, rect: Rect, widget: &Widget<ModalResult<T>>) -> Result<Option<T>> {
+pub fn main_loop<T>(context: &Context, widget: &Widget<ModalResult<T>>) -> Result<()> {
     widget.draw(context)?;
-    context.surface.update_rects(&[rect2_to_rect(rect)]);
+    context.surface.update_rects(&[rect2_to_rect(context.rect)]);
 
     loop {
         sleep(Duration::from_millis(5));
@@ -24,18 +24,18 @@ pub fn main_loop<T>(context: &Context, rect: Rect, widget: &Widget<ModalResult<T
             Event::MouseMotion(_, x, y, _, _) => widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32)),
             Event::MouseButton(mouse, true, x, y) => widget.on_event(&WidgetEvent::MouseButtonDown(mouse, x as i32, y as i32)),
             Event::MouseButton(mouse, false, x, y) => widget.on_event(&WidgetEvent::MouseButtonUp(mouse, x as i32, y as i32)),
-            Event::Quit => return Ok(None),
+            Event::Quit => return Ok(()),
             _ => EventReaction::NoOp
         };
         match reaction {
             EventReaction::Action(ModalResult(value)) => {
                 widget.draw(context)?;
-                context.surface.update_rects(&[rect2_to_rect(rect)]);
-                return Ok(Some(value));
+                context.surface.update_rects(&[rect2_to_rect(context.rect)]);
+                return Ok(());
             },
             EventReaction::Redraw => {
                 widget.draw(context)?;
-                context.surface.update_rects(&[rect2_to_rect(rect)]);
+                context.surface.update_rects(&[rect2_to_rect(context.rect)]);
             },
             EventReaction::StopPropagation |
             EventReaction::NoOp => {},

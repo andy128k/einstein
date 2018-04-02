@@ -3,7 +3,7 @@ use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
-use ui::utils::{HorizontalAlign, VerticalAlign};
+pub use ui::utils::{HorizontalAlign, VerticalAlign};
 use error::*;
 
 unsafe fn surface2_to_surface(surface: &::sdl2::surface::Surface) -> Surface {
@@ -15,14 +15,8 @@ mod cpp {
     use sdl::video::ll::SDL_Surface;
 
     extern "C" {
-        pub fn adjust_brightness(image: * mut SDL_Surface, k: c_double) -> * mut SDL_Surface;
         pub fn adjust_brightness_pixel(image: * mut SDL_Surface, x: c_int, y: c_int, k: c_double);
     }
-}
-
-fn adjust_brightness(image: &Surface, k: f64) -> Surface {
-    let s = unsafe { cpp::adjust_brightness(image.raw, k) };
-    Surface { raw: s, owned: true }
 }
 
 fn adjust_brightness_pixel(image: &Surface, x: u16, y: u16, k: f64) {

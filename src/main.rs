@@ -43,8 +43,10 @@ use sdl2::mixer;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
+use resources::messages::get_messages;
 use ui::context::Context;
-use ui::component::menu::menu;
+use ui::component::menu::make_menu;
+use ui::main_loop::{main_loop, ModalResult};
 
 #[no_mangle]
 pub extern fn ein_generate_puzzle(sp: *mut *const SolvedPuzzle, r: *mut *const Rule, rs: *mut ::libc::size_t) {
@@ -210,7 +212,9 @@ fn real_main() -> Result<()> {
             surface: surface.clone(),
             rect: Rect::new(0, 0, 800, 600)
         };
-        menu(&context, state.clone())?;
+
+        let menu = make_menu(get_messages(), state.clone())?;
+        main_loop(&context, &*menu)?;
     }
 
     quit();

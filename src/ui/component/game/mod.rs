@@ -1,23 +1,16 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
-use std::cell::{Cell};
 use debug_cell::RefCell;
-use sdl::video::Surface;
-use sdl::event::{Key, Mouse};
-use sdl2::rect::{Rect, Point};
-use sdl2::pixels::Color;
-use rules::{Rule, SolvedPuzzle, Possibilities, Thing, apply};
+use sdl::event::{Key};
+use sdl2::rect::{Rect};
+use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;
 use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog::*;
-use ui::widget::window::Window;
 use ui::widget::title::Title;
-use ui::widget::button::*;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
-use ui::widget::label::Label;
-use ui::utils::{load_image, draw_text, HorizontalAlign, VerticalAlign, adjust_brightness};
 use ui::main_loop::{main_loop, ModalResult};
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
@@ -25,15 +18,15 @@ use ui::component::puzzle::puzzle_cell::PuzzleAction;
 use ui::component::puzzle::horizontal_rules::HorizontalRules;
 use ui::component::puzzle::vertical_rules::VerticalRules;
 use ui::component::watch::Watch;
-use ui::component::rules_dialog::{show_description, new_help_dialog};
-use ui::component::save_dialog::{save_game, new_save_game_dialog};
-use ui::component::options_dialog::{new_options_dialog, show_options_window};
+use ui::component::rules_dialog::{new_help_dialog};
+use ui::component::save_dialog::{new_save_game_dialog};
+use ui::component::options_dialog::{new_options_dialog};
 use ui::component::pause_dialog::new_pause_dialog;
-use ui::component::failure_dialog::{new_failure_dialog, show_failure_dialog, FailureChoice};
+use ui::component::failure_dialog::{new_failure_dialog, FailureChoice};
 use ui::component::message_dialog::{create_message_dialog, MessageType};
 use ui::component::player_name_dialog::new_player_name_dialog;
 use ui::component::topscores_dialog::create_topscores_dialog;
-use resources::messages::{get_messages, Messages};
+use resources::messages::Messages;
 use error::*;
 use storage::*;
 
@@ -418,7 +411,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 victory_trigger.clone(),
                 move |_| create_message_dialog(MessageType::Neutral, messages.won)
             ),
-            move |result| {
+            move |_| {
                 *victory_trigger2.borrow_mut() = None;
                 let score = state2.borrow().elapsed.as_secs() as u32;
                 if !state2.borrow().hinted && storage2.borrow().scores.is_deserving(score) {
@@ -434,13 +427,12 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     container.push(Box::new({
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
-        let state2 = state.clone();
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         WidgetMapAction::new(
             ConditionalWidget::new(
                 save_score_trigger.clone(),
-                move |score| {
+                move |_| {
                     let last_name = match storage1.borrow().last_name {
                         Some(ref n) => n.clone(),
                         None => "anonymous".to_string()
@@ -521,11 +513,3 @@ void Game::pleaseWait()
     screen->flush();
 }
 */
-
-pub fn game_run(context: Context, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
-    let game_widget = new_game_widget(storage.clone(), game.clone(), get_messages())?;
-    game.borrow_mut().start();
-    let screen_rect = Rect::new(0, 0, 800, 600);
-    let result = main_loop(&context, screen_rect, &*game_widget)?;
-    Ok(result.is_none())
-}

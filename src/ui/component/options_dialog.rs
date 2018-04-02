@@ -106,22 +106,3 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Widg
     ];
     Ok(Box::new(container))
 }
-
-pub fn show_options_window(context: &Context, storage: &mut Storage) -> Result<bool> {
-    let rect = Rect::new(250, 170, 300, 260);
-
-    let container = new_options_dialog(storage, get_messages())?;
-    let result = main_loop(context, rect, &*container)?;
-    match result {
-        None => Ok(true), // quit
-        Some(DialogResult::Cancel) => Ok(false), // cancelled
-        Some(DialogResult::Ok(option_result)) => {
-            storage.fullscreen = option_result.fullscreen;
-            storage.volume = option_result.volume;
-
-            // screen->setMode(VideoMode(800, 600, 24, option_result.fullscreen));
-            // sound->setVolume(option_result.volume);
-            Ok(false)
-        },
-    }
-}

@@ -50,7 +50,7 @@ impl Slider {
         Rect::new(self.rect.left() + slider_x as i32, self.rect.top(), self.rect.height(), self.rect.height())
     }
 
-    fn drag_start(&self, x: i32, y: i32) {
+    fn drag_start(&self, x: i32, _y: i32) {
         let slider_x = self.value_to_x(self.value.get());
         self.dragging.set(Some(x - self.rect.left() - (slider_x as i32)));
     }
