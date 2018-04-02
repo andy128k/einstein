@@ -51,7 +51,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     }
 
     container.push(
-        new_dialog_button(Rect::new(355, 435, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Escape), ())?
+        new_dialog_button2(Rect::new(115, 310, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Escape), ())?
     );
 
     Ok(container)

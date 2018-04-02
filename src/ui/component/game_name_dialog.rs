@@ -42,7 +42,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
         .add({
             let state2 = state.clone();
             WidgetMapAction::new(
-                new_dialog_button(Rect::new(310, 340, 80, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
+                new_dialog_button2(Rect::new(140, 60, 80, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let value: String = state2.borrow().clone();
                     EventReaction::Action(DialogResult::Ok(value))
@@ -50,7 +50,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
             )
         })
         .add(
-            new_dialog_button(Rect::new(400, 340, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), DialogResult::Cancel)?
+            new_dialog_button2(Rect::new(230, 60, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), DialogResult::Cancel)?
         );
 
     Ok(container)

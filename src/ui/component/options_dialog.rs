@@ -74,7 +74,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            new_dialog_button(Rect::new(315, 390, 85, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
+            new_dialog_button2(Rect::new(65, 220, 85, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
             move |_| {
                 let s: Options = state2.borrow().clone();
                 EventReaction::Action(DialogResult::Ok(s))
@@ -82,7 +82,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
         )
     });
     container.push(
-        new_dialog_button(Rect::new(405, 390, 85, 25), BLUE_PATTERN, messages.cancel,
+        new_dialog_button2(Rect::new(155, 220, 85, 25), BLUE_PATTERN, messages.cancel,
             Some(Key::Escape),
             DialogResult::Cancel
         )?

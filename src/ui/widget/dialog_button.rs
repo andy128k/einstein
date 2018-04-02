@@ -27,7 +27,7 @@ impl ButtonRenderer for DialogButton {
     }
 }
 
-pub fn new_dialog_button<A>(rect: Rect, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton, A>> {
+pub fn new_dialog_button2<A>(rect: Rect, image: &[u8], text: &str, key: Option<Key>, action: A) -> Result<Button<DialogButton, A>> {
     let bg = load_image(image)?;
     let highlighted_bg = adjust_brightness(&bg, 1.5);
     Ok(Button::<DialogButton, A>::new(

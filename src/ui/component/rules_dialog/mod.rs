@@ -71,7 +71,7 @@ impl DescriptionPrivate {
             .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    new_dialog_button(Rect::new(110, 515, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
+                    new_dialog_button2(Rect::new(10, 465, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
                     move |_| {
                         state2.borrow_mut().prev();
                         EventReaction::Redraw
@@ -81,7 +81,7 @@ impl DescriptionPrivate {
             .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    new_dialog_button(Rect::new(200, 515, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
+                    new_dialog_button2(Rect::new(100, 465, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
                     move |_| {
                         state2.borrow_mut().next();
                         EventReaction::Redraw
@@ -89,7 +89,7 @@ impl DescriptionPrivate {
                 )
             })
             .add(
-                new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ())?
+                new_dialog_button2(Rect::new(510, 465, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ())?
             );
 
         Ok(container)

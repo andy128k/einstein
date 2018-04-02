@@ -39,7 +39,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
         .add({
             let state2 = state.clone();
             WidgetMapAction::new(
-                new_dialog_button(Rect::new(348, 340, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
+                new_dialog_button2(Rect::new(178, 60, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let result: String = state2.borrow().clone();
                     EventReaction::Action(result)

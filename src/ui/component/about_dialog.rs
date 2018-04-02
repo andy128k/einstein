@@ -36,7 +36,7 @@ pub fn create_about_dialog(messages: &Messages) -> Result<Modal<()>> {
             Label::new(Rect::new(0, 170, 360, 20),"http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
         ))
         .add(
-            new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
+            new_dialog_button2(Rect::new(140, 240, 80, 25), BLUE_PATTERN, messages.ok,
                 Some(Key::Escape), // Return also
                 ()
             )?

@@ -29,6 +29,8 @@ impl<R: ButtonRenderer, A> Button<R, A> {
 }
 
 impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
@@ -39,12 +41,12 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
                 // sound->play(L"click.wav"); TODO
                 EventReaction::Action(self.action.clone())
             },
-            Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
+            Event::MouseButtonDown(Mouse::Left, x, y) if self.get_client_rect().contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
                 EventReaction::Action(self.action.clone())
             },
             Event::MouseMove(x, y) => {
-                let to_highlight = self.rect.contains_point((x, y));
+                let to_highlight = self.get_client_rect().contains_point((x, y));
                 if self.highlighted.get() != to_highlight {
                     self.highlighted.set(to_highlight);
                     EventReaction::Redraw
@@ -57,6 +59,6 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        self.renderer.draw(&context.relative(self.rect), self.highlighted.get())
+        self.renderer.draw(context, self.highlighted.get())
     }
 }
