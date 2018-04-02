@@ -20,12 +20,14 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
 
     let font = text_font()?;
     let (text_width, text_height) = font.size_of(message)?;
+    let width = text_width + 100;
+    let height = text_height + 100;
 
     let rect = Rect::new(
-        ((800 - (text_width + 100)) / 2) as i32,
-        ((600 - (text_height + 100)) / 2) as i32,
-        text_width + 100,
-        text_height + 100
+        ((800 - width) / 2) as i32,
+        ((600 - height) / 2) as i32,
+        width,
+        height
     );
 
     let (bg, color) = match message_type {
@@ -36,7 +38,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
 
     let container = Modal::<()>::new(screen_rect)
         .add(WidgetMapAction::no_action(
-            Window::new(rect, bg)?
+            Window::new(Rect::new0(width, height), bg)?
         ))
         .add(WidgetMapAction::no_action(
             Label {

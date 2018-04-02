@@ -24,7 +24,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
 
     let container = Modal::<DialogResult<String>>::new(rect)
         .add(WidgetMapAction::no_action(
-            Window::new(rect, BLUE_PATTERN)?
+            Window::new(Rect::new0(460, 100), BLUE_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
             Label {

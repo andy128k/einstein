@@ -21,7 +21,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     let mut container = Modal::<DialogResult<(usize, String)>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(rect, BLUE_PATTERN)?
+        Window::new(Rect::new0(300, 420), BLUE_PATTERN)?
     ));
 
     container.push(WidgetMapAction::no_action(

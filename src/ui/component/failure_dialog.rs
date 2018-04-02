@@ -21,7 +21,7 @@ pub fn new_failure_dialog(messages: &Messages) -> Result<Modal<FailureChoice>> {
 
     let container = Modal::<FailureChoice>::new(rect)
         .add(WidgetMapAction::no_action(
-            Window::new(rect, RED_PATTERN)?
+            Window::new(Rect::new0(360, 140), RED_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
             Title { rect: Rect::new(30, 10, 300, 100), text: messages.loose.to_string() }

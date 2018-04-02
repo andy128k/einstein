@@ -57,7 +57,7 @@ impl DescriptionPrivate {
 
         let container = Modal::<()>::new(rect)
             .add(WidgetMapAction::no_action(
-                Window::new(rect.clone(), BLUE_PATTERN)?
+                Window::new(Rect::new0(WIDTH as u32, HEIGHT as u32), BLUE_PATTERN)?
             ))
             .add(WidgetMapAction::no_action(
                 Title {

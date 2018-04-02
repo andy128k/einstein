@@ -13,6 +13,10 @@ impl Rect {
         Rect(x, y, w, h)
     }
 
+    pub fn new0(w: u32, h: u32) -> Self {
+        Rect(0, 0, w, h)
+    }
+
     pub fn left(&self) -> i32 { self.0 }
     pub fn top(&self) -> i32 { self.1 }
     pub fn width(&self) -> u32 { self.2 }

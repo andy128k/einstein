@@ -17,14 +17,15 @@ impl Window {
 }
 
 impl Widget<Nothing> for Window {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-        c.tiles(&self.background);
-        c.bevel(true, 1);
+        context.tiles(&self.background);
+        context.bevel(true, 1);
         Ok(())
     }
 }

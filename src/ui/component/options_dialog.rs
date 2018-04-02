@@ -36,7 +36,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     let mut container = Modal::<DialogResult<Options>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(rect, BLUE_PATTERN)?
+        Window::new(Rect::new0(300, 260), BLUE_PATTERN)?
     ));
     container.push(WidgetMapAction::no_action(
         Title {

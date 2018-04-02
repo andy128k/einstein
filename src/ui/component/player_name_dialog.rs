@@ -21,7 +21,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
 
     let container = Modal::<String>::new(rect)
         .add(WidgetMapAction::no_action(
-            Window::new(rect, BLUE_PATTERN)?
+            Window::new(Rect::new0(460, 100), BLUE_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
             Label {

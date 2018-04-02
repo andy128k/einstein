@@ -19,7 +19,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     let mut container = Modal::<()>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(rect.clone(), BLUE_PATTERN)?
+        Window::new(Rect::new0(320, 350), BLUE_PATTERN)?
     ));
 
     container.push(WidgetMapAction::no_action(

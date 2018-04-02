@@ -18,7 +18,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
     let mut container = Modal::<DialogResult<GamePrivate>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(rect, BLUE_PATTERN)?
+        Window::new(Rect::new0(300, 420), BLUE_PATTERN)?
     ));
     container.push(WidgetMapAction::no_action(
         Title {
