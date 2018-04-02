@@ -23,34 +23,18 @@ pub fn create_about_dialog(messages: &Messages) -> Result<Modal<()>> {
             text: messages.about.to_string(),
             rect: Rect::new(30, 5, 300, 40),
         }))
-        .add(WidgetMapAction::no_action(Label {
-            text: messages.einstein_puzzle.to_string(),
-            rect: Rect::new(220, 240, 360, 20),
-            color: Color::RGB(255, 255, 255),
-            horizontal_align: HorizontalAlign::Center,
-            vertical_align: VerticalAlign::Middle,
-        }))
-        .add(WidgetMapAction::no_action(Label {
-            text: format!("{}{}", messages.version, VERSION),
-            rect: Rect::new(220, 260, 360, 20),
-            color: Color::RGB(255, 255, 255),
-            horizontal_align: HorizontalAlign::Center,
-            vertical_align: VerticalAlign::Middle,
-        }))
-        .add(WidgetMapAction::no_action(Label {
-            text: messages.copyright.to_string(),
-            rect: Rect::new(220, 280, 360, 20),
-            color: Color::RGB(255, 255, 255),
-            horizontal_align: HorizontalAlign::Center,
-            vertical_align: VerticalAlign::Middle,
-        }))
-        .add(WidgetMapAction::no_action(Label {
-            text: "http://games.flowix.com".to_string(),
-            rect: Rect::new(220, 330, 360, 20),
-            color: Color::RGB(255, 255, 0),
-            horizontal_align: HorizontalAlign::Center,
-            vertical_align: VerticalAlign::Middle,
-        }))
+        .add(WidgetMapAction::no_action(
+            Label::new(Rect::new(0, 80, 360, 20), messages.einstein_puzzle, Color::RGB(255, 255, 255), HorizontalAlign::Center)
+        ))
+        .add(WidgetMapAction::no_action(
+            Label::new(Rect::new(0, 100, 360, 20), &format!("{}{}", messages.version, VERSION), Color::RGB(255, 255, 255), HorizontalAlign::Center)
+        ))
+        .add(WidgetMapAction::no_action(
+            Label::new(Rect::new(0, 120, 360, 20), messages.copyright, Color::RGB(255, 255, 255), HorizontalAlign::Center)
+        ))
+        .add(WidgetMapAction::no_action(
+            Label::new(Rect::new(0, 170, 360, 20),"http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
+        ))
         .add(
             new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
                 Some(Key::Escape), // Return also

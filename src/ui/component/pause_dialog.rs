@@ -21,13 +21,7 @@ pub fn new_pause_dialog(messages: &Messages) -> Result<Modal<()>> {
             Window::new(Rect::new(280, 275, 240, 50), GREEN_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
-            Label {
-                text: messages.paused.to_string(),
-                rect: Rect::new(280, 275, 240, 50),
-                color: Color::RGB(255, 255, 0),
-                horizontal_align: HorizontalAlign::Center,
-                vertical_align: VerticalAlign::Middle,
-            }
+            Label::new(Rect::new(280, 275, 240, 50), messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center)
         ))
         .add(
             AnyKey::new(())

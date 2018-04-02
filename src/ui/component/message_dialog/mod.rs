@@ -41,13 +41,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
             Window::new(Rect::new0(width, height), bg)?
         ))
         .add(WidgetMapAction::no_action(
-            Label {
-                text: message.to_string(),
-                rect,
-                color,
-                horizontal_align: HorizontalAlign::Center,
-                vertical_align: VerticalAlign::Middle,
-            }
+            Label::new(Rect::new0(width, height), message, color, HorizontalAlign::Center)
         ))
         .add(
             AnyKey::new(())

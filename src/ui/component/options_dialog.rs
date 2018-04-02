@@ -55,22 +55,10 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
         )
     });
     container.push(WidgetMapAction::no_action(
-        Label {
-            text: messages.fullscreen.to_string(),
-            rect: Rect::new(300, 260, 300, 20),
-            color: Color::RGB(255, 255, 255),
-            horizontal_align: HorizontalAlign::Left,
-            vertical_align: VerticalAlign::Middle,
-        }
+        Label::new(Rect::new(50, 90, 300, 20), messages.fullscreen, Color::RGB(255, 255, 255), HorizontalAlign::Left)
     ));
     container.push(WidgetMapAction::no_action(
-        Label {
-            text: messages.volume.to_string(),
-            rect: Rect::new(265, 330, 300, 20),
-            color: Color::RGB(255, 255, 255),
-            horizontal_align: HorizontalAlign::Left,
-            vertical_align: VerticalAlign::Middle,
-        }
+        Label::new(Rect::new(15, 160, 300, 20), messages.volume, Color::RGB(255, 255, 255), HorizontalAlign::Left)
     ));
     container.push({
         let state2 = state.clone();

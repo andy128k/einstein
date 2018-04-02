@@ -27,13 +27,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
             Window::new(Rect::new0(460, 100), BLUE_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
-            Label {
-                text: messages.enter_game.to_string(),
-                rect: Rect::new(180, 300, 150, 26),
-                color: yellow,
-                horizontal_align: HorizontalAlign::Left,
-                vertical_align: VerticalAlign::Middle,
-            }
+            Label::new(Rect::new(10, 20, 150, 26), messages.enter_game, yellow, HorizontalAlign::Left)
         ))
         .add({
             let state2 = state.clone();

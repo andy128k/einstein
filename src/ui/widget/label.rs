@@ -5,21 +5,34 @@ use ui::widget::widget::*;
 use resources::fonts::text_font;
 
 pub struct Label {
-    pub text: String,
-    pub rect: Rect,
-    pub color: Color,
-    pub horizontal_align: HorizontalAlign,
-    pub vertical_align: VerticalAlign,
+    text: String,
+    rect: Rect,
+    color: Color,
+    horizontal_align: HorizontalAlign,
+    vertical_align: VerticalAlign,
+}
+
+impl Label {
+    pub fn new(rect: Rect, text: &str, color: Color, horizontal_align: HorizontalAlign) -> Self {
+        Self {
+            text: text.to_string(),
+            rect,
+            color,
+            horizontal_align,
+            vertical_align: VerticalAlign::Middle,
+        }
+    }
 }
 
 impl Widget<Nothing> for Label {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-        c.text(&self.text, text_font()?, self.color, true, self.horizontal_align, self.vertical_align)?;
+        context.text(&self.text, text_font()?, self.color, true, self.horizontal_align, self.vertical_align)?;
         Ok(())
     }
 }
