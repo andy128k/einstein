@@ -14,6 +14,7 @@ use error::*;
 const TILE_BG: &[u8] = include_bytes!("./tile.bmp");
 
 pub struct HorizontalRules {
+    rect: Rect,
     state: Rc<RefCell<GamePrivate>>,
     highlighted: Cell<Option<usize>>,
     tile: Surface,
@@ -24,15 +25,14 @@ const HINTS_COLS: usize =  3;
 const HINTS_ROWS: usize =  8;
 const TILE_GAP_X: i32 =    4;
 const TILE_GAP_Y: i32 =    4;
-const TILE_X: i32 =      348;
-const TILE_Y: i32 =       68;
 const TILE_WIDTH: i32 =   48;
 const TILE_HEIGHT: i32 =  48;
 
 impl HorizontalRules {
-    pub fn new(state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
+    pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
         let tile = load_image(TILE_BG)?;
         Ok(Self {
+            rect,
             state,
             highlighted: Cell::new(None),
             tile,
@@ -59,12 +59,9 @@ impl HorizontalRules {
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.get_rect().contains_point((x, y)) {
+        if !self.get_client_rect().contains_point((x, y)) {
             return None;
         }
-
-        let x = x - TILE_X;
-        let y = y - TILE_Y;
 
         let col: usize = (x / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
         if (col as i32) * (TILE_WIDTH*3 + TILE_GAP_X) + TILE_WIDTH*3 < x {
@@ -88,8 +85,8 @@ impl HorizontalRules {
         let row = index / HINTS_COLS;
         let col = index % HINTS_COLS;
         Rect::new(
-            TILE_X + (col as i32) * (TILE_WIDTH*3 + TILE_GAP_X),
-            TILE_Y + (row as i32) * (TILE_HEIGHT + TILE_GAP_Y),
+            (col as i32) * (TILE_WIDTH*3 + TILE_GAP_X),
+            (row as i32) * (TILE_HEIGHT + TILE_GAP_Y),
             TILE_WIDTH as u32 * 3,
             TILE_HEIGHT as u32
         )
@@ -97,14 +94,8 @@ impl HorizontalRules {
 }
 
 impl Widget<Nothing> for HorizontalRules {
-    fn get_rect(&self) -> Rect {
-        Rect::new(
-            TILE_X,
-            TILE_Y,
-            ((TILE_WIDTH as u32) * 3 + (TILE_GAP_X as u32)) * (HINTS_COLS as u32),
-            ((TILE_HEIGHT + TILE_GAP_Y) as u32) * (HINTS_ROWS as u32)
-        )
-    }
+    fn is_relative(&self) -> bool { true }
+    fn get_rect(&self) -> Rect { self.rect }
 
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
@@ -144,6 +135,8 @@ impl Widget<Nothing> for HorizontalRules {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
+        // let num_cols = ((self.get_client_rect().width() as i32 + TILE_GAP_X) / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
+        // let num_rows = ((self.get_client_rect().height() as i32 + TILE_GAP_Y) / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
         for i in 0..(HINTS_ROWS * HINTS_COLS) {
             self.draw_cell(context, i)?;
         }
