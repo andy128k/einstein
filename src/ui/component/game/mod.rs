@@ -255,7 +255,10 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         HorizontalRules::new(state.clone())?
     ));
     container.push(WidgetMapAction::no_action(
-        VerticalRules::new(state.clone())?
+        VerticalRules::new(
+            Rect::new(12, 495, 800 - 12 * 2, 48 * 2),
+            state.clone()
+        )?
     ));
 
     container.push({

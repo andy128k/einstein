@@ -14,24 +14,23 @@ use error::*;
 const TILE_BG: &[u8] = include_bytes!("./tile.bmp");
 
 pub struct VerticalRules {
+    rect: Rect,
     state: Rc<RefCell<GamePrivate>>,
     highlighted: Cell<Option<usize>>,
     tile: Surface,
     thing_images: Rc<ThingImages>,
 }
 
-const TILE_NUM: usize =   15;
 const TILE_GAP: i32 =      4;
-const TILE_X: i32 =       12;
-const TILE_Y: i32 =      495;
 const TILE_WIDTH: i32 =   48;
 const TILE_HEIGHT: i32 =  48;
 
 impl VerticalRules {
-    pub fn new(state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
+    pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
         let tile = load_image(TILE_BG)?;
 
         Ok(Self {
+            rect,
             state,
             highlighted: Cell::new(None),
             tile,
@@ -60,8 +59,8 @@ impl VerticalRules {
         if !self.get_rect().contains_point((x, y)) {
             return None;
         }
-        if (x - TILE_X) % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
-            let index = (x - TILE_X) / (TILE_WIDTH + TILE_GAP);
+        if x % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
+            let index = x / (TILE_WIDTH + TILE_GAP);
             Some(index as usize)
         } else {
             None
@@ -69,19 +68,13 @@ impl VerticalRules {
     }
 
     fn rect(&self, index: usize) -> Rect {
-        Rect::new(TILE_X + (index as i32) * (TILE_WIDTH + TILE_GAP), TILE_Y, TILE_WIDTH as u32, TILE_HEIGHT as u32 * 2)
+        Rect::new((index as i32) * (TILE_WIDTH + TILE_GAP), 0, TILE_WIDTH as u32, TILE_HEIGHT as u32 * 2)
     }
 }
 
 impl Widget<Nothing> for VerticalRules {
-    fn get_rect(&self) -> Rect {
-        Rect::new(
-            TILE_X,
-            TILE_Y,
-            (TILE_WIDTH as u32) * (TILE_NUM as u32) + (TILE_GAP as u32) * (TILE_NUM as u32 - 1),
-            (TILE_HEIGHT * 2) as u32
-        )
-    }
+    fn is_relative(&self) -> bool { true }
+    fn get_rect(&self) -> Rect { self.rect }
 
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
@@ -121,7 +114,8 @@ impl Widget<Nothing> for VerticalRules {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        for i in 0..TILE_NUM {
+        let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
+        for i in 0..num {
             self.draw_cell(context, i)?;
         }
         Ok(())
