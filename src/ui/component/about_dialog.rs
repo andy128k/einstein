@@ -22,7 +22,7 @@ pub fn create_about_dialog(messages: &Messages) -> Result<Modal<()>> {
         ))
         .add(WidgetMapAction::no_action(Title {
             text: messages.about.to_string(),
-            rect: Rect::new(250, 165, 300, 40),
+            rect: Rect::new(30, 5, 300, 40),
         }))
         .add(WidgetMapAction::no_action(Label {
             text: messages.einstein_puzzle.to_string(),

@@ -42,13 +42,13 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push(WidgetMapAction::no_action(
         Title {
             text: messages.options.to_string(),
-            rect: Rect::new(250, 175, 300, 40),
+            rect: Rect::new(0, 5, 300, 40),
         }
     ));
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            Checkbox::new(Rect::new(265, 260, 20, 20), BLUE_PATTERN, state.borrow().fullscreen)?,
+            Checkbox::new(15, 90, BLUE_PATTERN, state.borrow().fullscreen)?,
             move |value| {
                 state2.borrow_mut().fullscreen = *value;
                 EventReaction::Redraw

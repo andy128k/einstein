@@ -18,12 +18,12 @@ pub struct Checkbox {
 }
 
 impl Checkbox {
-    pub fn new(rect: Rect, bg: &[u8], checked: bool) -> Result<Self> {
+    pub fn new(x: i32, y: i32, bg: &[u8], checked: bool) -> Result<Self> {
         let image = load_image(bg)?;
         let highlighted = adjust_brightness(&image, 1.5);
 
         Ok(Self{
-            rect,
+            rect: Rect::new(x, y, 20, 20),
             image,
             highlighted,
             checked: Cell::new(checked),
@@ -33,19 +33,22 @@ impl Checkbox {
 }
 
 impl Widget<bool> for Checkbox {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
 
     fn on_event(&self, event: &Event) -> EventReaction<bool> {
+        let rect = self.get_client_rect();
         match *event {
-            Event::MouseButtonDown(Mouse::Left, x, y) if self.rect.contains_point((x, y)) => {
+            Event::MouseButtonDown(Mouse::Left, x, y) if rect.contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
                 self.checked.set(!self.checked.get());
                 EventReaction::Action(self.checked.get())
             },
             Event::MouseMove(x, y) => {
-                let to_highlight = self.rect.contains_point((x, y));
+                let to_highlight = rect.contains_point((x, y));
                 if self.mouse_inside.get() != to_highlight {
                     self.mouse_inside.set(to_highlight);
                     EventReaction::Redraw
@@ -58,16 +61,15 @@ impl Widget<bool> for Checkbox {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
         let image = if self.mouse_inside.get() {
             &self.highlighted
         } else {
             &self.image
         };
-        c.tiles(image);
-        c.etched();
+        context.tiles(image);
+        context.etched();
         if self.checked.get() {
-            c.text("X", text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
+            context.text("X", text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
         }
         Ok(())
     }

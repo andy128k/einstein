@@ -26,7 +26,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     container.push(WidgetMapAction::no_action(
         Title {
             text: messages.top_scores.to_string(),
-            rect: Rect::new(250, 135, 300, 40),
+            rect: Rect::new(10, 10, 300, 40),
         }
     ));
 

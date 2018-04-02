@@ -53,6 +53,14 @@ impl<A> EventReaction<A> {
 pub trait Widget<A> {
     fn is_relative(&self) -> bool { false }
     fn get_rect(&self) -> Rect;
+
+    fn get_client_rect(&self) -> Rect {
+        let mut client_rect = self.get_rect();
+        client_rect.set_x(0);
+        client_rect.set_y(0);
+        client_rect
+    }
+
     fn on_event(&self, _event: &Event) -> EventReaction<A> { EventReaction::NoOp } // TODO Result<EventReaction<A>>
     fn draw(&self, context: &Context) -> Result<()>;
 }

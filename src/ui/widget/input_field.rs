@@ -114,6 +114,8 @@ impl InputField {
 }
 
 impl Widget<String> for InputField {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
@@ -127,10 +129,8 @@ impl Widget<String> for InputField {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-
         let font = text_font()?;
-        c.text(&self.text.borrow(), font, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
+        context.text(&self.text.borrow(), font, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
 
         if self.cursor_visible.get() {
             let cursor_pos = self.cursor_pos.get();
@@ -139,10 +139,10 @@ impl Widget<String> for InputField {
             } else {
                 0
             };
-            c.image(&self.cursor, pos as i32, 4);
+            context.image(&self.cursor, pos as i32, 4);
         }
 
-        c.bevel(false, 1);
+        context.bevel(false, 1);
 
         Ok(())
     }

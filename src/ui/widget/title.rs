@@ -11,13 +11,14 @@ pub struct Title {
 }
 
 impl Widget<Nothing> for Title {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-        c.text(&self.text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
+        context.text(&self.text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
         Ok(())
     }
 }

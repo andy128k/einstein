@@ -39,7 +39,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
         .add({
             let state2 = state.clone();
             WidgetMapAction::new(
-                InputField::new(Rect::new(340, 300, 280, 26), name, 20)?,
+                InputField::new(Rect::new(170, 20, 280, 26), name, 20)?,
                 move |name| {
                     *state2.borrow_mut() = name.to_string();
                     EventReaction::Redraw

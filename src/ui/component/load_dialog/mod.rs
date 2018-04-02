@@ -23,7 +23,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
     container.push(WidgetMapAction::no_action(
         Title {
             text: messages.load_game.to_string(),
-            rect: Rect::new(250, 95, 300, 40),
+            rect: Rect::new(0, 5, 300, 40),
         }
     ));
 

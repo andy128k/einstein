@@ -62,7 +62,7 @@ impl DescriptionPrivate {
             .add(WidgetMapAction::no_action(
                 Title {
                     text: messages.rules.to_string(),
-                    rect: Rect::new(250, 60, 300, 40),
+                    rect: Rect::new(150, 10, 300, 40),
                 }
             ))
             .add(WidgetMapAction::no_action(

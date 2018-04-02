@@ -18,13 +18,14 @@ impl Image {
 }
 
 impl Widget<Nothing> for Image {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         self.rect
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-        c.tiles(&self.image);
+        context.tiles(&self.image);
         Ok(())
     }
 }

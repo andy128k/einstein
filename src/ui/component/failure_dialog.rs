@@ -24,7 +24,7 @@ pub fn new_failure_dialog(messages: &Messages) -> Result<Modal<FailureChoice>> {
             Window::new(rect, RED_PATTERN)?
         ))
         .add(WidgetMapAction::no_action(
-            Title { rect: Rect::new(250, 230, 300, 100), text: messages.loose.to_string() }
+            Title { rect: Rect::new(30, 10, 300, 100), text: messages.loose.to_string() }
         ))
         .add(
             new_dialog_button(Rect::new(250, 340, 90, 25), RED_PATTERN, messages.start_new, None, FailureChoice::StartNew)?
