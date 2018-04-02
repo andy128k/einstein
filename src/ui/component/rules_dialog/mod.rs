@@ -66,7 +66,7 @@ impl DescriptionPrivate {
                 }
             ))
             .add(WidgetMapAction::no_action(
-                PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)
+                PageView::new(Rect::new(15, 50, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)
             ))
             .add({
                 let state2 = state.clone();
