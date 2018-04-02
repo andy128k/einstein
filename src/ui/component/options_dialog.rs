@@ -63,7 +63,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            Slider::new(Rect::new(360, 332, 160, 16), BLUE_PATTERN, state.borrow().volume_float)?,
+            Slider::new(Rect::new(110, 162, 160, 16), BLUE_PATTERN, state.borrow().volume_float)?,
             move |value| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;
