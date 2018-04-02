@@ -14,7 +14,7 @@ use ui::component::background::*;
 pub fn new_pause_dialog(messages: &Messages) -> Result<Modal<()>> {
     let rect = Rect::new(0, 0, 800, 600);
 
-    let container = Modal::<()>::new()
+    let container = Modal::<()>::new(rect)
         .add(WidgetMapAction::no_action(
             Background::new()?
         ))

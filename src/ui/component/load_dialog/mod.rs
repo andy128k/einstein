@@ -15,7 +15,7 @@ use storage::SavedGame;
 pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<Modal<DialogResult<GamePrivate>>> {
     let rect = Rect::new(250, 90, 300, 420);
 
-    let mut container = Modal::<DialogResult<GamePrivate>>::new();
+    let mut container = Modal::<DialogResult<GamePrivate>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
         Window::new(rect, BLUE_PATTERN)?

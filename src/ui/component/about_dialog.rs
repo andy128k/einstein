@@ -16,7 +16,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn create_about_dialog(messages: &Messages) -> Result<Modal<()>> {
     let rect = Rect::new(220, 160, 360, 280);
-    let container = Modal::<()>::new()
+    let container = Modal::<()>::new(rect)
         .add(WidgetMapAction::no_action(
             Window::new(rect.clone(), BLUE_PATTERN)?
         ))

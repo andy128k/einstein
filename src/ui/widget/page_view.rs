@@ -20,6 +20,10 @@ impl PageView {
 }
 
 impl Widget<Nothing> for PageView {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn draw(&self, context: &Context) -> Result<()> {
         let c = context.relative(self.rect);
         for item in (*self.page.borrow()).iter() {

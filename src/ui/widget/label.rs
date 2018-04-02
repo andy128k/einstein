@@ -14,6 +14,10 @@ pub struct Label {
 }
 
 impl Widget<Nothing> for Label {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn draw(&self, context: &Context) -> Result<()> {
         let c = context.relative(self.rect);
         c.text(&self.text, text_font()?, self.color, true, self.horizontal_align, self.vertical_align)?;

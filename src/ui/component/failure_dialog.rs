@@ -19,7 +19,7 @@ pub enum FailureChoice {
 pub fn new_failure_dialog(messages: &Messages) -> Result<Modal<FailureChoice>> {
     let rect = Rect::new(220, 240, 360, 140);
 
-    let container = Modal::<FailureChoice>::new()
+    let container = Modal::<FailureChoice>::new(rect)
         .add(WidgetMapAction::no_action(
             Window::new(rect, RED_PATTERN)?
         ))

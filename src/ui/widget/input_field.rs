@@ -114,6 +114,10 @@ impl InputField {
 }
 
 impl Widget<String> for InputField {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<String> {
         match *event {
             Event::KeyDown(key, ch) => self.on_key_down(key, ch),

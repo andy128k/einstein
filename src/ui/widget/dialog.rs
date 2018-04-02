@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
+use sdl2::rect::Rect;
 use debug_cell::RefCell;
 use ui::context::Context;
 use ui::widget::widget::*;
@@ -42,6 +43,20 @@ impl<A, W, I> ConditionalWidget<A, W, I> where W: Widget<A> {
 }
 
 impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
+    fn is_relative(&self) -> bool {
+        match *self.wrapped.borrow() {
+            Some(ref widget) => widget.is_relative(),
+            None => false
+        }
+    }
+
+    fn get_rect(&self) -> Rect {
+        match *self.wrapped.borrow() {
+            Some(ref widget) => widget.get_rect(),
+            None => Rect::new(-10000, -10000, 1, 1)
+        }
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<A> {
         self.check().unwrap();
         match *self.wrapped.borrow() {

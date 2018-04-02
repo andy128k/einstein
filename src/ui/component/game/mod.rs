@@ -191,7 +191,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Modal::<()>::new();
+    let mut container = Modal::<()>::new(screen_rect);
 
     container.push(WidgetMapAction::no_action(
         Image::new(screen_rect, RAIN_TILE)?

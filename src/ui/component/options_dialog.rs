@@ -34,7 +34,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
         volume_float: storage.volume as f32 / 100_f32,
     }));
 
-    let mut container = Modal::<DialogResult<Options>>::new();
+    let mut container = Modal::<DialogResult<Options>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
         Window::new(rect, BLUE_PATTERN)?

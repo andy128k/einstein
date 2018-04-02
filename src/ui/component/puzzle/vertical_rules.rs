@@ -72,7 +72,9 @@ impl VerticalRules {
     fn rect(&self, index: usize) -> Rect {
         Rect::new(TILE_X + (index as i32) * (TILE_WIDTH + TILE_GAP), TILE_Y, TILE_WIDTH as u32, TILE_HEIGHT as u32 * 2)
     }
+}
 
+impl Widget<Nothing> for VerticalRules {
     fn get_rect(&self) -> Rect {
         Rect::new(
             TILE_X,
@@ -81,9 +83,7 @@ impl VerticalRules {
             (TILE_HEIGHT * 2) as u32
         )
     }
-}
 
-impl Widget<Nothing> for VerticalRules {
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
             Event::MouseButtonDown(Mouse::Right, x, y) => {

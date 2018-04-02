@@ -55,7 +55,7 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         }));
 
-        let container = Modal::<()>::new()
+        let container = Modal::<()>::new(rect)
             .add(WidgetMapAction::no_action(
                 Window::new(rect.clone(), BLUE_PATTERN)?
             ))

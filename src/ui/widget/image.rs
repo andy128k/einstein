@@ -18,6 +18,10 @@ impl Image {
 }
 
 impl Widget<Nothing> for Image {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn draw(&self, context: &Context) -> Result<()> {
         let c = context.relative(self.rect);
         c.tiles(&self.image);

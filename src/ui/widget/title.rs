@@ -11,6 +11,10 @@ pub struct Title {
 }
 
 impl Widget<Nothing> for Title {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn draw(&self, context: &Context) -> Result<()> {
         let c = context.relative(self.rect);
         c.text(&self.text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;

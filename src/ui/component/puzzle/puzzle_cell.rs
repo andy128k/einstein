@@ -133,7 +133,9 @@ impl PuzzleCell {
 
         EventReaction::Redraw
     }
+}
 
+impl Widget<PuzzleAction> for PuzzleCell {
     fn get_rect(&self) -> Rect {
         Rect::new(
             (FIELD_OFFSET_X as i32) + (self.col as i32) * ((FIELD_TILE_WIDTH + FIELD_GAP_X) as i32),
@@ -142,9 +144,7 @@ impl PuzzleCell {
             FIELD_TILE_HEIGHT as u32
         )
     }
-}
 
-impl Widget<PuzzleAction> for PuzzleCell {
     fn on_event(&self, event: &Event) -> EventReaction<PuzzleAction> {
         match *event {
             Event::MouseButtonDown(button, x, y) => self.on_mouse_button_down(button, x, y),

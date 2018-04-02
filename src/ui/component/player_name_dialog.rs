@@ -20,7 +20,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container = Modal::<String>::new()
+    let container = Modal::<String>::new(rect)
         .add(WidgetMapAction::no_action(
             Window::new(rect, BLUE_PATTERN)?
         ))

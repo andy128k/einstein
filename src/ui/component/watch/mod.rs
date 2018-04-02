@@ -31,7 +31,9 @@ impl Watch {
             last_duration: Cell::new(None)
         }
     }
+}
 
+impl Widget<Nothing> for Watch {
     fn get_rect(&self) -> Rect {
         Rect::new(
             (APP_WIDTH - TITLE_RIGHT - TITLE_PADDING_RIGHT - WATCH_WIDTH) as i32,
@@ -40,9 +42,7 @@ impl Watch {
             WATCH_HEIGHT
         )
     }
-}
 
-impl Widget<Nothing> for Watch {
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
             Event::Tick => {

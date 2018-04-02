@@ -17,7 +17,7 @@ use util::time::sec_to_str;
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Modal<()>> {
     let rect = Rect::new(240, 125, 320, 350);
 
-    let mut container = Modal::<()>::new();
+    let mut container = Modal::<()>::new(rect);
 
     container.push(WidgetMapAction::no_action(
         Window::new(rect.clone(), BLUE_PATTERN)?

@@ -95,7 +95,9 @@ impl HorizontalRules {
             TILE_HEIGHT as u32
         )
     }
+}
 
+impl Widget<Nothing> for HorizontalRules {
     fn get_rect(&self) -> Rect {
         Rect::new(
             TILE_X,
@@ -104,9 +106,7 @@ impl HorizontalRules {
             ((TILE_HEIGHT + TILE_GAP_Y) as u32) * (HINTS_ROWS as u32)
         )
     }
-}
 
-impl Widget<Nothing> for HorizontalRules {
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
             Event::MouseButtonDown(Mouse::Right, x, y) => {

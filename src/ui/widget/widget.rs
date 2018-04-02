@@ -1,4 +1,5 @@
 use sdl::event::{Key, Mouse};
+use sdl2::rect::Rect;
 use error::*;
 use ui::context::Context;
 pub use algebra::*;
@@ -50,6 +51,8 @@ impl<A> EventReaction<A> {
 }
 
 pub trait Widget<A> {
+    fn is_relative(&self) -> bool { false }
+    fn get_rect(&self) -> Rect;
     fn on_event(&self, _event: &Event) -> EventReaction<A> { EventReaction::NoOp } // TODO Result<EventReaction<A>>
     fn draw(&self, context: &Context) -> Result<()>;
 }
@@ -57,6 +60,14 @@ pub trait Widget<A> {
 pub type WidgetPtr<A> = Box<Widget<A>>;
 
 impl<A> Widget<A> for WidgetPtr<A> {
+    fn is_relative(&self) -> bool {
+        (**self).is_relative()
+    }
+
+    fn get_rect(&self) -> Rect {
+        (**self).get_rect()
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<A> {
         (**self).on_event(event)
     }
@@ -86,6 +97,14 @@ impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
 }
 
 impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
+    fn is_relative(&self) -> bool {
+        self.wrapped.is_relative()
+    }
+
+    fn get_rect(&self) -> Rect {
+        self.wrapped.get_rect()
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<AT> {
         let event = self.wrapped.on_event(event);
         event.flatmap_action(&*self.convert)

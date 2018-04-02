@@ -1,3 +1,4 @@
+use sdl2::rect::Rect;
 use error::*;
 use ui::context::Context;
 use ui::widget::widget::*;
@@ -13,6 +14,10 @@ impl<A> AnyKey<A> {
 }
 
 impl<A> Widget<A> for AnyKey<A> where A: Clone {
+    fn get_rect(&self) -> Rect {
+        Rect::new(-10000, -10000, 1, 1)
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {

@@ -23,7 +23,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
         name.to_string()
     ));
 
-    let container = Modal::<DialogResult<String>>::new()
+    let container = Modal::<DialogResult<String>>::new(rect)
         .add(WidgetMapAction::no_action(
             Window::new(rect, BLUE_PATTERN)?
         ))

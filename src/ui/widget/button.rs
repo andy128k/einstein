@@ -30,6 +30,10 @@ impl<R: ButtonRenderer, A> Button<R, A> {
 }
 
 impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
+    fn get_rect(&self) -> Rect {
+        self.rect
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<A> {
         match *event {
             Event::KeyDown(key, _) if Some(key) == self.key => {

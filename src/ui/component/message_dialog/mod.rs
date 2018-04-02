@@ -31,7 +31,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (RED_PATTERN, Color::RGB(255, 255, 255))
     };
 
-    let container = Modal::<()>::new()
+    let container = Modal::<()>::new(screen_rect)
         .add(WidgetMapAction::no_action(
             Window::new(rect, bg)?
         ))

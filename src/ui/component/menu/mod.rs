@@ -31,7 +31,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Modal::<MainLoopQuit>::new();
+    let mut container = Modal::<MainLoopQuit>::new(rect);
 
     container.push(WidgetMapAction::no_action(
         Image::new(rect, MENU_BG)?

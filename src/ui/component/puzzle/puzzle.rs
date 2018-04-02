@@ -21,6 +21,15 @@ pub struct Puzzle {
 }
 
 impl Widget<PuzzleAction> for Puzzle {
+    fn get_rect(&self) -> Rect {
+        Rect::new(
+            FIELD_OFFSET_X as i32,
+            FIELD_OFFSET_Y as i32,
+            (6 * FIELD_TILE_WIDTH + 5 * FIELD_GAP_X) as u32,
+            (6 * FIELD_TILE_HEIGHT + 5 * FIELD_GAP_Y) as u32
+        )
+    }
+
     fn on_event(&self, event: &Event) -> EventReaction<PuzzleAction> {
         for child in &self.cells {
             let reaction = child.on_event(event);
@@ -40,13 +49,6 @@ impl Widget<PuzzleAction> for Puzzle {
 }
 
 pub fn new_puzzle_widget(state: Rc<RefCell<GamePrivate>>) -> Result<Puzzle> {
-    let rect = Rect::new(
-        FIELD_OFFSET_X as i32,
-        FIELD_OFFSET_Y as i32,
-        (6 * FIELD_TILE_WIDTH + 5 * FIELD_GAP_X) as u32,
-        (6 * FIELD_TILE_HEIGHT + 5 * FIELD_GAP_Y) as u32
-    );
-
     let thing_images = ThingImages::new()?;
 
     let mut container = Puzzle { cells: Vec::new() };
