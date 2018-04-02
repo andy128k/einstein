@@ -2,8 +2,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::{Widget, Nothing};
-use ui::context::Context;
-use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, HorizontalAlign, VerticalAlign};
 use resources::fonts::title_font;
 
 pub struct Title {

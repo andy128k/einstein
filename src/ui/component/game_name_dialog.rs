@@ -1,24 +1,21 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::component::dialog::DialogResult;
-use ui::main_loop::{main_loop, ModalResult};
 use resources::background::BLUE_PATTERN;
-use resources::messages::{get_messages, Messages};
+use resources::messages::Messages;
 
-pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalResult<DialogResult<String>>>> {
+pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<DialogResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);
     let yellow = Color::RGB(255, 255, 0);
 
@@ -26,7 +23,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalR
         name.to_string()
     ));
 
-    let container: Vec<WidgetPtr<ModalResult<DialogResult<String>>>> = vec![
+    let container: Vec<WidgetPtr<DialogResult<String>>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -58,12 +55,12 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalR
                 new_dialog_button(Rect::new(310, 340, 80, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let value: String = state2.borrow().clone();
-                    EventReaction::Action(ModalResult(DialogResult::Ok(value)))
+                    EventReaction::Action(DialogResult::Ok(value))
                 }
             )
         }),
         Box::new(
-            new_dialog_button(Rect::new(400, 340, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), ModalResult(DialogResult::Cancel))?
+            new_dialog_button(Rect::new(400, 340, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), DialogResult::Cancel)?
         ),
     ];
 

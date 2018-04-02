@@ -1,11 +1,9 @@
-use sdl::video::Surface;
 use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, HorizontalAlign, VerticalAlign};
 use ui::widget::button::*;
-use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 
 pub struct MenuButton {

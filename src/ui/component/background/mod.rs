@@ -2,9 +2,9 @@ use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
-use ui::utils::{load_image, draw_text, HorizontalAlign, VerticalAlign};
+use ui::utils::load_image;
 use resources::fonts::title_font;
 
 pub struct Background {

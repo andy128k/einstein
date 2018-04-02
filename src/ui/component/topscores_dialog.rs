@@ -1,27 +1,23 @@
-use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::dialog::*;
 use ui::widget::title::Title;
-use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::main_loop::{main_loop, ModalResult};
 use resources::background::BLUE_PATTERN;
-use resources::messages::{get_messages, Messages};
-use locale::get_language;
+use resources::messages::Messages;
 use storage::{Scores};
 use util::time::sec_to_str;
 
-pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<WidgetPtr<()>> {
     let rect = Rect::new(240, 125, 320, 350);
 
-    let mut container: Vec<WidgetPtr<ModalResult<()>>> = vec![];
+    let mut container: Vec<WidgetPtr<()>> = vec![];
 
     container.push(Box::new(
         InterceptWidget::default()
@@ -80,7 +76,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     }
 
     container.push(Box::new(
-        new_dialog_button(Rect::new(355, 435, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Escape), ModalResult(()))?
+        new_dialog_button(Rect::new(355, 435, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Escape), ())?
     ));
 
     Ok(Box::new(container))

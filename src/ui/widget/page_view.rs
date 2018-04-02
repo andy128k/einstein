@@ -1,12 +1,10 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
-use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 use ui::page_layout::*;
 

@@ -3,7 +3,7 @@ use sdl2::rect::Rect;
 use error::*;
 use ui::context::Context;
 use ui::widget::widget::*;
-use ui::utils::{load_image, draw_tiles, draw_bevel};
+use ui::utils::load_image;
 
 pub struct Window {
     rect: Rect,

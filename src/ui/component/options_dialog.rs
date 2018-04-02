@@ -1,11 +1,10 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::{Surface};
 use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
@@ -14,11 +13,9 @@ use ui::widget::checkbox::*;
 use ui::widget::slider::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::utils::{HorizontalAlign, VerticalAlign};
 use ui::component::dialog::*;
-use ui::main_loop::{main_loop, ModalResult};
 use resources::background::BLUE_PATTERN;
-use resources::messages::{Messages, get_messages};
+use resources::messages::Messages;
 use storage::Storage;
 
 #[derive(Clone)]
@@ -28,7 +25,7 @@ pub struct Options {
     volume_float: f32
 }
 
-pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<WidgetPtr<ModalResult<DialogResult<Options>>>> {
+pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<WidgetPtr<DialogResult<Options>>> {
     let rect = Rect::new(250, 170, 300, 260);
 
     let state = Rc::new(RefCell::new(Options {
@@ -37,7 +34,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Widg
         volume_float: storage.volume as f32 / 100_f32,
     }));
 
-    let container: Vec<WidgetPtr<ModalResult<DialogResult<Options>>>> = vec![
+    let container: Vec<WidgetPtr<DialogResult<Options>>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -95,13 +92,13 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Widg
                 new_dialog_button(Rect::new(315, 390, 85, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let s: Options = state2.borrow().clone();
-                    EventReaction::Action(ModalResult(DialogResult::Ok(s)))
+                    EventReaction::Action(DialogResult::Ok(s))
                 }
             )
         }),
         Box::new(new_dialog_button(Rect::new(405, 390, 85, 25), BLUE_PATTERN, messages.cancel,
             Some(Key::Escape),
-            ModalResult(DialogResult::Cancel)
+            DialogResult::Cancel
         )?)
     ];
     Ok(Box::new(container))

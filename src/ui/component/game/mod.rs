@@ -5,13 +5,11 @@ use sdl::event::{Key};
 use sdl2::rect::{Rect};
 use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;
-use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog::*;
 use ui::widget::title::Title;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
-use ui::main_loop::{main_loop, ModalResult};
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
 use ui::component::puzzle::puzzle_cell::PuzzleAction;
@@ -180,7 +178,7 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<WidgetPtr<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let save_game_trigger = Rc::new(RefCell::new(None));
@@ -192,7 +190,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container: Vec<WidgetPtr<ModalResult<()>>> = Vec::new();
+    let mut container: Vec<WidgetPtr<()>> = Vec::new();
 
     container.push(Box::new(
         InterceptWidget::default()
@@ -272,7 +270,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     }));
 
     container.push(Box::new(
-        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Key::Escape), ModalResult(()))
+        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Key::Escape), ())
     ));
 
     container.push(Box::new({
@@ -360,13 +358,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 *show_opts_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
                 match *result {
-                    ModalResult(DialogResult::Ok(ref options)) => {
+                    DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
                         storage2.borrow_mut().volume = options.volume;
                         // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
                         // sound->setVolume(options.volume);
                     },
-                    ModalResult(DialogResult::Cancel) => {},
+                    DialogResult::Cancel => {},
                 }
                 EventReaction::Redraw
             }
@@ -386,13 +384,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |result| {
                 *save_game_trigger2.borrow_mut() = None;
                 match *result {
-                    ModalResult(DialogResult::Ok((index, ref name))) => {
+                    DialogResult::Ok((index, ref name)) => {
                         storage2.borrow_mut().saved_games[index] = Some(SavedGame {
                             name: name.to_owned(),
                             game: this_state.borrow().clone()
                         });
                     },
-                    ModalResult(DialogResult::Cancel) => {}
+                    DialogResult::Cancel => {}
                 }
                 this_state.borrow_mut().start();
                 EventReaction::Redraw
@@ -440,16 +438,12 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     new_player_name_dialog(&last_name, messages)
                 }
             ),
-            move |result| {
+            move |name| {
                 let score = save_score_trigger2.borrow().unwrap_or(0);
                 *save_score_trigger2.borrow_mut() = None;
-                match *result {
-                    ModalResult(ref name) => {
-                        storage2.borrow_mut().last_name = Some(name.to_string());
-                        let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score });
-                        *show_scores_trigger2.borrow_mut() = Some(pos);
-                    },
-                };
+                storage2.borrow_mut().last_name = Some(name.to_string());
+                let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score });
+                *show_scores_trigger2.borrow_mut() = Some(pos);
                 EventReaction::Redraw
             }
         )
@@ -465,7 +459,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             ),
             move |_| {
                 *show_scores_trigger2.borrow_mut() = None;
-                EventReaction::Action(ModalResult(()))
+                EventReaction::Action(())
             }
         )
     }));
@@ -481,16 +475,16 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |result| {
                 *failure_trigger2.borrow_mut() = None;
                 match *result {
-                    ModalResult(FailureChoice::StartNew) => {
+                    FailureChoice::StartNew => {
                         let g = GamePrivate::new().unwrap();
                         *state2.borrow_mut() = g.borrow().clone();
                         EventReaction::Redraw
                     },
-                    ModalResult(FailureChoice::TryAgain) => {
+                    FailureChoice::TryAgain => {
                         state2.borrow_mut().restart();
                         EventReaction::Redraw
                     },
-                    ModalResult(FailureChoice::Cancel) => EventReaction::Action(ModalResult(())),
+                    FailureChoice::Cancel => EventReaction::Action(()),
                 }
             }
         )

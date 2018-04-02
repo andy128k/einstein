@@ -1,29 +1,23 @@
-use std::convert::Into;
-use std::marker::PhantomData;
 use std::rc::Rc;
-use std::cell::Cell;
 use debug_cell::RefCell;
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::main_loop::{main_loop, ModalResult};
-use ui::component::game::GamePrivate;
 use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
 use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
-use storage::{Storage, SavedGame};
+use storage::SavedGame;
 
-pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<WidgetPtr<ModalResult<DialogResult<(usize, String)>>>> {
+pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<WidgetPtr<DialogResult<(usize, String)>>> {
     let rect = Rect::new(250, 90, 300, 420);
 
-    let mut container: Vec<WidgetPtr<ModalResult<DialogResult<(usize, String)>>>> = vec![];
+    let mut container: Vec<WidgetPtr<DialogResult<(usize, String)>>> = vec![];
 
     container.push(Box::new(
         InterceptWidget::default()
@@ -64,7 +58,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     }
 
     container.push(Box::new(
-        new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ModalResult(DialogResult::Cancel))?
+        new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), DialogResult::Cancel)?
     ));
 
     container.push(Box::new({
@@ -78,8 +72,8 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                 let index = ask_name2.borrow().as_ref().map(|p| p.0).unwrap();
                 *ask_name2.borrow_mut() = None;
                 match *result {
-                    ModalResult(DialogResult::Ok(ref name)) => EventReaction::Action(ModalResult(DialogResult::Ok((index, name.to_string())))),
-                    ModalResult(DialogResult::Cancel) => EventReaction::Action(ModalResult(DialogResult::Cancel)),
+                    DialogResult::Ok(ref name) => EventReaction::Action(DialogResult::Ok((index, name.to_string()))),
+                    DialogResult::Cancel => EventReaction::Action(DialogResult::Cancel),
                 }
             }
         )

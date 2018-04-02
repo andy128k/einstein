@@ -1,23 +1,20 @@
-use sdl::video::{Surface};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::window::*;
 use ui::widget::dialog::*;
 use ui::widget::any_key::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::main_loop::{main_loop, ModalResult};
-use resources::messages::{Messages, get_messages};
+use resources::messages::Messages;
 use resources::background::{GREEN_PATTERN};
 use ui::component::background::*;
 
-pub fn new_pause_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn new_pause_dialog(messages: &Messages) -> Result<WidgetPtr<()>> {
     let rect = Rect::new(0, 0, 800, 600);
 
-    let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+    let container: Vec<WidgetPtr<()>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -37,7 +34,7 @@ pub fn new_pause_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>
             }
         )),
         Box::new(
-            AnyKey::new(ModalResult(()))
+            AnyKey::new(())
         ),
     ];
 

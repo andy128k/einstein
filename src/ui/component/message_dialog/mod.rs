@@ -1,4 +1,3 @@
-use sdl::video::{Surface};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
@@ -7,8 +6,7 @@ use ui::widget::label::*;
 use ui::widget::any_key::*;
 use ui::widget::window::*;
 use ui::widget::dialog::*;
-use ui::utils::{HorizontalAlign, VerticalAlign, rect_to_rect2};
-use ui::main_loop::{main_loop, ModalResult};
+use ui::context::{HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
 
@@ -18,7 +16,7 @@ pub enum MessageType {
     Failure
 }
 
-pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<WidgetPtr<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let font = text_font()?;
@@ -33,7 +31,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (RED_PATTERN, Color::RGB(255, 255, 255))
     };
 
-    let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+    let container: Vec<WidgetPtr<()>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -49,7 +47,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
                 vertical_align: VerticalAlign::Middle,
             }
         )),
-        Box::new(AnyKey::new(ModalResult(()))),
+        Box::new(AnyKey::new(())),
     ];
 
     Ok(Box::new(container))

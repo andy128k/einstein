@@ -9,15 +9,14 @@ use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
-use ui::main_loop::{ModalResult, main_loop};
 use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn create_about_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn create_about_dialog(messages: &Messages) -> Result<WidgetPtr<()>> {
     let rect = Rect::new(220, 160, 360, 280);
-    let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+    let container: Vec<WidgetPtr<()>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -58,7 +57,7 @@ pub fn create_about_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<
         })),
         Box::new(new_dialog_button(Rect::new(360, 400, 80, 25), BLUE_PATTERN, messages.ok,
             Some(Key::Escape), // Return also
-            ModalResult(())
+            ()
         )?),
     ];
     Ok(Box::new(container))

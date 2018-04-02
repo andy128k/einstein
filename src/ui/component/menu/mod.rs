@@ -1,19 +1,14 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::Surface;
 use sdl::event::{Key};
-use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
 use storage::*;
-use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
 use ui::widget::dialog::*;
 use ui::widget::image::*;
-use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
-use resources::fonts::*;
-use ui::main_loop::{main_loop, ModalResult};
+use ui::main_loop::MainLoopQuit;
 use ui::component::dialog::*;
 use ui::component::game::{new_game_widget, GamePrivate};
 use ui::component::load_dialog::{new_load_game_dialog};
@@ -21,11 +16,11 @@ use ui::component::topscores_dialog::{create_topscores_dialog};
 use ui::component::rules_dialog::{new_help_dialog};
 use ui::component::options_dialog::{new_options_dialog};
 use ui::component::about_dialog::{create_about_dialog};
-use resources::messages::{get_messages, Messages};
+use resources::messages::Messages;
 
 const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
 
-pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<MainLoopQuit>> {
     let rect = Rect::new(0, 0, 800, 600);
 
     let new_game_trigger = Rc::new(RefCell::new(None));
@@ -35,7 +30,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container: Vec<WidgetPtr<ModalResult<()>>> = vec![];
+    let mut container: Vec<WidgetPtr<MainLoopQuit>> = vec![];
 
     container.push(Box::new(
         InterceptWidget::default()
@@ -116,7 +111,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     }));
     container.push(Box::new(
-        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Key::Escape), ModalResult(()))
+        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Key::Escape), MainLoopQuit)
     ));
 
     container.push(Box::new({
@@ -153,12 +148,12 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             move |result| {
                 *load_game_trigger2.borrow_mut() = None;
                 match *result {
-                    ModalResult(DialogResult::Ok(ref game_data)) => {
+                    DialogResult::Ok(ref game_data) => {
                         let game = Rc::new(RefCell::new(game_data.clone()));
                         game.borrow_mut().hinted = true;
                         *new_game_trigger2.borrow_mut() = Some(game);
                     },
-                    ModalResult(DialogResult::Cancel) => {},
+                    DialogResult::Cancel => {},
                 }
                 EventReaction::Redraw
             }
@@ -206,13 +201,13 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             move |result| {
                 *show_opts_trigger2.borrow_mut() = None;
                 match *result {
-                    ModalResult(DialogResult::Ok(ref options)) => {
+                    DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
                         storage2.borrow_mut().volume = options.volume;
                         // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
                         // sound->setVolume(options.volume);
                     },
-                    ModalResult(DialogResult::Cancel) => {},
+                    DialogResult::Cancel => {},
                 }
                 EventReaction::Redraw
             }

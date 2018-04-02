@@ -5,7 +5,7 @@ use sdl2::rect::{Rect};
 use error::*;
 use ui::context::Context;
 use ui::widget::widget::*;
-use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_bevel, draw_etched_rect};
+use ui::utils::{load_image, adjust_brightness};
 
 pub struct Slider {
     rect: Rect,

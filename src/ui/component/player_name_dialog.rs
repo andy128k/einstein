@@ -1,29 +1,26 @@
 use std::rc::Rc;
 use debug_cell::RefCell;
-use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
+use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
 use ui::widget::dialog::*;
-use ui::utils::{HorizontalAlign, VerticalAlign};
-use ui::main_loop::{main_loop, ModalResult};
 use resources::background::BLUE_PATTERN;
-use resources::messages::{get_messages, Messages};
+use resources::messages::Messages;
 
-pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetPtr<ModalResult<String>>> {
+pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetPtr<String>> {
     let rect = Rect::new(170, 280, 460, 100);
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container: Vec<WidgetPtr<ModalResult<String>>> = vec![
+    let container: Vec<WidgetPtr<String>> = vec![
         Box::new(
             InterceptWidget::default()
         ),
@@ -55,7 +52,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetP
                 new_dialog_button(Rect::new(348, 340, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let result: String = state2.borrow().clone();
-                    EventReaction::Action(ModalResult(result))
+                    EventReaction::Action(result)
                 }
             )
         }),

@@ -46,7 +46,7 @@ use puzzle_gen::generate_puzzle;
 use resources::messages::get_messages;
 use ui::context::Context;
 use ui::component::menu::make_menu;
-use ui::main_loop::{main_loop, ModalResult};
+use ui::main_loop::main_loop;
 
 #[no_mangle]
 pub extern fn ein_generate_puzzle(sp: *mut *const SolvedPuzzle, r: *mut *const Rule, rs: *mut ::libc::size_t) {

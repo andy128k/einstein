@@ -3,19 +3,17 @@ use debug_cell::RefCell;
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
-use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::page_view::*;
 use ui::widget::dialog::*;
-use ui::main_loop::{main_loop, ModalResult};
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
 use resources::rules::{get_rules, TextItem};
-use resources::messages::{get_messages, Messages};
+use resources::messages::Messages;
 
 const WIDTH: u16 = 600;
 const HEIGHT: u16 = 500;
@@ -43,7 +41,7 @@ struct DescriptionPrivate {
 }
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<WidgetPtr<ModalResult<()>>> {
+    fn new(messages: &Messages, text: &[TextItem]) -> Result<WidgetPtr<()>> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
             .into_iter().map(Rc::new).collect();
 
@@ -57,7 +55,7 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         }));
 
-        let container: Vec<WidgetPtr<ModalResult<()>>> = vec![
+        let container: Vec<WidgetPtr<()>> = vec![
             Box::new(
                 InterceptWidget::default()
             ),
@@ -94,7 +92,7 @@ impl DescriptionPrivate {
                 )
             }),
             Box::new(
-                new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ModalResult(()))?
+                new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ())?
             ),
         ];
 
@@ -116,6 +114,6 @@ impl DescriptionPrivate {
     }
 }
 
-pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>> {
+pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<()>> {
     DescriptionPrivate::new(messages, get_rules())
 }

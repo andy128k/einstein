@@ -7,9 +7,8 @@ use sdl::event::{Key};
 use sdl::video::{Surface, SurfaceFlag};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
-use ui::context::Context;
+use ui::context::{Context, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
-use ui::utils::{draw_bevel, draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
 use resources::fonts::text_font;
 use error::*;
 

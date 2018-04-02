@@ -1,17 +1,15 @@
 use std::thread::sleep;
 use std::time::Duration;
-use sdl::video::Surface;
 use sdl::event::{Event, poll_event};
-use sdl2::rect::Rect;
 use error::*;
 use ui::context::Context;
 use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
 use ui::utils::rect2_to_rect;
 
 #[derive(Clone)]
-pub struct ModalResult<T>(pub T);
+pub struct MainLoopQuit;
 
-pub fn main_loop<T>(context: &Context, widget: &Widget<ModalResult<T>>) -> Result<()> {
+pub fn main_loop(context: &Context, widget: &Widget<MainLoopQuit>) -> Result<()> {
     widget.draw(context)?;
     context.surface.update_rects(&[rect2_to_rect(context.rect)]);
 
@@ -28,7 +26,7 @@ pub fn main_loop<T>(context: &Context, widget: &Widget<ModalResult<T>>) -> Resul
             _ => EventReaction::NoOp
         };
         match reaction {
-            EventReaction::Action(ModalResult(value)) => {
+            EventReaction::Action(MainLoopQuit) => {
                 widget.draw(context)?;
                 context.surface.update_rects(&[rect2_to_rect(context.rect)]);
                 return Ok(());
