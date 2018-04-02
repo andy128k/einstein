@@ -4,6 +4,7 @@ use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
@@ -21,15 +22,16 @@ impl PageView {
 }
 
 impl Widget<Nothing> for PageView {
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
         for item in (*self.page.borrow()).iter() {
             match *item {
                 PageItem::Text(ref text, x, y, w, h) => {
-                    let r = Rect::new((self.rect.left() + x as i32), (self.rect.top() + y as i32), w as u32, h as u32);
-                    draw_text(surface, text, text_font()?, Color::RGB(255, 255, 255), true, r, HorizontalAlign::Left, VerticalAlign::Middle)?;
+                    c.relative(Rect::new(x as i32, y as i32, w as u32, h as u32))
+                        .text(text, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
                 },
                 PageItem::Image(ref image, x, y, _w, _h) => {
-                    surface.blit_at(image, (self.rect.left() + x as i32) as i16, (self.rect.top() + y as i32) as i16);
+                    c.image(image, x as i32, y as i32);
                 }
             }
         }

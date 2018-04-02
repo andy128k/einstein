@@ -3,6 +3,7 @@ use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
@@ -85,10 +86,10 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     Ok(Box::new(container))
 }
 
-pub fn show_scores(surface: &Surface, scores: &Scores, highlight: Option<usize>) -> Result<bool> {
+pub fn show_scores(context: &Context, scores: &Scores, highlight: Option<usize>) -> Result<bool> {
     let rect = Rect::new(240, 125, 320, 350);
 
     let topscores = create_topscores_dialog(scores, get_messages(), highlight)?;
-    let quit = main_loop(surface, rect, &*topscores)?.is_none();
+    let quit = main_loop(context, rect, &*topscores)?.is_none();
     Ok(quit)
 }

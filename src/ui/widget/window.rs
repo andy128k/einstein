@@ -1,6 +1,7 @@
 use sdl::video::Surface;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{load_image, draw_tiles, draw_bevel};
 
@@ -17,9 +18,10 @@ impl Window {
 }
 
 impl Widget<Nothing> for Window {
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_tiles(&surface, self.rect, &self.background);
-        draw_bevel(&surface, self.rect, true, 1);
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
+        c.tiles(&self.background);
+        c.bevel(true, 1);
         Ok(())
     }
 }

@@ -5,6 +5,7 @@ use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
@@ -106,11 +107,11 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Widg
     Ok(Box::new(container))
 }
 
-pub fn show_options_window(surface: &Surface, storage: &mut Storage) -> Result<bool> {
+pub fn show_options_window(context: &Context, storage: &mut Storage) -> Result<bool> {
     let rect = Rect::new(250, 170, 300, 260);
 
     let container = new_options_dialog(storage, get_messages())?;
-    let result = main_loop(&surface, rect, &*container)?;
+    let result = main_loop(context, rect, &*container)?;
     match result {
         None => Ok(true), // quit
         Some(DialogResult::Cancel) => Ok(false), // cancelled

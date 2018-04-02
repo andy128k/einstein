@@ -4,6 +4,7 @@ use sdl::video::Surface;
 use sdl::event::{Key};
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::window::*;
 use ui::widget::dialog::*;
@@ -47,8 +48,8 @@ pub fn new_failure_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<F
     Ok(Box::new(container))
 }
 
-pub fn show_failure_dialog(surface: &Surface) -> Result<Option<FailureChoice>> {
+pub fn show_failure_dialog(context: &Context) -> Result<Option<FailureChoice>> {
     let rect = Rect::new(220, 240, 360, 140);
     let dlg = new_failure_dialog(get_messages())?;
-    main_loop(surface, rect, &*dlg)
+    main_loop(context, rect, &*dlg)
 }

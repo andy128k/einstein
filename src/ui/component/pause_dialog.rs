@@ -2,6 +2,7 @@ use sdl::video::{Surface};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::window::*;
@@ -43,10 +44,10 @@ pub fn new_pause_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>
     Ok(Box::new(container))
 }
 
-pub fn pause(surface: &Surface) -> Result<bool> {
+pub fn pause(context: &Context) -> Result<bool> {
     let rect = Rect::new(0, 0, 800, 600);
 
     let pause_dialog = new_pause_dialog(get_messages())?;
-    let quit = main_loop(surface, rect, &*pause_dialog)?.is_none();
+    let quit = main_loop(context, rect, &*pause_dialog)?.is_none();
     Ok(quit)
 }

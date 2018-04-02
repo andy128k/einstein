@@ -1,12 +1,12 @@
 use std::cell::Cell;
-use sdl::video::Surface;
 use sdl::event::{Key, Mouse};
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 
 pub trait ButtonRenderer {
-    fn draw(&self, surface: &Surface, rect: Rect, highlighted: bool) -> Result<()>;
+    fn draw(&self, context: &Context, highlighted: bool) -> Result<()>;
 }
 
 pub struct Button<R: ButtonRenderer, A> {
@@ -53,7 +53,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        self.renderer.draw(surface, self.rect, self.highlighted.get())
+    fn draw(&self, context: &Context) -> Result<()> {
+        self.renderer.draw(&context.relative(self.rect), self.highlighted.get())
     }
 }

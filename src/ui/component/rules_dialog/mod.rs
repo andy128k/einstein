@@ -5,6 +5,7 @@ use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
@@ -125,10 +126,10 @@ pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<ModalResult<()>>
     DescriptionPrivate::new(messages, get_rules())
 }
 
-pub fn show_description(surface: &Surface) -> Result<bool> {
+pub fn show_description(context: &Context) -> Result<bool> {
     let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
 
     let description = DescriptionPrivate::new(get_messages(), get_rules())?;
-    let quit = main_loop(surface, rect, &*description)?.is_none();
+    let quit = main_loop(context, rect, &*description)?.is_none();
     Ok(quit)
 }

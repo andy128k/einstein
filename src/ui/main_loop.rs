@@ -4,15 +4,16 @@ use sdl::video::Surface;
 use sdl::event::{Event, poll_event};
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
 use ui::utils::rect2_to_rect;
 
 #[derive(Clone)]
 pub struct ModalResult<T>(pub T);
 
-pub fn main_loop<T>(surface: &Surface, rect: Rect, widget: &Widget<ModalResult<T>>) -> Result<Option<T>> {
-    widget.draw(surface)?;
-    surface.update_rects(&[rect2_to_rect(rect)]);
+pub fn main_loop<T>(context: &Context, rect: Rect, widget: &Widget<ModalResult<T>>) -> Result<Option<T>> {
+    widget.draw(context)?;
+    context.surface.update_rects(&[rect2_to_rect(rect)]);
 
     loop {
         sleep(Duration::from_millis(5));
@@ -28,13 +29,13 @@ pub fn main_loop<T>(surface: &Surface, rect: Rect, widget: &Widget<ModalResult<T
         };
         match reaction {
             EventReaction::Action(ModalResult(value)) => {
-                widget.draw(surface)?;
-                surface.update_rects(&[rect2_to_rect(rect)]);
+                widget.draw(context)?;
+                context.surface.update_rects(&[rect2_to_rect(rect)]);
                 return Ok(Some(value));
             },
             EventReaction::Redraw => {
-                widget.draw(surface)?;
-                surface.update_rects(&[rect2_to_rect(rect)]);
+                widget.draw(context)?;
+                context.surface.update_rects(&[rect2_to_rect(rect)]);
             },
             EventReaction::StopPropagation |
             EventReaction::NoOp => {},

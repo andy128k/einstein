@@ -7,6 +7,7 @@ use sdl::event::{Key};
 use sdl::video::{Surface, SurfaceFlag};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{draw_bevel, draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
 use resources::fonts::text_font;
@@ -122,15 +123,11 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_bevel(surface, self.rect, false, 1);
-
-        let window_rect = self.rect;
-        let rect = Rect::new(window_rect.left() + 1, window_rect.top() + 1, window_rect.width() - 2, window_rect.height() - 2);
-        surface.set_clip_rect(Some(&rect2_to_rect(rect)));
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
 
         let font = text_font()?;
-        draw_text(surface, &self.text.borrow(), font, Color::RGB(255, 255, 0), true, rect, HorizontalAlign::Left, VerticalAlign::Middle)?;
+        c.text(&self.text.borrow(), font, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
 
         if self.cursor_visible.get() {
             let cursor_pos = self.cursor_pos.get();
@@ -139,10 +136,10 @@ impl Widget<String> for InputField {
             } else {
                 0
             };
-            surface.blit_at(&self.cursor, window_rect.left() as i16 + pos as i16, window_rect.top() as i16 + 4);
+            c.image(&self.cursor, pos as i32, 4);
         }
 
-        surface.set_clip_rect(None);
+        c.bevel(false, 1);
 
         Ok(())
     }

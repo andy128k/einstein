@@ -8,6 +8,7 @@ use sdl2::rect::{Rect, Point};
 use sdl2::pixels::Color;
 use rules::{Rule, SolvedPuzzle, Possibilities, Thing, apply};
 use puzzle_gen::generate_puzzle;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog::*;
 use ui::widget::window::Window;
@@ -521,10 +522,10 @@ void Game::pleaseWait()
 }
 */
 
-pub fn game_run(surface: Rc<Surface>, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
+pub fn game_run(context: Context, game: Rc<RefCell<GamePrivate>>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
     let game_widget = new_game_widget(storage.clone(), game.clone(), get_messages())?;
     game.borrow_mut().start();
     let screen_rect = Rect::new(0, 0, 800, 600);
-    let result = main_loop(&surface, screen_rect, &*game_widget)?;
+    let result = main_loop(&context, screen_rect, &*game_widget)?;
     Ok(result.is_none())
 }

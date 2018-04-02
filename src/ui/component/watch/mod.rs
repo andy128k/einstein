@@ -5,6 +5,7 @@ use debug_cell::RefCell;
 use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign, rect2_to_rect};
 use resources::fonts::text_font;
@@ -57,15 +58,15 @@ impl Widget<Nothing> for Watch {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         let duration = self.state.borrow().get_current_duration();
         self.last_duration.set(Some(duration));
 
         let s = sec_to_str(duration.as_secs() as u32);
 
-        let rect = self.get_rect();
-        surface.fill_rect(Some(rect2_to_rect(rect)), ::sdl::video::Color::RGB(48, 0, 255));
-        draw_text(surface, &s, text_font()?, Color::RGB(255, 255, 255), true, rect, HorizontalAlign::Right, VerticalAlign::Middle)?;
+        let c = context.relative(self.get_rect());
+        c.fill(Color::RGB(48, 0, 255));
+        c.text(&s, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Right, VerticalAlign::Middle)?;
         Ok(())
     }
 }

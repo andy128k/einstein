@@ -1,6 +1,6 @@
-use sdl::video::Surface;
 use sdl::event::{Key, Mouse};
 use error::*;
+use ui::context::Context;
 pub use algebra::*;
 
 pub enum Event {
@@ -51,7 +51,7 @@ impl<A> EventReaction<A> {
 
 pub trait Widget<A> {
     fn on_event(&self, _event: &Event) -> EventReaction<A> { EventReaction::NoOp } // TODO Result<EventReaction<A>>
-    fn draw(&self, surface: &Surface) -> Result<()>;
+    fn draw(&self, context: &Context) -> Result<()>;
 }
 
 pub type WidgetPtr<A> = Box<Widget<A>>;
@@ -61,8 +61,8 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).on_event(event)
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        (**self).draw(surface)
+    fn draw(&self, context: &Context) -> Result<()> {
+        (**self).draw(context)
     }
 }
 
@@ -91,8 +91,8 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         event.flatmap_action(&*self.convert)
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        self.wrapped.draw(surface)
+    fn draw(&self, context: &Context) -> Result<()> {
+        self.wrapped.draw(context)
     }
 }
 
@@ -108,9 +108,9 @@ impl<'w, A> Widget<A> for Vec<WidgetPtr<A>> {
         EventReaction::NoOp
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         for child in self {
-            child.draw(surface)?;
+            child.draw(context)?;
         }
         Ok(())
     }

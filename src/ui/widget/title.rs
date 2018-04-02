@@ -1,8 +1,8 @@
-use sdl::video::Surface;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
 use ui::widget::widget::{Widget, Nothing};
+use ui::context::Context;
 use ui::utils::{draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::title_font;
 
@@ -12,8 +12,9 @@ pub struct Title {
 }
 
 impl Widget<Nothing> for Title {
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_text(surface, &self.text, title_font()?, Color::RGB(255, 255, 0), true, self.rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
+        c.text(&self.text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
         Ok(())
     }
 }

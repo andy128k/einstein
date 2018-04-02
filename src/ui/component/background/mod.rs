@@ -2,8 +2,9 @@ use sdl::video::Surface;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
-use ui::utils::{load_image, draw_tiles, draw_text, HorizontalAlign, VerticalAlign};
+use ui::utils::{load_image, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::title_font;
 
 pub struct Background {
@@ -25,11 +26,12 @@ impl Background {
 }
 
 impl Widget<()> for Background {
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        draw_tiles(surface, self.rect, &self.background);
-        surface.blit_at(&self.title_background, 8, 10);
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
+        c.tiles(&self.background);
+        c.image(&self.title_background, 8, 10);
         let text = "Einstein Puzzle"; // i18n msg(L"einsteinPuzzle")
-        draw_text(surface, text, title_font()?, Color::RGB(255, 255, 0), true, Rect::new(20, 10, 500, 47), HorizontalAlign::Left, VerticalAlign::Middle)?;
+        c.relative(Rect::new(20, 10, 500, 47)).text(text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
         Ok(())
     }
 }

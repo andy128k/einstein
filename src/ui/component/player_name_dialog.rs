@@ -5,6 +5,7 @@ use sdl::event::Key;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
@@ -63,11 +64,11 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetP
     Ok(Box::new(container))
 }
 
-pub fn ask_player_name(surface: &Surface, default_name: &str) -> Result<Option<String>> {
+pub fn ask_player_name(context: &Context, default_name: &str) -> Result<Option<String>> {
     let rect = Rect::new(170, 280, 460, 100);
     let messages = get_messages();
     let container = new_player_name_dialog(default_name, messages)?;
-    let result = main_loop(surface, rect, &*container)?;
+    let result = main_loop(context, rect, &*container)?;
     match result {
         None => Ok(None), // quit
         Some(name) => Ok(Some(name)),

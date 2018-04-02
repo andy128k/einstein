@@ -5,6 +5,7 @@ use sdl::video::Surface;
 use sdl::event::{Mouse};
 use sdl2::rect::{Rect};
 use rules::{Thing};
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::load_image;
 use ui::component::game::GamePrivate;
@@ -152,8 +153,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         let global_rect = self.get_rect();
+        let c = context.relative(global_rect);
         let row = self.row;
         let col = self.col;
 
@@ -161,9 +163,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
             let image = self.thing_images.get_thing_image(thing, highlight)?;
-            surface.blit_at(image, global_rect.left() as i16, global_rect.top() as i16);
+            c.image(image, 0, 0);
         } else {
-            surface.blit_at(&self.bg, global_rect.left() as i16, global_rect.top() as i16);
+            c.image(&self.bg, 0, 0);
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);
@@ -171,7 +173,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
                     let image = self.thing_images.get_small_thing_image(thing, highlight)?;
-                    surface.blit_at(image, global_rect.left() as i16 + choice_rect.left() as i16, global_rect.top() as i16 + choice_rect.top() as i16);
+                    c.image(image, choice_rect.left(), choice_rect.top());
                 }
             }
         }

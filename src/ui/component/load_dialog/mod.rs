@@ -5,6 +5,7 @@ use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
@@ -63,11 +64,11 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
     Ok(Box::new(container))
 }
 
-pub fn load_game(surface: Rc<Surface>, storage: &Storage) -> Result<Option<GamePrivate>> {
+pub fn load_game(context: &Context, storage: &Storage) -> Result<Option<GamePrivate>> {
     let rect = Rect::new(250, 90, 300, 420);
     let container = new_load_game_dialog(&storage.saved_games, get_messages())?;
 
-    let result = main_loop(&surface, rect, &*container)?;
+    let result = main_loop(context, rect, &*container)?;
     match result {
         None => {
             ::std::process::exit(0);

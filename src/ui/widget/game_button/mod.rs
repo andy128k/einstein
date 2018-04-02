@@ -3,6 +3,7 @@ use sdl::event::{Key};
 use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
+use ui::context::Context;
 use ui::widget::button::*;
 use ui::utils::{load_image, adjust_brightness, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
@@ -30,15 +31,15 @@ pub struct GameButton {
 }
 
 impl ButtonRenderer for GameButton {
-    fn draw(&self, surface: &Surface, rect: Rect, highlighted: bool) -> Result<()> {
+    fn draw(&self, context: &Context, highlighted: bool) -> Result<()> {
         RESOURCES.with(|res| {
             let image = if highlighted {
                 &res.game_button_bg_highlighted
             } else {
                 &res.game_button_bg
             };
-            surface.blit_at(image, rect.left() as i16, rect.top() as i16);
-            draw_text(surface, &self.text, button_font()?, Color::RGB(255, 255, 0), true, rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
+            context.image(image, 0, 0);
+            context.text(&self.text, button_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
             Ok(())
         })
     }

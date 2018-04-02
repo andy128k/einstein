@@ -4,6 +4,7 @@ use sdl::event::{Mouse};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_etched_rect, draw_text, HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
@@ -52,16 +53,17 @@ impl Widget<bool> for Checkbox {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
+        let c = context.relative(self.rect);
         let image = if self.mouse_inside.get() {
             &self.highlighted
         } else {
             &self.image
         };
-        draw_tiles(surface, self.rect, image);
-        draw_etched_rect(surface, self.rect);
+        c.tiles(image);
+        c.etched();
         if self.checked.get() {
-            draw_text(surface, "X", text_font()?, Color::RGB(255, 255, 255), true, self.rect, HorizontalAlign::Center, VerticalAlign::Middle)?;
+            c.text("X", text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
         }
         Ok(())
     }

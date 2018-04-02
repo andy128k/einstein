@@ -6,6 +6,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Rect};
 use error::*;
 use storage::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
 use ui::widget::dialog::*;
@@ -24,7 +25,7 @@ use resources::messages::{get_messages, Messages};
 
 const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
 
-fn make_menu(surface: Rc<Surface>, messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
+fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<WidgetPtr<ModalResult<()>>> {
     let rect = Rect::new(0, 0, 800, 600);
 
     let new_game_trigger = Rc::new(RefCell::new(None));
@@ -85,7 +86,6 @@ fn make_menu(surface: Rc<Surface>, messages: &'static Messages, storage: Rc<RefC
         )
     }));
     container.push(Box::new({
-        let surface2 = surface.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Rect::new(550, 430, 220, 30), messages.rules, None, ()),
@@ -236,9 +236,9 @@ fn make_menu(surface: Rc<Surface>, messages: &'static Messages, storage: Rc<RefC
     Ok(Box::new(container))
 }
 
-pub fn menu(surface: Rc<Surface>, storage: Rc<RefCell<Storage>>) -> Result<bool> {
+pub fn menu(context: &Context, storage: Rc<RefCell<Storage>>) -> Result<bool> {
     let rect = Rect::new(0, 0, 800, 600);
-    let menu = make_menu(surface.clone(), get_messages(), storage.clone())?;
-    let quit = main_loop(&surface, rect, &*menu)?.is_none();
+    let menu = make_menu(get_messages(), storage.clone())?;
+    let quit = main_loop(context, rect, &*menu)?.is_none();
     Ok(quit)
 }

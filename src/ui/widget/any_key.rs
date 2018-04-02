@@ -1,5 +1,5 @@
-use sdl::video::Surface;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 
 pub struct AnyKey<A> {
@@ -23,7 +23,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         }
     }
 
-    fn draw(&self, _surface: &Surface) -> Result<()> {
+    fn draw(&self, _context: &Context) -> Result<()> {
         Ok(())
     }
 }

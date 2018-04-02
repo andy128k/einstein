@@ -1,5 +1,5 @@
 use failure::err_msg;
-use sdl::video::Surface;
+use sdl::video::{Surface, SurfaceFlag};
 use sdl::video::ll::{SDL_LoadBMP_RW, SDL_RWFromConstMem};
 use sdl::video::ll::SDL_Surface;
 use sdl2;
@@ -45,6 +45,7 @@ pub fn load_image(data: &[u8]) -> Result<Surface> {
         Surface { raw: SDL_LoadBMP_RW(op, 0), owned: true }
     };
     let surface = surface.display_format().map_err(err_msg)?;
+    surface.set_color_key(&[SurfaceFlag::SrcColorKey], ::sdl::video::Color::RGBA(255, 255, 255, 255));
     Ok(surface)
 }
 

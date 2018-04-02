@@ -4,6 +4,7 @@ use debug_cell::RefCell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
 use sdl2::rect::{Rect, Point};
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
 use resources::thing::ThingImages;
@@ -47,20 +48,21 @@ impl HorizontalRules {
             .unwrap_or(false)
     }
 
-    fn draw_cell(&self, surface: &Surface, index: usize) -> Result<()> {
+    fn draw_cell(&self, context: &Context, index: usize) -> Result<()> {
         let rect = self.rect(index);
+        let c = context.relative(rect);
 
         if let Some(horizontal_rule) = self.state.borrow().horizontal_rules.get(index) {
             if self.state.borrow().show_excluded == horizontal_rule.is_excluded {
                 let rule = &self.state.borrow().rules[horizontal_rule.original_index];
-                draw_rule(&self.thing_images, &rule, surface, rect.left() as i16, rect.top() as i16, self.highlighted.get() == Some(index))?;
+                draw_rule(&self.thing_images, &rule, &c, self.highlighted.get() == Some(index))?;
                 return Ok(());
             }
         }
 
-        surface.blit_at(&self.tile, rect.left() as i16, rect.top() as i16);
-        surface.blit_at(&self.tile, (rect.left() as i16) + (TILE_WIDTH as i16), rect.top() as i16);
-        surface.blit_at(&self.tile, (rect.left() as i16) + (TILE_WIDTH as i16) * 2, rect.top() as i16);
+        c.image(&self.tile, 0, 0);
+        c.image(&self.tile, TILE_WIDTH, 0);
+        c.image(&self.tile, TILE_WIDTH * 2, 0);
         Ok(())
     }
 
@@ -149,9 +151,9 @@ impl Widget<Nothing> for HorizontalRules {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         for i in 0..(HINTS_ROWS * HINTS_COLS) {
-            self.draw_cell(surface, i)?;
+            self.draw_cell(context, i)?;
         }
         Ok(())
     }

@@ -3,6 +3,7 @@ use sdl::video::Surface;
 use sdl::event::{Mouse};
 use sdl2::rect::{Rect};
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness, draw_tiles, draw_bevel, draw_etched_rect};
 
@@ -106,19 +107,22 @@ impl Widget<f32> for Slider {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         let rect = self.rect;
+        let c = context.relative(self.rect);
 
-        draw_bevel(surface, Rect::new(rect.left(), rect.top() + rect.height() as i32 / 2 - 2, rect.width(), 4), false, 1);
+        c.relative(Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4))
+            .bevel(false, 1);
 
         let x = self.value_to_x(self.value.get());
-        let slider_rect = Rect::new(rect.left() + x as i32, rect.top(), rect.height(), rect.height());
+        let slider_rect = Rect::new(x as i32, 0, rect.height(), rect.height());
+        let slider_context = c.relative(slider_rect);
         if self.highlight.get() {
-            draw_tiles(surface, slider_rect, &self.background_highlighted);
+            slider_context.tiles(&self.background_highlighted);
         } else {
-            draw_tiles(surface, slider_rect, &self.background);
+            slider_context.tiles(&self.background);
         }
-        draw_etched_rect(surface, slider_rect);
+        slider_context.etched();
         Ok(())
     }
 }

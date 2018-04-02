@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 use std::rc::Rc;
 use debug_cell::RefCell;
 use sdl::video::{Surface};
+use ui::context::Context;
 use ui::widget::widget::*;
 use error::*;
 
@@ -18,7 +19,7 @@ impl<A> Widget<A> for InterceptWidget<A> {
         EventReaction::StopPropagation
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         Ok(())
     }
 }
@@ -68,10 +69,10 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn draw(&self, surface: &Surface) -> Result<()> {
+    fn draw(&self, context: &Context) -> Result<()> {
         self.check()?;
         match *self.wrapped.borrow() {
-            Some(ref widget) => widget.draw(surface),
+            Some(ref widget) => widget.draw(context),
             None => Ok(())
         }
     }

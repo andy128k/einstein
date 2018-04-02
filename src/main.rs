@@ -38,10 +38,12 @@ use sdl::wm::set_caption;
 use sdl::event::{enable_key_repeat, RepeatDelay, RepeatInterval, enable_unicode};
 use sdl::video::{set_video_mode, SurfaceFlag, VideoFlag};
 use sdl2::ttf::Sdl2TtfContext;
+use sdl2::rect::Rect;
 use sdl2::mixer;
 use error::*;
 use rules::{Possibilities, SolvedPuzzle, Thing, Rule, apply};
 use puzzle_gen::generate_puzzle;
+use ui::context::Context;
 use ui::component::menu::menu;
 
 #[no_mangle]
@@ -203,7 +205,12 @@ fn real_main() -> Result<()> {
     {
         // mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
         // let audio = audio::Audio::new()?;
-        menu(surface.clone(), state.clone())?;
+
+        let context = Context {
+            surface: surface.clone(),
+            rect: Rect::new(0, 0, 800, 600)
+        };
+        menu(&context, state.clone())?;
     }
 
     quit();

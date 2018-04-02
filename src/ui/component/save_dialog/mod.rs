@@ -7,6 +7,7 @@ use sdl::video::{Surface};
 use sdl::event::Key;
 use sdl2::rect::Rect;
 use error::*;
+use ui::context::Context;
 use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
@@ -19,19 +20,6 @@ use ui::component::dialog::DialogResult;
 use resources::background::BLUE_PATTERN;
 use resources::messages::{get_messages, Messages};
 use storage::{Storage, SavedGame};
-
-#[derive(Default)]
-pub struct DummyWidget<A>(PhantomData<A>);
-
-impl<A> Widget<A> for DummyWidget<A> {
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
-        EventReaction::NoOp
-    }
-
-    fn draw(&self, surface: &Surface) -> Result<()> {
-        Ok(())
-    }
-}
 
 pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<WidgetPtr<ModalResult<DialogResult<(usize, String)>>>> {
     let rect = Rect::new(250, 90, 300, 420);
@@ -101,14 +89,14 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     Ok(Box::new(container))
 }
 
-pub fn save_game(surface: &Surface, storage: &mut Storage, game: &GamePrivate) -> Result<()> {
+pub fn save_game(context: &Context, storage: &mut Storage, game: &GamePrivate) -> Result<()> {
     let rect = Rect::new(250, 90, 300, 420);
 
     let messages = get_messages();
 
     let container = new_save_game_dialog(&storage.saved_games, messages)?;
 
-    let result = main_loop(&surface, rect, &*container)?;
+    let result = main_loop(context, rect, &*container)?;
     match result {
         None => {
             // quit
