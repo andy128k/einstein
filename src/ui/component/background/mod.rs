@@ -25,14 +25,15 @@ impl Background {
 }
 
 impl Widget<()> for Background {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect { self.rect }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let c = context.relative(self.rect);
-        c.tiles(&self.background);
-        c.image(&self.title_background, 8, 10);
+        context.tiles(&self.background);
+        context.image(&self.title_background, 8, 10);
         let text = "Einstein Puzzle"; // i18n msg(L"einsteinPuzzle")
-        c.relative(Rect::new(20, 10, 500, 47)).text(text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
+        context.relative(Rect::new(20, 10, 500, 47)).text(text, title_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
         Ok(())
     }
 }

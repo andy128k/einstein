@@ -13,8 +13,10 @@ impl<A> AnyKey<A> {
 }
 
 impl<A> Widget<A> for AnyKey<A> where A: Clone {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
-        Rect::new(-10000, -10000, 1, 1)
+        Rect::default()
     }
 
     fn on_event(&self, event: &Event) -> EventReaction<A> {
