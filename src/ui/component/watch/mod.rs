@@ -10,22 +10,16 @@ use error::*;
 use util::time::sec_to_str;
 use ui::component::game::GamePrivate;
 
-const APP_WIDTH: u32 =          800;
-const TITLE_RIGHT: u32 =          9;
-const TITLE_TOP: u32 =            8;
-const TITLE_PADDING_RIGHT: u32 =  7;
-const TITLE_PADDING_TOP: u32 =    7;
-const WATCH_WIDTH: u32 =        100;
-const WATCH_HEIGHT: u32 =        34;
-
 pub struct Watch {
+    rect: Rect,
     state: Rc<RefCell<GamePrivate>>,
     last_duration: Cell<Option<Duration>>,
 }
 
 impl Watch {
-    pub fn new(state: Rc<RefCell<GamePrivate>>) -> Self {
+    pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Self {
         Self {
+            rect,
             state,
             last_duration: Cell::new(None)
         }
@@ -33,14 +27,8 @@ impl Watch {
 }
 
 impl Widget<Nothing> for Watch {
-    fn get_rect(&self) -> Rect {
-        Rect::new(
-            (APP_WIDTH - TITLE_RIGHT - TITLE_PADDING_RIGHT - WATCH_WIDTH) as i32,
-            (TITLE_TOP + TITLE_PADDING_TOP) as i32,
-            WATCH_WIDTH,
-            WATCH_HEIGHT
-        )
-    }
+    fn is_relative(&self) -> bool { true }
+    fn get_rect(&self) -> Rect { self.rect }
 
     fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
         match *event {
@@ -61,9 +49,8 @@ impl Widget<Nothing> for Watch {
 
         let s = sec_to_str(duration.as_secs() as u32);
 
-        let c = context.relative(self.get_rect());
-        c.fill(Color::RGB(48, 0, 255));
-        c.text(&s, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Right, VerticalAlign::Middle)?;
+        context.fill(Color::RGB(48, 0, 255));
+        context.text(&s, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Right, VerticalAlign::Middle)?;
         Ok(())
     }
 }

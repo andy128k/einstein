@@ -179,6 +179,14 @@ impl GamePrivate {
     }
 }
 
+const APP_WIDTH: u32 =          800;
+const TITLE_RIGHT: u32 =          9;
+const TITLE_TOP: u32 =            8;
+const TITLE_PADDING_RIGHT: u32 =  7;
+const TITLE_PADDING_TOP: u32 =    7;
+const WATCH_WIDTH: u32 =        100;
+const WATCH_HEIGHT: u32 =        34;
+
 pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Modal<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
@@ -209,7 +217,15 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     ));
 
     container.push(WidgetMapAction::no_action(
-        Watch::new(state.clone())
+        Watch::new(
+            Rect::new(
+                (APP_WIDTH - TITLE_RIGHT - TITLE_PADDING_RIGHT - WATCH_WIDTH) as i32,
+                (TITLE_TOP + TITLE_PADDING_TOP) as i32,
+                WATCH_WIDTH,
+                WATCH_HEIGHT
+            ),
+            state.clone()
+        )
     ));
 
     container.push({
