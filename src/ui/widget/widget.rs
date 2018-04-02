@@ -11,6 +11,18 @@ pub enum Event {
     KeyDown(Key, u16),
 }
 
+impl Event {
+    pub fn relative(&self, rect: Rect) -> Self {
+        match *self {
+            Event::Tick => Event::Tick,
+            Event::MouseButtonDown(mouse, x, y) => Event::MouseButtonDown(mouse, x - rect.left(), y - rect.top()),
+            Event::MouseButtonUp(mouse, x, y) => Event::MouseButtonUp(mouse, x - rect.left(), y - rect.top()),
+            Event::MouseMove(x, y) => Event::MouseMove(x - rect.left(), y - rect.top()),
+            Event::KeyDown(key, ch) => Event::KeyDown(key, ch),
+        }
+    }
+}
+
 pub enum EventReaction<A> {
     Action(A),
     Redraw,
@@ -50,7 +62,7 @@ impl<A> EventReaction<A> {
 }
 
 pub trait Widget<A> {
-    fn is_relative(&self) -> bool { false }
+    fn is_relative(&self) -> bool;
     fn get_rect(&self) -> Rect;
 
     fn get_client_rect(&self) -> Rect {

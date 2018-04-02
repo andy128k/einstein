@@ -13,20 +13,8 @@ use error::*;
 
 const PUZZLE_SIZE: u8 = 6;
 
-const FIELD_OFFSET_X: u16 =    12;
-const FIELD_OFFSET_Y: u16 =    68;
-const FIELD_GAP_X: u16 =        4;
-const FIELD_GAP_Y: u16 =        4;
 const FIELD_TILE_WIDTH: u16 =  48;
 const FIELD_TILE_HEIGHT: u16 = 48;
-
-fn local_point(rect: Rect, x: i32, y: i32) -> Option<(i32, i32)> {
-    if rect.contains_point((x, y)) {
-        Some((x - rect.left(), y - rect.top()))
-    } else {
-        None
-    }
-}
 
 fn local_choice_cell_rect(value: u8) -> Rect {
     let x: i32 = ((value % 3) as i32) * ((FIELD_TILE_WIDTH / 3) as i32);
@@ -51,6 +39,8 @@ pub enum PuzzleAction {
 }
 
 pub struct PuzzleCell {
+    x: i32,
+    y: i32,
     state: Rc<RefCell<GamePrivate>>,
     row: u8,
     col: u8,
@@ -60,9 +50,11 @@ pub struct PuzzleCell {
 }
 
 impl PuzzleCell {
-    pub fn new(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>) -> Result<Self> {
+    pub fn new(x: i32, y: i32, state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>) -> Result<Self> {
         let bg = load_image(EMPTY_FIELD_ICON)?;
         Ok(Self {
+            x,
+            y,
             state,
             row,
             col,
@@ -77,12 +69,11 @@ impl PuzzleCell {
             return EventReaction::NoOp;
         }
 
-        let lp = match local_point(self.get_rect(), x, y) {
-            Some(v) => v,
-            None => return EventReaction::NoOp
-        };
+        if !self.get_client_rect().contains_point((x, y)) {
+            return EventReaction::NoOp;
+        }
 
-        let value = match local_find_choice(lp.0, lp.1) {
+        let value = match local_find_choice(x, y) {
             Some(v) => v,
             None => return EventReaction::NoOp
         };
@@ -116,18 +107,17 @@ impl PuzzleCell {
     }
 
     fn on_mouse_move(&self, x: i32, y: i32) -> EventReaction<PuzzleAction> {
-        let rect = self.get_rect();
-        let lp = local_point(rect, x, y);
-        if lp.is_none() && self.highlighted.get().is_none() {
+        if !self.get_client_rect().contains_point((x,y)) && self.highlighted.get().is_none() {
             return EventReaction::NoOp;
         }
 
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             self.highlighted.set(Some(None));
         } else {
-            self.highlighted.set(
-                lp.and_then(|(x, y)| local_find_choice(x, y)).map(Some)
-            );
+            match local_find_choice(x, y) {
+                Some(p) => self.highlighted.set(Some(Some(p))),
+                None => self.highlighted.set(None)
+            }
         }
 
         EventReaction::Redraw
@@ -135,10 +125,12 @@ impl PuzzleCell {
 }
 
 impl Widget<PuzzleAction> for PuzzleCell {
+    fn is_relative(&self) -> bool { true }
+
     fn get_rect(&self) -> Rect {
         Rect::new(
-            (FIELD_OFFSET_X as i32) + (self.col as i32) * ((FIELD_TILE_WIDTH + FIELD_GAP_X) as i32),
-            (FIELD_OFFSET_Y as i32) + (self.row as i32) * ((FIELD_TILE_HEIGHT + FIELD_GAP_Y) as i32),
+            self.x,
+            self.y,
             FIELD_TILE_WIDTH as u32,
             FIELD_TILE_HEIGHT as u32
         )
@@ -153,8 +145,6 @@ impl Widget<PuzzleAction> for PuzzleCell {
     }
 
     fn draw(&self, context: &Context) -> Result<()> {
-        let global_rect = self.get_rect();
-        let c = context.relative(global_rect);
         let row = self.row;
         let col = self.col;
 
@@ -162,9 +152,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
             let image = self.thing_images.get_thing_image(thing, highlight)?;
-            c.image(image, 0, 0);
+            context.image(image, 0, 0);
         } else {
-            c.image(&self.bg, 0, 0);
+            context.image(&self.bg, 0, 0);
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);
@@ -172,7 +162,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
                     let image = self.thing_images.get_small_thing_image(thing, highlight)?;
-                    c.image(image, choice_rect.left(), choice_rect.top());
+                    context.image(image, choice_rect.left(), choice_rect.top());
                 }
             }
         }
