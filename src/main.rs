@@ -214,7 +214,7 @@ fn real_main() -> Result<()> {
         };
 
         let menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&context, &*menu)?;
+        main_loop(&context, &menu)?;
     }
 
     quit();

@@ -1,5 +1,6 @@
 pub mod widget;
 pub mod dialog;
+pub mod modal;
 pub mod image;
 pub mod window;
 pub mod title;

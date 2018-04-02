@@ -8,14 +8,14 @@ use ui::context::{HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
-use ui::widget::dialog::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
+use ui::widget::modal::Modal;
 use ui::component::dialog::DialogResult;
 use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 
-pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<DialogResult<String>>> {
+pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);
     let yellow = Color::RGB(255, 255, 0);
 
@@ -23,14 +23,11 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<Dialog
         name.to_string()
     ));
 
-    let container: Vec<WidgetPtr<DialogResult<String>>> = vec![
-        Box::new(
-            InterceptWidget::default()
-        ),
-        Box::new(WidgetMapAction::no_action(
+    let container = Modal::<DialogResult<String>>::new()
+        .add(WidgetMapAction::no_action(
             Window::new(rect, BLUE_PATTERN)?
-        )),
-        Box::new(WidgetMapAction::no_action(
+        ))
+        .add(WidgetMapAction::no_action(
             Label {
                 text: messages.enter_game.to_string(),
                 rect: Rect::new(180, 300, 150, 26),
@@ -38,8 +35,8 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<Dialog
                 horizontal_align: HorizontalAlign::Left,
                 vertical_align: VerticalAlign::Middle,
             }
-        )),
-        Box::new({
+        ))
+        .add({
             let state2 = state.clone();
             WidgetMapAction::new(
                 InputField::new(Rect::new(340, 300, 280, 26), name, 20)?,
@@ -48,8 +45,8 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<Dialog
                     EventReaction::Redraw
                 }
             )
-        }),
-        Box::new({
+        })
+        .add({
             let state2 = state.clone();
             WidgetMapAction::new(
                 new_dialog_button(Rect::new(310, 340, 80, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
@@ -58,11 +55,10 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<WidgetPtr<Dialog
                     EventReaction::Action(DialogResult::Ok(value))
                 }
             )
-        }),
-        Box::new(
+        })
+        .add(
             new_dialog_button(Rect::new(400, 340, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), DialogResult::Cancel)?
-        ),
-    ];
+        );
 
-    Ok(Box::new(container))
+    Ok(container)
 }

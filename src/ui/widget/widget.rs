@@ -95,23 +95,3 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         self.wrapped.draw(context)
     }
 }
-
-
-impl<'w, A> Widget<A> for Vec<WidgetPtr<A>> {
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
-        for child in self.iter().rev() {
-            let reaction = child.on_event(event);
-            if reaction.is_op() {
-                return reaction;
-            }
-        }
-        EventReaction::NoOp
-    }
-
-    fn draw(&self, context: &Context) -> Result<()> {
-        for child in self {
-            child.draw(context)?;
-        }
-        Ok(())
-    }
-}

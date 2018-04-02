@@ -5,7 +5,7 @@ use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::any_key::*;
 use ui::widget::window::*;
-use ui::widget::dialog::*;
+use ui::widget::modal::Modal;
 use ui::context::{HorizontalAlign, VerticalAlign};
 use resources::fonts::*;
 use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
@@ -16,7 +16,7 @@ pub enum MessageType {
     Failure
 }
 
-pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<WidgetPtr<()>> {
+pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Modal<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let font = text_font()?;
@@ -31,14 +31,11 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (RED_PATTERN, Color::RGB(255, 255, 255))
     };
 
-    let container: Vec<WidgetPtr<()>> = vec![
-        Box::new(
-            InterceptWidget::default()
-        ),
-        Box::new(WidgetMapAction::no_action(
+    let container = Modal::<()>::new()
+        .add(WidgetMapAction::no_action(
             Window::new(rect, bg)?
-        )),
-        Box::new(WidgetMapAction::no_action(
+        ))
+        .add(WidgetMapAction::no_action(
             Label {
                 text: message.to_string(),
                 rect,
@@ -46,9 +43,10 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
                 horizontal_align: HorizontalAlign::Center,
                 vertical_align: VerticalAlign::Middle,
             }
-        )),
-        Box::new(AnyKey::new(())),
-    ];
+        ))
+        .add(
+            AnyKey::new(())
+        );
 
-    Ok(Box::new(container))
+    Ok(container)
 }

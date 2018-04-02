@@ -7,6 +7,7 @@ use ui::widget::widget::*;
 use ui::widget::dialog_button::*;
 use ui::widget::dialog::*;
 use ui::widget::window::*;
+use ui::widget::modal::Modal;
 use ui::widget::title::Title;
 use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
@@ -14,25 +15,21 @@ use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 use storage::SavedGame;
 
-pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<WidgetPtr<DialogResult<(usize, String)>>> {
+pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<Modal<DialogResult<(usize, String)>>> {
     let rect = Rect::new(250, 90, 300, 420);
 
-    let mut container: Vec<WidgetPtr<DialogResult<(usize, String)>>> = vec![];
+    let mut container = Modal::<DialogResult<(usize, String)>>::new();
 
-    container.push(Box::new(
-        InterceptWidget::default()
+    container.push(WidgetMapAction::no_action(
+        Window::new(rect, BLUE_PATTERN)?
     ));
 
-    container.push(Box::new(WidgetMapAction::no_action(
-        Window::new(rect, BLUE_PATTERN)?
-    )));
-
-    container.push(Box::new(WidgetMapAction::no_action(
+    container.push(WidgetMapAction::no_action(
         Title {
             text: messages.save_game.to_string(),
             rect: Rect::new(250, 95, 300, 40),
         }
-    )));
+    ));
 
     let ask_name: Rc<RefCell<Option<(usize, String)>>> = Rc::new(RefCell::new(None));
 
@@ -45,7 +42,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
             )
         };
 
-        container.push(Box::new({
+        container.push({
             let ask_name2 = ask_name.clone();
             WidgetMapAction::new(
                 new_dialog_button(Rect::new(260, 150 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label, None, ())?,
@@ -54,14 +51,14 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                     EventReaction::Redraw
                 }
             )
-        }));
+        });
     }
 
-    container.push(Box::new(
+    container.push(
         new_dialog_button(Rect::new(360, 470, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), DialogResult::Cancel)?
-    ));
+    );
 
-    container.push(Box::new({
+    container.push({
         let ask_name2 = ask_name.clone();
         WidgetMapAction::new(
             ConditionalWidget::new(
@@ -77,7 +74,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                 }
             }
         )
-    }));
+    });
 
-    Ok(Box::new(container))
+    Ok(container)
 }

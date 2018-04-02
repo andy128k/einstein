@@ -8,7 +8,7 @@ use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::widget::page_view::*;
-use ui::widget::dialog::*;
+use ui::widget::modal::Modal;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::background::BLUE_PATTERN;
@@ -41,7 +41,7 @@ struct DescriptionPrivate {
 }
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<WidgetPtr<()>> {
+    fn new(messages: &Messages, text: &[TextItem]) -> Result<Modal<()>> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
             .into_iter().map(Rc::new).collect();
 
@@ -55,23 +55,20 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         }));
 
-        let container: Vec<WidgetPtr<()>> = vec![
-            Box::new(
-                InterceptWidget::default()
-            ),
-            Box::new(WidgetMapAction::no_action(
+        let container = Modal::<()>::new()
+            .add(WidgetMapAction::no_action(
                 Window::new(rect.clone(), BLUE_PATTERN)?
-            )),
-            Box::new(WidgetMapAction::no_action(
+            ))
+            .add(WidgetMapAction::no_action(
                 Title {
                     text: messages.rules.to_string(),
                     rect: Rect::new(250, 60, 300, 40),
                 }
-            )),
-            Box::new(WidgetMapAction::no_action(
+            ))
+            .add(WidgetMapAction::no_action(
                 PageView::new(Rect::new(START_X as i32, START_Y as i32, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)
-            )),
-            Box::new({
+            ))
+            .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
                     new_dialog_button(Rect::new(110, 515, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
@@ -80,8 +77,8 @@ impl DescriptionPrivate {
                         EventReaction::Redraw
                     }
                 )
-            }),
-            Box::new({
+            })
+            .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
                     new_dialog_button(Rect::new(200, 515, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
@@ -90,13 +87,12 @@ impl DescriptionPrivate {
                         EventReaction::Redraw
                     }
                 )
-            }),
-            Box::new(
+            })
+            .add(
                 new_dialog_button(Rect::new(610, 515, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ())?
-            ),
-        ];
+            );
 
-        Ok(Box::new(container))
+        Ok(container)
     }
 
     fn prev(&mut self) {
@@ -114,6 +110,6 @@ impl DescriptionPrivate {
     }
 }
 
-pub fn new_help_dialog(messages: &Messages) -> Result<WidgetPtr<()>> {
+pub fn new_help_dialog(messages: &Messages) -> Result<Modal<()>> {
     DescriptionPrivate::new(messages, get_rules())
 }

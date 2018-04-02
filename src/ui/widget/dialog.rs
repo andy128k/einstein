@@ -5,24 +5,6 @@ use ui::context::Context;
 use ui::widget::widget::*;
 use error::*;
 
-pub struct InterceptWidget<A>(PhantomData<A>);
-
-impl<A> Default for InterceptWidget<A> {
-    fn default() -> Self {
-        InterceptWidget(PhantomData)
-    }
-}
-
-impl<A> Widget<A> for InterceptWidget<A> {
-    fn on_event(&self, _event: &Event) -> EventReaction<A> {
-        EventReaction::StopPropagation
-    }
-
-    fn draw(&self, _context: &Context) -> Result<()> {
-        Ok(())
-    }
-}
-
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
     wrapped: RefCell<Option<W>>,
     factory: Box<Fn(&I) -> Result<W>>,

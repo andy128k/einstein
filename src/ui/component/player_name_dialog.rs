@@ -10,24 +10,21 @@ use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
-use ui::widget::dialog::*;
+use ui::widget::modal::Modal;
 use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 
-pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetPtr<String>> {
+pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<String>> {
     let rect = Rect::new(170, 280, 460, 100);
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container: Vec<WidgetPtr<String>> = vec![
-        Box::new(
-            InterceptWidget::default()
-        ),
-        Box::new(WidgetMapAction::no_action(
+    let container = Modal::<String>::new()
+        .add(WidgetMapAction::no_action(
             Window::new(rect, BLUE_PATTERN)?
-        )),
-        Box::new(WidgetMapAction::no_action(
+        ))
+        .add(WidgetMapAction::no_action(
             Label {
                 text: messages.enter_name.to_string(),
                 rect: Rect::new(180, 300, 150, 26),
@@ -35,8 +32,8 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetP
                 horizontal_align: HorizontalAlign::Left,
                 vertical_align: VerticalAlign::Middle,
             }
-        )),
-        Box::new({
+        ))
+        .add({
             let state2 = state.clone();
             WidgetMapAction::new(
                 InputField::new(Rect::new(340, 300, 280, 26), name, 20)?,
@@ -45,8 +42,8 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetP
                     EventReaction::Redraw
                 }
             )
-        }),
-        Box::new({
+        })
+        .add({
             let state2 = state.clone();
             WidgetMapAction::new(
                 new_dialog_button(Rect::new(348, 340, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
@@ -55,8 +52,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<WidgetP
                     EventReaction::Action(result)
                 }
             )
-        }),
-    ];
+        });
 
-    Ok(Box::new(container))
+    Ok(container)
 }

@@ -10,6 +10,7 @@ use ui::widget::dialog::*;
 use ui::widget::title::Title;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
+use ui::widget::modal::Modal;
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
 use ui::component::puzzle::puzzle_cell::PuzzleAction;
@@ -178,7 +179,7 @@ impl GamePrivate {
     }
 }
 
-pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<WidgetPtr<()>> {
+pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Modal<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let save_game_trigger = Rc::new(RefCell::new(None));
@@ -190,32 +191,28 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container: Vec<WidgetPtr<()>> = Vec::new();
+    let mut container = Modal::<()>::new();
 
-    container.push(Box::new(
-        InterceptWidget::default()
+    container.push(WidgetMapAction::no_action(
+        Image::new(screen_rect, RAIN_TILE)?
     ));
 
-    container.push(Box::new(WidgetMapAction::no_action(
-        Image::new(screen_rect, RAIN_TILE)?
-    )));
-
-    container.push(Box::new(WidgetMapAction::no_action(
+    container.push(WidgetMapAction::no_action(
         Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?
-    )));
+    ));
 
-    container.push(Box::new(WidgetMapAction::no_action(
+    container.push(WidgetMapAction::no_action(
         Title {
             text: messages.einstein_puzzle.to_string(),
             rect: Rect::new(20, 10, 500, 47),
         }
-    )));
+    ));
 
-    container.push(Box::new(WidgetMapAction::no_action(
+    container.push(WidgetMapAction::no_action(
         Watch::new(state.clone())
-    )));
+    ));
 
-    container.push(Box::new({
+    container.push({
         let state2 = state.clone();
         let victory_trigger2 = victory_trigger.clone();
         let failure_trigger2 = failure_trigger.clone();
@@ -236,16 +233,16 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new(WidgetMapAction::no_action(
+    container.push(WidgetMapAction::no_action(
         HorizontalRules::new(state.clone())?
-    )));
-    container.push(Box::new(WidgetMapAction::no_action(
+    ));
+    container.push(WidgetMapAction::no_action(
         VerticalRules::new(state.clone())?
-    )));
+    ));
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let save_game_trigger2 = save_game_trigger.clone();
         WidgetMapAction::new(
@@ -256,9 +253,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         WidgetMapAction::new(
             new_game_button(Rect::new(119, 400, 94, 30), messages.switch, None, ()),
@@ -267,13 +264,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new(
+    container.push(
         new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Key::Escape), ())
-    ));
+    );
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
@@ -284,9 +281,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
         WidgetMapAction::new(
@@ -297,9 +294,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let pause_trigger2 = pause_trigger.clone();
         WidgetMapAction::new(
@@ -310,9 +307,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let pause_trigger2 = pause_trigger.clone();
         WidgetMapAction::new(
@@ -326,9 +323,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
@@ -342,9 +339,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         let this_state = state.clone();
@@ -369,9 +366,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         let this_state = state.clone();
@@ -396,9 +393,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let victory_trigger2 = victory_trigger.clone();
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
@@ -420,9 +417,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         let storage1 = storage.clone();
@@ -447,9 +444,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Redraw
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let storage2 = storage.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         WidgetMapAction::new(
@@ -462,9 +459,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 EventReaction::Action(())
             }
         )
-    }));
+    });
 
-    container.push(Box::new({
+    container.push({
         let failure_trigger2 = failure_trigger.clone();
         let state2 = state.clone();
         WidgetMapAction::new(
@@ -488,9 +485,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 }
             }
         )
-    }));
+    });
 
-    Ok(Box::new(container))
+    Ok(container)
 }
 
 /*
