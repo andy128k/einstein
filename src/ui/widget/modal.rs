@@ -24,26 +24,17 @@ impl<A> Modal<A> {
 
 impl<A> Widget<A> for Modal<A> {
     fn is_relative(&self) -> bool {
-        false
+        true
     }
 
-    fn get_rect(&self) -> Rect {
-        self.rect
-    }
+    fn get_rect(&self) -> Rect { self.rect }
 
     fn on_event(&self, event: &Event) -> EventReaction<A> {
         for child in self.children.iter().rev() {
-            if child.is_relative() {
-                let event2 = event.relative(self.get_rect()).relative(child.get_rect());
-                let reaction = child.on_event(&event2);
-                if reaction.is_op() {
-                    return reaction;
-                }
-            } else {
-                let reaction = child.on_event(event);
-                if reaction.is_op() {
-                    return reaction;
-                }
+            let event2 = event.relative(child.get_rect());
+            let reaction = child.on_event(&event2);
+            if reaction.is_op() {
+                return reaction;
             }
         }
         EventReaction::StopPropagation
@@ -51,12 +42,7 @@ impl<A> Widget<A> for Modal<A> {
 
     fn draw(&self, context: &Context) -> Result<()> {
         for child in &self.children {
-            if child.is_relative() {
-                let c = context.relative(self.get_rect()).relative(child.get_rect());
-                child.draw(&c)?;
-            } else {
-                child.draw(context)?;
-            }
+            child.draw(&context.relative(child.get_rect()))?;
         }
         Ok(())
     }

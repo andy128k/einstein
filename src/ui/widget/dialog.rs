@@ -42,17 +42,13 @@ impl<A, W, I> ConditionalWidget<A, W, I> where W: Widget<A> {
 }
 
 impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
-    fn is_relative(&self) -> bool {
-        match *self.wrapped.borrow() {
-            Some(ref widget) => widget.is_relative(),
-            None => false
-        }
-    }
+    fn is_relative(&self) -> bool { true }
 
     fn get_rect(&self) -> Rect {
+        self.check().unwrap();
         match *self.wrapped.borrow() {
             Some(ref widget) => widget.get_rect(),
-            None => Rect::new(-10000, -10000, 1, 1)
+            None => Rect::default()
         }
     }
 
