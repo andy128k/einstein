@@ -33,8 +33,10 @@ impl<A> Widget<A> for Modal<A> {
         for child in self.children.iter().rev() {
             let event2 = event.relative(child.get_rect());
             let reaction = child.on_event(&event2);
-            if reaction.is_op() {
-                return reaction;
+            match reaction {
+                EventReaction::Redraw => return Ok((reaction, action)),
+                EventReaction::StopPropagation => return Ok((reaction, action)),
+                EventReaction::NoOp => {},
             }
         }
         EventReaction::StopPropagation

@@ -31,16 +31,6 @@ pub enum EventReaction<A> {
 }
 
 impl<A> EventReaction<A> {
-    pub fn is_noop(&self) -> bool {
-        match self {
-            &EventReaction::NoOp => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_op(&self) -> bool {
-        !self.is_noop()
-    }
 
     pub fn map_action<B, F: Fn(&A) -> B>(&self, f: F) -> EventReaction<B> {
         match *self {
@@ -50,7 +40,6 @@ impl<A> EventReaction<A> {
             EventReaction::NoOp => EventReaction::NoOp,
         }
     }
-
     pub fn flatmap_action<B, F: Fn(&A) -> EventReaction<B>>(&self, f: F) -> EventReaction<B> {
         match *self {
             EventReaction::Action(ref value) => f(value),

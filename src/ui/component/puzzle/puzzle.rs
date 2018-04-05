@@ -35,8 +35,10 @@ impl Widget<PuzzleAction> for Puzzle {
         for child in &self.cells {
             let event2 = event.relative(child.get_rect());
             let reaction = child.on_event(&event2);
-            if reaction.is_op() {
-                return reaction;
+            match reaction {
+                EventReaction::Redraw => return Ok((reaction, action)),
+                EventReaction::StopPropagation => return Ok((reaction, action)),
+                EventReaction::NoOp => {},
             }
         }
         EventReaction::NoOp
