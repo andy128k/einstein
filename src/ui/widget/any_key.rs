@@ -19,7 +19,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         Rect::default()
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
+    fn on_event(&mut self, event: &Event) -> EventResult<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
                 // sound->play(L"click.wav");

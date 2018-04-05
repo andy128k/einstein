@@ -119,7 +119,7 @@ impl Widget<String> for InputField {
         self.rect
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<String> {
+    fn on_event(&mut self, event: &Event) -> EventResult<String> {
         match *event {
             Event::KeyDown(key, ch) => self.on_key_down(key, ch),
             Event::Tick => self.on_tick(),

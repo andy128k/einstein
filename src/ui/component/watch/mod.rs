@@ -30,7 +30,7 @@ impl Widget<Nothing> for Watch {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&self, event: &Event) -> EventReaction<Nothing> {
+    fn on_event(&mut self, event: &Event) -> EventResult<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {

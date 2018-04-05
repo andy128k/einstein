@@ -96,7 +96,7 @@ impl Widget<f32> for Slider {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&self, event: &Event) -> EventReaction<f32> {
+    fn on_event(&mut self, event: &Event) -> EventResult<f32> {
         match *event {
             Event::MouseButtonDown(Mouse::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
                 self.drag_start(x, y);

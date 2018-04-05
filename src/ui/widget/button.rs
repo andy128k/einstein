@@ -35,7 +35,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         self.rect
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
+    fn on_event(&mut self, event: &Event) -> EventResult<A> {
         match *event {
             Event::KeyDown(key, _) if Some(key) == self.key => {
                 // sound->play(L"click.wav"); TODO

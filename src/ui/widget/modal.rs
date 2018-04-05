@@ -29,8 +29,8 @@ impl<A> Widget<A> for Modal<A> {
 
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
-        for child in self.children.iter().rev() {
+    fn on_event(&mut self, event: &Event) -> EventResult<A> {
+        for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.get_rect());
             let reaction = child.on_event(&event2);
             match reaction {

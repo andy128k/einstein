@@ -8,7 +8,7 @@ use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
 #[derive(Clone)]
 pub struct MainLoopQuit;
 
-pub fn main_loop(context: &Context, widget: &Widget<MainLoopQuit>) -> Result<()> {
+pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>) -> Result<()> {
     widget.draw(context)?;
     context.surface.update_rects(&[rect_to_rect1(context.rect)]);
 

@@ -31,8 +31,8 @@ impl Widget<PuzzleAction> for Puzzle {
         )
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<PuzzleAction> {
-        for child in &self.cells {
+    fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
+        for child in self.cells.iter_mut() {
             let event2 = event.relative(child.get_rect());
             let reaction = child.on_event(&event2);
             match reaction {

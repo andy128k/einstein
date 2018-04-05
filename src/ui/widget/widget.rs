@@ -59,7 +59,7 @@ pub trait Widget<A> {
         Rect::new(0, 0, rect.width(), rect.height())
     }
 
-    fn on_event(&self, _event: &Event) -> EventReaction<A> { EventReaction::NoOp } // TODO Result<EventReaction<A>>
+    fn on_event(&mut self, _event: &Event) -> EventResult<A> {
     fn draw(&self, context: &Context) -> Result<()>;
 }
 
@@ -74,7 +74,7 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).get_rect()
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
+    fn on_event(&mut self, event: &Event) -> Result<(EventReaction, Option<A>)> {
         (**self).on_event(event)
     }
 
@@ -111,7 +111,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         self.wrapped.get_rect()
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<AT> {
+    fn on_event(&mut self, event: &Event) -> EventResult<AT> {
         let event = self.wrapped.on_event(event);
         event.flatmap_action(&*self.convert)
     }

@@ -136,7 +136,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         )
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<PuzzleAction> {
+    fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
         match *event {
             Event::MouseButtonDown(button, x, y) => self.on_mouse_button_down(button, x, y),
             Event::MouseMove(x, y) => self.on_mouse_move(x, y),

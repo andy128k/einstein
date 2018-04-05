@@ -52,10 +52,10 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn on_event(&self, event: &Event) -> EventReaction<A> {
+    fn on_event(&mut self, event: &Event) -> EventResult<A> {
         self.check().unwrap();
-        match *self.wrapped.borrow() {
-            Some(ref widget) => widget.on_event(event),
+        match *self.wrapped.borrow_mut() {
+            Some(ref mut widget) => widget.on_event(event),
             None => EventReaction::NoOp
         }
     }

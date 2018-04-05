@@ -212,8 +212,8 @@ fn real_main() -> Result<()> {
             rect: Rect::new(0, 0, 800, 600)
         };
 
-        let menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&context, &menu)?;
+        let mut menu = make_menu(get_messages(), state.clone())?;
+        main_loop(&context, &mut menu)?;
     }
 
     quit();
