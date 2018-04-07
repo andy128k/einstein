@@ -79,8 +79,7 @@ impl<A> EventReaction<A> where A: Clone {
             self.action = match (&self.action, &reaction2.action) {
                 (&None, &None) => None,
                 (&Some(ref a), &None) => Some((*a).clone()),
-                (&None, &Some(ref a)) => Some((*a).clone()),
-                (&Some(ref a1), &Some(ref a2)) => Some((*a2).clone()),
+                (_, &Some(ref a)) => Some((*a).clone()),
             };
         }
     }
@@ -152,7 +151,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
     }
 
     fn on_event(&mut self, event: &Event) -> EventResult<AT> {
-        let mut reaction = self.wrapped.on_event(event)?;
+        let reaction = self.wrapped.on_event(event)?;
         if let Some(ref action) = reaction.action {
             let mut reaction2 = (self.convert)(action)?;
             reaction2.update.splice(0..0, reaction.update.into_iter());

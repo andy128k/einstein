@@ -19,8 +19,6 @@ const WIDTH: u16 = 600;
 const HEIGHT: u16 = 500;
 const CLIENT_WIDTH: u16 = 570;
 const CLIENT_HEIGHT: u16 = 390;
-const START_X: u16 = 115;
-const START_Y: u16 = 100;
 
 fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Vec<Page>> {
     let font = text_font()?;

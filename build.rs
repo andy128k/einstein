@@ -7,11 +7,6 @@ fn main() {
         .define("PREFIX", "L\"/usr/local\"")
         .define("_GNU_SOURCE", "1")
         .define("_REENTRANT", None)
-        .flag("-Wno-narrowing")
-        .flag("-Wno-write-strings")
-        .flag("-Wno-unused-parameter")
-        .flag("-Wno-type-limits")
-        .flag("-Wno-unused-but-set-variable")
         .include(Path::new("/usr/include/SDL"))
         .include(Path::new("/usr/local/include/SDL"))  // osx brew
         .include(Path::new("C:\\Users\\user1\\Documents\\SDL-1.2.15\\include"))

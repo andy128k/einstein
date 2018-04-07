@@ -63,7 +63,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
         WidgetMapAction::new(
             ConditionalWidget::new(
                 ask_name.clone(),
-                move |&(index, ref name)| new_game_name(name, messages)
+                move |&(_index, ref name)| new_game_name(name, messages)
             ),
             move |result| {
                 let index = ask_name2.borrow().as_ref().map(|p| p.0).unwrap();

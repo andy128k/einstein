@@ -5,7 +5,7 @@ use ui::widget::label::*;
 use ui::widget::any_key::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use ui::context::{Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use resources::fonts::*;
 use resources::background::{MARBLE_PATTERN, GREEN_PATTERN, RED_PATTERN};
 
@@ -38,7 +38,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
 
     let container = Modal::<()>::new(screen_rect)
         .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(width, height), bg)?
+            Window::new(rect, bg)?
         ))
         .add(WidgetMapAction::no_action(
             Label::new(Rect::new0(width, height), message, color, HorizontalAlign::Center)

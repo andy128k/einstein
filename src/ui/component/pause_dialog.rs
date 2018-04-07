@@ -1,6 +1,6 @@
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::{Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::window::*;
