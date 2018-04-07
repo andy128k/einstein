@@ -246,7 +246,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                         *failure_trigger2.borrow_mut() = Some(());
                     }
                 }
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -272,7 +272,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 this_state.borrow_mut().stop();
                 *save_game_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -283,7 +283,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             new_game_button(Rect::new(119, 400, 94, 30), messages.switch, None, ()),
             move |_| {
                 this_state.borrow_mut().toggle_show_excluded();
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -300,7 +300,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 this_state.borrow_mut().stop();
                 *show_help_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -313,7 +313,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 this_state.borrow_mut().stop();
                 *show_opts_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -326,7 +326,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 this_state.borrow_mut().stop();
                 *pause_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -342,7 +342,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 *pause_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -358,7 +358,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             move |_| {
                 *show_help_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -385,7 +385,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     },
                     DialogResult::Cancel => {},
                 }
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -412,7 +412,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     DialogResult::Cancel => {}
                 }
                 this_state.borrow_mut().start();
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -436,7 +436,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 } else {
                     *show_scores_trigger2.borrow_mut() = Some(None);
                 }
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -463,7 +463,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 storage2.borrow_mut().last_name = Some(name.to_string());
                 let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score });
                 *show_scores_trigger2.borrow_mut() = Some(pos);
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -478,7 +478,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
             ),
             move |_| {
                 *show_scores_trigger2.borrow_mut() = None;
-                EventReaction::Action(())
+                Ok(EventReaction::action(()))
             }
         )
     });
@@ -497,13 +497,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     FailureChoice::StartNew => {
                         let g = GamePrivate::new().unwrap();
                         *state2.borrow_mut() = g.borrow().clone();
-                        EventReaction::Redraw
+                        Ok(EventReaction::empty())
                     },
                     FailureChoice::TryAgain => {
                         state2.borrow_mut().restart();
-                        EventReaction::Redraw
+                        Ok(EventReaction::empty())
                     },
-                    FailureChoice::Cancel => EventReaction::Action(()),
+                    FailureChoice::Cancel => Ok(EventReaction::action(())),
                 }
             }
         )

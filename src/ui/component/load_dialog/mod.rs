@@ -39,9 +39,9 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
                 new_dialog_button2(Rect::new(10, 60 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label, None, ())?,
                 move |_| {
                     if let Some(ref game3) = game2 {
-                        EventReaction::Action(DialogResult::Ok(game3.game.clone()))
+                        Ok(EventReaction::action(DialogResult::Ok(game3.game.clone())))
                     } else {
-                        EventReaction::NoOp
+                        Ok(EventReaction::empty())
                     }
                 }
             )

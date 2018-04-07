@@ -39,22 +39,22 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         match *event {
             Event::KeyDown(key, _) if Some(key) == self.key => {
                 // sound->play(L"click.wav"); TODO
-                EventReaction::Action(self.action.clone())
+                Ok(EventReaction::update_and_action(self.get_rect(), self.action.clone()))
             },
             Event::MouseButtonDown(Mouse::Left, x, y) if self.get_client_rect().contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
-                EventReaction::Action(self.action.clone())
+                Ok(EventReaction::update_and_action(self.get_rect(), self.action.clone()))
             },
             Event::MouseMove(x, y) => {
                 let to_highlight = self.get_client_rect().contains_point((x, y));
                 if self.highlighted.get() != to_highlight {
                     self.highlighted.set(to_highlight);
-                    EventReaction::Redraw
+                    Ok(EventReaction::update(self.get_rect()))
                 } else {
-                    EventReaction::NoOp
+                    Ok(EventReaction::empty())
                 }
             },
-            _ => EventReaction::NoOp,
+            _ => Ok(EventReaction::empty()),
         }
     }
 

@@ -59,14 +59,14 @@ impl Slider {
         self.dragging.set(None);
     }
 
-    fn on_mouse_move(&self, x: i32, y: i32) -> EventReaction<f32> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> bool {
         if let Some(drag_x) = self.dragging.get() {
             let val = self.x_to_value(x - drag_x);
             if val != self.value.get() {
                 self.value.set(val);
-                EventReaction::Redraw
+                true
             } else {
-                EventReaction::NoOp
+                false
             }
         } else {
             let p = (x, y);
@@ -79,13 +79,13 @@ impl Slider {
                 if highlight != self.highlight.get() {
                     self.highlight.set(highlight);
                 }
-                EventReaction::Redraw
+                true
             } else {
                 if self.highlight.get() {
                     self.highlight.set(false);
-                    EventReaction::Redraw
+                    true
                 } else {
-                    EventReaction::NoOp
+                    false
                 }
             }
         }
@@ -100,14 +100,20 @@ impl Widget<f32> for Slider {
         match *event {
             Event::MouseButtonDown(Mouse::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
                 self.drag_start(x, y);
-                EventReaction::NoOp
+                Ok(EventReaction::empty())
             },
             Event::MouseButtonUp(..) => {
                 self.drag_stop();
-                EventReaction::Action(self.value.get())
+                Ok(EventReaction::update_and_action(self.get_rect(), self.value.get()))
             },
-            Event::MouseMove(x, y) => self.on_mouse_move(x, y),
-            _ => EventReaction::NoOp,
+            Event::MouseMove(x, y) => {
+                if self.on_mouse_move(x, y) {
+                    Ok(EventReaction::update(self.get_rect()))
+                } else {
+                    Ok(EventReaction::empty())
+                }
+            },
+            _ => Ok(EventReaction::empty()),
         }
     }
 

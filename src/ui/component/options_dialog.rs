@@ -50,7 +50,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
             Checkbox::new(15, 90, BLUE_PATTERN, state.borrow().fullscreen)?,
             move |value| {
                 state2.borrow_mut().fullscreen = *value;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -67,7 +67,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
             move |value| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -77,7 +77,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
             new_dialog_button2(Rect::new(65, 220, 85, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
             move |_| {
                 let s: Options = state2.borrow().clone();
-                EventReaction::Action(DialogResult::Ok(s))
+                Ok(EventReaction::action(DialogResult::Ok(s)))
             }
         )
     });

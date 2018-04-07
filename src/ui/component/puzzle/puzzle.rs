@@ -32,16 +32,17 @@ impl Widget<PuzzleAction> for Puzzle {
     }
 
     fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
+        let mut reaction = EventReaction::empty();
         for child in self.cells.iter_mut() {
             let event2 = event.relative(child.get_rect());
-            let reaction = child.on_event(&event2);
-            match reaction {
-                EventReaction::Redraw => return Ok((reaction, action)),
-                EventReaction::StopPropagation => return Ok((reaction, action)),
-                EventReaction::NoOp => {},
+            let cell_reaction = child.on_event(&event2)?;
+            // TODO -relative
+            reaction.add(&cell_reaction);
+            if reaction.terminated {
+                break;
             }
         }
-        EventReaction::NoOp
+        Ok(reaction)
     }
 
     fn draw(&self, context: &Context) -> Result<()> {

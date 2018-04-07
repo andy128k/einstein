@@ -22,7 +22,7 @@ impl<A> Modal<A> {
     }
 }
 
-impl<A> Widget<A> for Modal<A> {
+impl<A> Widget<A> for Modal<A> where A: Clone {
     fn is_relative(&self) -> bool {
         true
     }
@@ -30,16 +30,18 @@ impl<A> Widget<A> for Modal<A> {
     fn get_rect(&self) -> Rect { self.rect }
 
     fn on_event(&mut self, event: &Event) -> EventResult<A> {
+        let mut reaction = EventReaction::empty();
         for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.get_rect());
-            let reaction = child.on_event(&event2);
-            match reaction {
-                EventReaction::Redraw => return Ok((reaction, action)),
-                EventReaction::StopPropagation => return Ok((reaction, action)),
-                EventReaction::NoOp => {},
+            let child_reaction = child.on_event(&event2)?;
+            // TODO -relative
+            reaction.add(&child_reaction);
+            if reaction.terminated {
+                break;
             }
         }
-        EventReaction::StopPropagation
+        reaction.terminated = true;
+        Ok(reaction)
     }
 
     fn draw(&self, context: &Context) -> Result<()> {

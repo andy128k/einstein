@@ -48,7 +48,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                 new_dialog_button2(Rect::new(10, 60 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label, None, ())?,
                 move |_| {
                     *ask_name2.borrow_mut() = Some((i, default_name.clone()));
-                    EventReaction::Redraw
+                    Ok(EventReaction::empty())
                 }
             )
         });
@@ -69,8 +69,8 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                 let index = ask_name2.borrow().as_ref().map(|p| p.0).unwrap();
                 *ask_name2.borrow_mut() = None;
                 match *result {
-                    DialogResult::Ok(ref name) => EventReaction::Action(DialogResult::Ok((index, name.to_string()))),
-                    DialogResult::Cancel => EventReaction::Action(DialogResult::Cancel),
+                    DialogResult::Ok(ref name) => Ok(EventReaction::action(DialogResult::Ok((index, name.to_string())))),
+                    DialogResult::Cancel => Ok(EventReaction::action(DialogResult::Cancel)),
                 }
             }
         )

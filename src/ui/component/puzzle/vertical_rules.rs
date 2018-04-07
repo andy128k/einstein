@@ -83,12 +83,12 @@ impl Widget<Nothing> for VerticalRules {
                     Some(no) => {
                         if self.state.borrow_mut().toggle_vertical_rule(no).is_some() {
                             // sound->play(L"whizz.wav");
-                            EventReaction::Redraw // self.rect(no)
+                            Ok(EventReaction::update(self.rect(no)))
                         } else {
-                            EventReaction::NoOp
+                            Ok(EventReaction::empty())
                         }
                     },
-                    None => EventReaction::NoOp
+                    None => Ok(EventReaction::empty())
                 }
             },
             Event::MouseMove(x, y) => {
@@ -104,12 +104,12 @@ impl Widget<Nothing> for VerticalRules {
                     } else {
                         self.highlighted.set(None);
                     }
-                    EventReaction::Redraw // rects
+                    Ok(EventReaction::updates(&rects))
                 } else {
-                    EventReaction::NoOp
+                    Ok(EventReaction::empty())
                 }
             },
-            _ => EventReaction::NoOp,
+            _ => Ok(EventReaction::empty()),
         }
     }
 

@@ -34,12 +34,12 @@ impl Widget<Nothing> for Watch {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
-                    EventReaction::Redraw
+                    Ok(EventReaction::update(self.get_rect()))
                 } else {
-                    EventReaction::NoOp
+                    Ok(EventReaction::empty())
                 }
             },
-            _ => EventReaction::NoOp,
+            _ => Ok(EventReaction::empty()),
         }
     }
 

@@ -35,7 +35,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
                 InputField::new(Rect::new(170, 20, 280, 26), name, 20)?,
                 move |name| {
                     *state2.borrow_mut() = name.to_string();
-                    EventReaction::Redraw
+                    Ok(EventReaction::empty())
                 }
             )
         })
@@ -45,7 +45,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
                 new_dialog_button2(Rect::new(140, 60, 80, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let value: String = state2.borrow().clone();
-                    EventReaction::Action(DialogResult::Ok(value))
+                    Ok(EventReaction::action(DialogResult::Ok(value)))
                 }
             )
         })

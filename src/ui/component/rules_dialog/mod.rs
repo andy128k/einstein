@@ -74,7 +74,7 @@ impl DescriptionPrivate {
                     new_dialog_button2(Rect::new(10, 465, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
                     move |_| {
                         state2.borrow_mut().prev();
-                        EventReaction::Redraw
+                        Ok(EventReaction::empty())
                     }
                 )
             })
@@ -84,7 +84,7 @@ impl DescriptionPrivate {
                     new_dialog_button2(Rect::new(100, 465, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
                     move |_| {
                         state2.borrow_mut().next();
-                        EventReaction::Redraw
+                        Ok(EventReaction::empty())
                     }
                 )
             })

@@ -3,7 +3,7 @@ use debug_cell::RefCell;
 use sdl::event::Key;
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::{Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
@@ -32,7 +32,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
                 InputField::new(Rect::new(170, 20, 280, 26), name, 20)?,
                 move |name| {
                     *state2.borrow_mut() = name.to_string();
-                    EventReaction::Redraw
+                    Ok(EventReaction::empty())
                 }
             )
         })
@@ -42,7 +42,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
                 new_dialog_button2(Rect::new(178, 60, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
                 move |_| {
                     let result: String = state2.borrow().clone();
-                    EventReaction::Action(result)
+                    Ok(EventReaction::action(result))
                 }
             )
         });

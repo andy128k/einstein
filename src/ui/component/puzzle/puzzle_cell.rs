@@ -33,6 +33,7 @@ fn local_find_choice(x: i32, y: i32) -> Option<u8> {
 
 const EMPTY_FIELD_ICON: &[u8] = include_bytes!("./tile.bmp");
 
+#[derive(Clone)]
 pub enum PuzzleAction {
     Victory,
     Failure,
@@ -66,16 +67,16 @@ impl PuzzleCell {
 
     fn on_mouse_button_down(&self, button: Mouse, x: i32, y: i32) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
-            return EventReaction::NoOp;
+            return EventReaction::empty();
         }
 
         if !self.get_client_rect().contains_point((x, y)) {
-            return EventReaction::NoOp;
+            return EventReaction::empty();
         }
 
         let value = match local_find_choice(x, y) {
             Some(v) => v,
-            None => return EventReaction::NoOp
+            None => return EventReaction::empty()
         };
         let thing = Thing { row: self.row, value };
 
@@ -98,17 +99,17 @@ impl PuzzleCell {
         }
 
         if !self.state.borrow().is_valid() {
-            EventReaction::Action(PuzzleAction::Failure)
+            EventReaction::action(PuzzleAction::Failure)
         } else if self.state.borrow().possibilities.is_solved() {
-            EventReaction::Action(PuzzleAction::Victory)
+            EventReaction::action(PuzzleAction::Victory)
         } else {
-            EventReaction::Redraw
+            EventReaction::update(self.get_rect())
         }
     }
 
-    fn on_mouse_move(&self, x: i32, y: i32) -> EventReaction<PuzzleAction> {
+    fn on_mouse_move(&self, x: i32, y: i32) -> bool {
         if !self.get_client_rect().contains_point((x,y)) && self.highlighted.get().is_none() {
-            return EventReaction::NoOp;
+            return false;
         }
 
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
@@ -120,7 +121,7 @@ impl PuzzleCell {
             }
         }
 
-        EventReaction::Redraw
+        true
     }
 }
 
@@ -138,9 +139,15 @@ impl Widget<PuzzleAction> for PuzzleCell {
 
     fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
         match *event {
-            Event::MouseButtonDown(button, x, y) => self.on_mouse_button_down(button, x, y),
-            Event::MouseMove(x, y) => self.on_mouse_move(x, y),
-            _ => EventReaction::NoOp,
+            Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y)),
+            Event::MouseMove(x, y) => {
+                if self.on_mouse_move(x, y) {
+                    Ok(EventReaction::update(self.get_rect()))
+                } else {
+                    Ok(EventReaction::empty())
+                }
+            },
+            _ => Ok(EventReaction::empty()),
         }
     }
 

@@ -54,7 +54,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             move |_| {
                 let game = GamePrivate::new().unwrap();
                 *new_game_trigger2.borrow_mut() = Some(game);
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -64,7 +64,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             new_menu_button(Rect::new(550, 370, 220, 30), messages.load_game, None, ()),
             move |_| {
                 *load_game_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -74,7 +74,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             new_menu_button(Rect::new(550, 400, 220, 30), messages.top_scores, None, ()),
             move |_| {
                 *show_scores_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -84,7 +84,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             new_menu_button(Rect::new(550, 430, 220, 30), messages.rules, None, ()),
             move |_| {
                 *show_help_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -94,7 +94,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             new_menu_button(Rect::new(550, 460, 220, 30), messages.options, None, ()),
             move |_| {
                 *show_opts_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -104,7 +104,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             new_menu_button(Rect::new(550, 490, 220, 30), messages.about, None, ()),
             move |_| {
                 *show_about_trigger2.borrow_mut() = Some(());
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -126,7 +126,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             ),
             move |_| {
                 *new_game_trigger2.borrow_mut() = None;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -153,7 +153,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     },
                     DialogResult::Cancel => {},
                 }
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -168,7 +168,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             ),
             move |_| {
                 *show_scores_trigger2.borrow_mut() = None;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -182,7 +182,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             ),
             move |_| {
                 *show_help_trigger2.borrow_mut() = None;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -207,7 +207,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     },
                     DialogResult::Cancel => {},
                 }
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });
@@ -221,7 +221,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             ),
             move |_| {
                 *show_about_trigger2.borrow_mut() = None;
-                EventReaction::Redraw
+                Ok(EventReaction::empty())
             }
         )
     });

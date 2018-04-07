@@ -23,9 +23,9 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
                 // sound->play(L"click.wav");
-                EventReaction::Action(self.action.clone())
+                Ok(EventReaction::action(self.action.clone()))
             },
-            _ => EventReaction::NoOp,
+            _ => Ok(EventReaction::empty()),
         }
     }
 
