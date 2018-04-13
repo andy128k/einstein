@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
-use debug_cell::RefCell;
+use cell::RefCell;
 use sdl::event::{Key};
 use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;

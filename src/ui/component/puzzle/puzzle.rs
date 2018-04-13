@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use debug_cell::RefCell;
+use cell::RefCell;
 use rules::{PUZZLE_SIZE};
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;

@@ -26,8 +26,9 @@ pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>) -> Result
         };
         if reaction.update.len() > 0 {
             widget.draw(context)?;
-            let rects = reaction.update.iter().map(|r| rect_to_rect1(*r)).collect::<Vec<_>>();
-            context.surface.update_rects(&rects);
+            // let rects = reaction.update.iter().map(|r| rect_to_rect1(*r)).collect::<Vec<_>>();
+            // context.surface.update_rects(&rects);
+            context.surface.update_rects(&[rect_to_rect1(context.rect)]);
         }
         if reaction.action.is_some() {
             return Ok(());

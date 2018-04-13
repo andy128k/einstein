@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use debug_cell::RefCell;
+use cell::RefCell;
 use sdl::event::{Key};
 use sdl2::pixels::Color;
 use error::*;

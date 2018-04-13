@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use std::cell::{Cell};
-use debug_cell::RefCell;
+use cell::RefCell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
 use ui::context::{Context, Rect};

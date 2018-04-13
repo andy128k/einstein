@@ -1,7 +1,7 @@
 use std::time::{Duration};
 use std::rc::Rc;
 use std::cell::{Cell};
-use debug_cell::RefCell;
+use cell::RefCell;
 use sdl2::pixels::Color;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;

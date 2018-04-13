@@ -9,10 +9,10 @@ extern crate serde;
 extern crate serde_json;
 extern crate regex;
 #[macro_use] extern crate lazy_static;
-extern crate debug_cell;
 #[cfg(windows)]
 extern crate winapi;
 
+pub mod cell;
 pub mod error;
 pub mod algebra;
 pub mod util;
@@ -27,7 +27,7 @@ pub mod audio;
 
 use std::process::exit;
 use std::rc::Rc;
-use debug_cell::RefCell;
+use cell::RefCell;
 use std::env::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
