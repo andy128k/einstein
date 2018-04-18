@@ -2,7 +2,6 @@ use std::rc::Rc;
 use sdl::video::Surface;
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
-pub use ui::utils::{HorizontalAlign, VerticalAlign};
 use error::*;
 
 #[derive(Clone, Copy, Default)]
@@ -67,6 +66,20 @@ pub fn rect_to_rect1(rect: Rect) -> ::sdl::Rect {
 
 pub fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
     ::sdl2::rect::Rect::new(rect.0, rect.1, rect.2, rect.3)
+}
+
+#[derive(Clone, Copy)]
+pub enum HorizontalAlign {
+    Left,
+    Center,
+    Right
+}
+
+#[derive(Clone, Copy)]
+pub enum VerticalAlign {
+    Top,
+    Middle,
+    Bottom
 }
 
 pub struct Context {
