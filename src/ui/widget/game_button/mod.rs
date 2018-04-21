@@ -4,10 +4,11 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::button::*;
-use ui::utils::{load_image, adjust_brightness};
+use ui::utils::load_image;
 use resources::fonts::*;
 
 const BUTTON_BG_BYTES: &[u8] = include_bytes!("./btn.bmp");
+const BUTTON_BG_HIGHLIGHTED_BYTES: &[u8] = include_bytes!("./btn-highlighted.bmp");
 
 struct Resources {
     game_button_bg: Surface,
@@ -18,7 +19,7 @@ thread_local!(static RESOURCES: Resources = init_resources());
 
 fn init_resources() -> Resources {
     let game_button_bg = load_image(BUTTON_BG_BYTES).unwrap();
-    let game_button_bg_highlighted = adjust_brightness(&game_button_bg, 1.5);
+    let game_button_bg_highlighted = load_image(BUTTON_BG_HIGHLIGHTED_BYTES).unwrap();
     Resources {
         game_button_bg,
         game_button_bg_highlighted,

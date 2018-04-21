@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::collections::BTreeMap;
 use rules::{Thing, PUZZLE_SIZE};
 use sdl::video::Surface;
-use ui::utils::{load_image, adjust_brightness};
+use ui::utils::load_image;
 use error::*;
 
 const LARGE_IMAGES: [[&[u8]; 6]; 6] = [
@@ -107,15 +107,18 @@ const SMALL_IMAGES: [[&[u8]; 6]; 6] = [
     ],
 ];
 
-pub struct ThingImages(BTreeMap<u32, Surface>);
+pub struct ThingImages {
+    things: BTreeMap<u32, Surface>,
+    pub large_bg: Surface,
+    pub large_bg_highlighted: Surface,
+    pub small_bg: Surface,
+    pub small_bg_highlighted: Surface,
+}
 
-fn make_key(row: u8, value: u8, small: bool, hightlighted: bool) -> u32 {
+fn make_key(row: u8, value: u8, small: bool) -> u32 {
     let mut key: u32 = ((row as u32) << 8) | (value as u32);
     if small {
         key |= 0x01_00_00u32;
-    }
-    if hightlighted {
-        key |= 0x10_00_00u32;
     }
     key
 }
@@ -128,22 +131,26 @@ impl ThingImages {
             for row in 0..PUZZLE_SIZE {
                 for value in 0..PUZZLE_SIZE {
                     let image = load_image(bytes[row as usize][value as usize])?;
-                    let hightlighted = adjust_brightness(&image, 1.5);
-                    things.insert(make_key(row as u8, value as u8, size > 0, false), image);
-                    things.insert(make_key(row as u8, value as u8, size > 0, true), hightlighted);
+                    things.insert(make_key(row as u8, value as u8, size > 0), image);
                 }
             }
         }
-        Ok(Rc::new(ThingImages(things)))
+        Ok(Rc::new(ThingImages {
+            things,
+            large_bg: load_image(include_bytes!("./large-bg.bmp"))?,
+            large_bg_highlighted: load_image(include_bytes!("./large-bg-highlighted.bmp"))?,
+            small_bg: load_image(include_bytes!("./small-bg.bmp"))?,
+            small_bg_highlighted: load_image(include_bytes!("./small-bg-highlighted.bmp"))?,
+        }))
     }
 
-    pub fn get_thing_image(&self, thing: Thing, highlighted: bool) -> Result<&Surface> {
-        self.0.get(&make_key(thing.row, thing.value, false, highlighted))
-            .ok_or_else(|| format_err!("Image for {:?} highlighted={} doesn't exist", thing, highlighted))
+    pub fn get_thing_image(&self, thing: Thing) -> Result<&Surface> {
+        self.things.get(&make_key(thing.row, thing.value, false))
+            .ok_or_else(|| format_err!("Image for {:?} doesn't exist", thing))
     }
 
-    pub fn get_small_thing_image(&self, thing: Thing, highlighted: bool) -> Result<&Surface> {
-        self.0.get(&make_key(thing.row, thing.value, true, highlighted))
-            .ok_or_else(|| format_err!("Small image for {:?} highlighted={} doesn't exist", thing, highlighted))
+    pub fn get_small_thing_image(&self, thing: Thing) -> Result<&Surface> {
+        self.things.get(&make_key(thing.row, thing.value, true))
+            .ok_or_else(|| format_err!("Small image for {:?} doesn't exist", thing))
     }
 }

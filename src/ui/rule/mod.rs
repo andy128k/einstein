@@ -1,58 +1,82 @@
-use rules::{Rule};
-use sdl::video::{SurfaceFlag, Color};
+use rules::{Rule, Thing};
 use resources::thing::ThingImages;
-use super::utils::adjust_brightness;
+use ui::utils::adjust_brightness;
 use error::*;
-use ui::context::Context;
+use ui::context::{Context, Rect};
 use ui::utils::load_image;
+
+const TILE_WIDTH: i32 = 48;
+const TILE_HEIGHT: i32 = 48;
+
+const RECT_1_0: Rect = Rect(TILE_WIDTH * 1, 0, TILE_WIDTH as u32, TILE_HEIGHT as u32);
+const RECT_2_0: Rect = Rect(TILE_WIDTH * 2, 0, TILE_WIDTH as u32, TILE_HEIGHT as u32);
+const RECT_0_1: Rect = Rect(0, TILE_HEIGHT, TILE_WIDTH as u32, TILE_HEIGHT as u32);
 
 const HINT_NEAR_ICON: &[u8] = include_bytes!("./hint-near.bmp");
 const HINT_SIDE_ICON: &[u8] = include_bytes!("./hint-side.bmp");
 const HINT_BETWEEN_ICON: &[u8] = include_bytes!("./betwarr.bmp");
 
-pub fn draw_rule(images: &ThingImages, rule: &Rule, context: &Context, hightlighted: bool) -> Result<()> {
+pub fn draw_thing(context: &Context, images: &ThingImages, thing: Thing) -> Result<()> {
+    let icon = images.get_thing_image(thing)?;
+    context.image(&icon, 0, 0);
+    Ok(())
+}
+
+pub fn draw_rule(images: &ThingImages, rule: &Rule, context: &Context, highlighted: bool) -> Result<()> {
+    let bg = if highlighted {
+        &images.large_bg_highlighted
+    } else {
+        &images.large_bg
+    };
+
     match *rule {
         Rule::Near(thing1, thing2) => {
-            let icon1 = images.get_thing_image(thing1, hightlighted)?;
+            context.image(bg, 0, 0);
+            context.image(bg, TILE_WIDTH * 2, 0);
+
+            draw_thing(context, images, thing1)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing2)?;
+
             let mut hint = load_image(HINT_NEAR_ICON)?;
-            if hightlighted {
+            if highlighted {
                 hint = adjust_brightness(&hint, 1.5);
             }
-            let icon2 = images.get_thing_image(thing2, hightlighted)?;
-            context.image(&icon1, 0, 0);
-            context.image(&hint, icon1.get_width() as i32, 0);
-            context.image(&icon2, icon1.get_width() as i32 * 2, 0);
+            context.image(&hint, TILE_WIDTH, 0);
         },
         Rule::Direction(thing1, thing2) => {
-            let icon1 = images.get_thing_image(thing1, hightlighted)?;
+            context.image(bg, 0, 0);
+            context.image(bg, TILE_WIDTH * 2, 0);
+
+            draw_thing(context, images, thing1)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing2)?;
+
             let mut hint = load_image(HINT_SIDE_ICON)?;
-            if hightlighted {
+            if highlighted {
                 hint = adjust_brightness(&hint, 1.5);
             }
-            let icon2 = images.get_thing_image(thing2, hightlighted)?;
-            context.image(&icon1, 0, 0);
-            context.image(&hint, icon1.get_width() as i32, 0);
-            context.image(&icon2, icon1.get_width() as i32 * 2, 0);
+            context.image(&hint, TILE_WIDTH, 0);
         },
         Rule::Under(thing1, thing2) => {
-            let icon1 = images.get_thing_image(thing1, hightlighted)?;
-            let icon2 = images.get_thing_image(thing2, hightlighted)?;
-            context.image(&icon1, 0, 0);
-            context.image(&icon2, 0, icon1.get_height() as i32);
+            context.image(bg, 0, 0);
+            context.image(bg, 0, TILE_HEIGHT);
+
+            draw_thing(context, images, thing1)?;
+            draw_thing(&context.relative(RECT_0_1), images, thing2)?;
         },
         Rule::Between(thing1, thing2, thing3) => {
-            let icon1 = images.get_thing_image(thing1, hightlighted)?;
-            let icon2 = images.get_thing_image(thing2, hightlighted)?;
-            let icon3 = images.get_thing_image(thing3, hightlighted)?;
+            context.image(bg, 0, 0);
+            context.image(bg, TILE_WIDTH, 0);
+            context.image(bg, TILE_WIDTH * 2, 0);
+
+            draw_thing(context, images, thing1)?;
+            draw_thing(&context.relative(RECT_1_0), images, thing2)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing3)?;
+
             let mut arrow = load_image(HINT_BETWEEN_ICON)?;
-            arrow.set_color_key(&[SurfaceFlag::SrcColorKey], Color::RGBA(255, 255, 255, 255));
-            if hightlighted {
+            if highlighted {
                 arrow = adjust_brightness(&arrow, 1.5);
             }
-            context.image(&icon1, 0, 0);
-            context.image(&icon2, icon1.get_width() as i32, 0);
-            context.image(&icon3, icon1.get_width() as i32 * 2, 0);
-            context.image(&arrow, ((3 * icon1.get_width() - arrow.get_width()) / 2) as i32, 0);
+            context.image(&arrow, (3 * TILE_WIDTH - arrow.get_width() as i32) / 2, 0);
         },
         _ => {}
     }

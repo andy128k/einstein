@@ -5,7 +5,7 @@ use sdl2::ttf::Font;
 use error::*;
 
 #[derive(Clone, Copy, Default)]
-pub struct Rect(i32, i32, u32, u32);
+pub struct Rect(pub i32, pub i32, pub u32, pub u32);
 
 impl Rect {
     pub fn new(x: i32, y: i32, w: u32, h: u32) -> Self {

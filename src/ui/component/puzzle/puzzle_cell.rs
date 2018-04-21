@@ -7,6 +7,7 @@ use rules::{Thing};
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::utils::load_image;
+use ui::rule::draw_thing;
 use ui::component::game::GamePrivate;
 use resources::thing::ThingImages;
 use error::*;
@@ -158,8 +159,15 @@ impl Widget<PuzzleAction> for PuzzleCell {
         if let Some(value) = self.state.borrow().possibilities.get_defined(col, row) {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
-            let image = self.thing_images.get_thing_image(thing, highlight)?;
-            context.image(image, 0, 0);
+
+            let bg = if highlight {
+                &self.thing_images.large_bg_highlighted
+            } else {
+                &self.thing_images.large_bg
+            };
+            context.image(bg, 0, 0);
+
+            draw_thing(context, &self.thing_images, thing)?;
         } else {
             context.image(&self.bg, 0, 0);
 
@@ -168,7 +176,15 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 let thing = Thing { row, value: i };
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
-                    let image = self.thing_images.get_small_thing_image(thing, highlight)?;
+
+                    let bg = if highlight {
+                        &self.thing_images.small_bg_highlighted
+                    } else {
+                        &self.thing_images.small_bg
+                    };
+                    context.image(bg, choice_rect.left(), choice_rect.top());
+
+                    let image = self.thing_images.get_small_thing_image(thing)?;
                     context.image(image, choice_rect.left(), choice_rect.top());
                 }
             }
