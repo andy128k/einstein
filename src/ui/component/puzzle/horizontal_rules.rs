@@ -44,6 +44,10 @@ impl HorizontalRules {
         let rect = self.rect(index);
         let c = context.relative(rect);
 
+        c.image(&self.tile, 0, 0);
+        c.image(&self.tile, TILE_WIDTH, 0);
+        c.image(&self.tile, TILE_WIDTH * 2, 0);
+
         if let Some(horizontal_rule) = self.state.borrow().horizontal_rules.get(index) {
             if self.state.borrow().show_excluded == horizontal_rule.is_excluded {
                 let rule = &self.state.borrow().rules[horizontal_rule.original_index];
@@ -52,9 +56,6 @@ impl HorizontalRules {
             }
         }
 
-        c.image(&self.tile, 0, 0);
-        c.image(&self.tile, TILE_WIDTH, 0);
-        c.image(&self.tile, TILE_WIDTH * 2, 0);
         Ok(())
     }
 
