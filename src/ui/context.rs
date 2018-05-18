@@ -43,6 +43,11 @@ impl Rect {
     }
 }
 
+pub struct Sprite<'s> {
+    pub image: &'s Surface,
+    pub rect: Rect,
+}
+
 unsafe fn surface2_to_surface(surface: &::sdl2::surface::Surface) -> Surface {
     Surface { raw: surface.raw() as * mut ::sdl::video::ll::SDL_Surface, owned: false }
 }
@@ -115,6 +120,21 @@ impl Context {
     pub fn image(&self, image: &Surface, x: i32, y: i32) {
         self.surface.set_clip_rect(Some(&rect_to_rect1(self.rect)));
         self.surface.blit_at(&image, (self.rect.left() + x) as i16, (self.rect.top() + y) as i16);
+        self.surface.set_clip_rect(None);
+    }
+
+    pub fn sprite(&self, sprite: &Sprite, x: i32, y: i32) {
+        let clip = Rect::new(
+                self.rect.left() + x,
+                self.rect.top() + y,
+                sprite.rect.width(),
+                sprite.rect.height()
+            )
+            .intersection(&self.rect)
+            .unwrap();
+
+        self.surface.set_clip_rect(Some(&rect_to_rect1(clip)));
+        self.surface.blit_rect(&sprite.image, Some(rect_to_rect1(sprite.rect)), Some(rect_to_rect1(clip)));
         self.surface.set_clip_rect(None);
     }
 

@@ -16,26 +16,17 @@ const HINT_NEAR_ICON: &[u8] = include_bytes!("./hint-near.bmp");
 const HINT_SIDE_ICON: &[u8] = include_bytes!("./hint-side.bmp");
 const HINT_BETWEEN_ICON: &[u8] = include_bytes!("./betwarr.bmp");
 
-pub fn draw_thing(context: &Context, images: &ThingImages, thing: Thing) -> Result<()> {
-    let icon = images.get_thing_image(thing)?;
-    context.image(&icon, 0, 0);
+pub fn draw_thing(context: &Context, images: &ThingImages, thing: Thing, highlighted: bool) -> Result<()> {
+    let sprite = images.get_thing_image(thing, highlighted);
+    context.sprite(&sprite, 0, 0);
     Ok(())
 }
 
 pub fn draw_rule(images: &ThingImages, rule: &Rule, context: &Context, highlighted: bool) -> Result<()> {
-    let bg = if highlighted {
-        &images.large_bg_highlighted
-    } else {
-        &images.large_bg
-    };
-
     match *rule {
         Rule::Near(thing1, thing2) => {
-            context.image(bg, 0, 0);
-            context.image(bg, TILE_WIDTH * 2, 0);
-
-            draw_thing(context, images, thing1)?;
-            draw_thing(&context.relative(RECT_2_0), images, thing2)?;
+            draw_thing(context, images, thing1, highlighted)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing2, highlighted)?;
 
             let mut hint = load_image(HINT_NEAR_ICON)?;
             if highlighted {
@@ -44,11 +35,8 @@ pub fn draw_rule(images: &ThingImages, rule: &Rule, context: &Context, highlight
             context.image(&hint, TILE_WIDTH, 0);
         },
         Rule::Direction(thing1, thing2) => {
-            context.image(bg, 0, 0);
-            context.image(bg, TILE_WIDTH * 2, 0);
-
-            draw_thing(context, images, thing1)?;
-            draw_thing(&context.relative(RECT_2_0), images, thing2)?;
+            draw_thing(context, images, thing1, highlighted)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing2, highlighted)?;
 
             let mut hint = load_image(HINT_SIDE_ICON)?;
             if highlighted {
@@ -57,20 +45,13 @@ pub fn draw_rule(images: &ThingImages, rule: &Rule, context: &Context, highlight
             context.image(&hint, TILE_WIDTH, 0);
         },
         Rule::Under(thing1, thing2) => {
-            context.image(bg, 0, 0);
-            context.image(bg, 0, TILE_HEIGHT);
-
-            draw_thing(context, images, thing1)?;
-            draw_thing(&context.relative(RECT_0_1), images, thing2)?;
+            draw_thing(context, images, thing1, highlighted)?;
+            draw_thing(&context.relative(RECT_0_1), images, thing2, highlighted)?;
         },
         Rule::Between(thing1, thing2, thing3) => {
-            context.image(bg, 0, 0);
-            context.image(bg, TILE_WIDTH, 0);
-            context.image(bg, TILE_WIDTH * 2, 0);
-
-            draw_thing(context, images, thing1)?;
-            draw_thing(&context.relative(RECT_1_0), images, thing2)?;
-            draw_thing(&context.relative(RECT_2_0), images, thing3)?;
+            draw_thing(context, images, thing1, highlighted)?;
+            draw_thing(&context.relative(RECT_1_0), images, thing2, highlighted)?;
+            draw_thing(&context.relative(RECT_2_0), images, thing3, highlighted)?;
 
             let mut arrow = load_image(HINT_BETWEEN_ICON)?;
             if highlighted {

@@ -159,15 +159,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         if let Some(value) = self.state.borrow().possibilities.get_defined(col, row) {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
-
-            let bg = if highlight {
-                &self.thing_images.large_bg_highlighted
-            } else {
-                &self.thing_images.large_bg
-            };
-            context.image(bg, 0, 0);
-
-            draw_thing(context, &self.thing_images, thing)?;
+            draw_thing(context, &self.thing_images, thing, highlight)?;
         } else {
             context.image(&self.bg, 0, 0);
 
@@ -176,16 +168,8 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 let thing = Thing { row, value: i };
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
-
-                    let bg = if highlight {
-                        &self.thing_images.small_bg_highlighted
-                    } else {
-                        &self.thing_images.small_bg
-                    };
-                    context.image(bg, choice_rect.left(), choice_rect.top());
-
-                    let image = self.thing_images.get_small_thing_image(thing)?;
-                    context.image(image, choice_rect.left(), choice_rect.top());
+                    let image = self.thing_images.get_small_thing_image(thing, highlight);
+                    context.sprite(&image, choice_rect.left(), choice_rect.top());
                 }
             }
         }
