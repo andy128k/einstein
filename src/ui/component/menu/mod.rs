@@ -1,14 +1,17 @@
 use std::rc::Rc;
 use cell::RefCell;
 use sdl::event::{Key};
+use sdl2::pixels::Color;
 use error::*;
 use storage::*;
-use ui::context::Rect;
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
 use ui::widget::dialog::*;
 use ui::widget::modal::Modal;
 use ui::widget::image::*;
+use ui::widget::label::*;
+use ui::widget::title::*;
 use ui::main_loop::MainLoopQuit;
 use ui::component::dialog::*;
 use ui::component::game::{new_game_widget, GamePrivate};
@@ -37,15 +40,16 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         Image::new(rect, MENU_BG)?
     ));
 
-    // Font font(L"nova.ttf", 28);
-    // std::wstring s(msg(L"einsteinFlowix"));
-    // int width = font.getWidth(s);
-    // font.draw(screen->getSurface(), (screen->getWidth() - width) / 2, 30, 255,255,255, true, s);
+    container.push(WidgetMapAction::no_action(
+        Title {
+            text: messages.einstein_flowix.to_owned(),
+            rect: Rect::new(0, 30, 800, 30),
+        }
+    ));
 
-    // Font urlFont(L"luximb.ttf", 16);
-    // s = L"http://games.flowix.com";
-    // width = urlFont.getWidth(s);
-    // urlFont.draw(screen->getSurface(), (screen->getWidth() - width) / 2, 60, 255,255,0, true, s);
+    container.push(WidgetMapAction::no_action(
+        Label::new(Rect::new(0, 60, 800, 30), "http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
+    ));
 
     container.push({
         let new_game_trigger2 = new_game_trigger.clone();
