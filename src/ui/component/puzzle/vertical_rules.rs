@@ -56,7 +56,7 @@ impl VerticalRules {
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.get_rect().contains_point((x, y)) {
+        if !self.get_client_rect().contains_point((x, y)) {
             return None;
         }
         if x % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
