@@ -11,6 +11,7 @@ extern crate regex;
 #[macro_use] extern crate lazy_static;
 #[cfg(windows)]
 extern crate winapi;
+extern crate dirs;
 
 pub mod cell;
 pub mod error;
@@ -28,7 +29,7 @@ pub mod audio;
 use std::process::exit;
 use std::rc::Rc;
 use cell::RefCell;
-use std::env::home_dir;
+use dirs::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
 use sdl::sdl::{init, InitFlag, get_error, quit};

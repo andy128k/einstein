@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::io::{Read, Write};
 use std::fs::{File, create_dir_all};
-use std::env::home_dir;
+use dirs::home_dir;
 use failure::err_msg;
 use serde_json;
 use error::*;
