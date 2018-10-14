@@ -8,6 +8,7 @@ use ui::widget::widget::*;
 use ui::rule::{draw_rule};
 use ui::utils::load_image;
 use ui::component::game::{GamePrivate};
+use resources::manager::ResourceManager;
 use resources::thing::ThingImages;
 use error::*;
 
@@ -113,7 +114,7 @@ impl Widget<Nothing> for VerticalRules {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
         for i in 0..num {
             self.draw_cell(context, i)?;

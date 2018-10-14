@@ -5,6 +5,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::modal::Modal;
@@ -26,6 +27,7 @@ pub struct Options {
 
 pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Modal<DialogResult<Options>>> {
     let rect = Rect::new(250, 170, 300, 260);
+    let bg = BackgroundPattern::Blue;
 
     let state = Rc::new(RefCell::new(Options {
         fullscreen: storage.fullscreen,
@@ -36,7 +38,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     let mut container = Modal::<DialogResult<Options>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(Rect::new0(300, 260), BLUE_PATTERN)?
+        Window::new(Rect::new0(300, 260), bg)
     ));
     container.push(WidgetMapAction::no_action(
         Title {
@@ -74,7 +76,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            new_dialog_button2(Rect::new(65, 220, 85, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
+            DialogButton::new(Rect::new(65, 220, 85, 25), bg, messages.ok, Some(Key::Return), ()),
             move |_| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
@@ -82,10 +84,10 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
         )
     });
     container.push(
-        new_dialog_button2(Rect::new(155, 220, 85, 25), BLUE_PATTERN, messages.cancel,
+        DialogButton::new(Rect::new(155, 220, 85, 25), bg, messages.cancel,
             Some(Key::Escape),
             DialogResult::Cancel
-        )?
+        )
     );
 
     Ok(container)

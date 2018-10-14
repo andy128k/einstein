@@ -3,6 +3,7 @@ use std::rc::Rc;
 use cell::RefCell;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
+use resources::manager::ResourceManager;
 use error::*;
 
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
@@ -60,10 +61,10 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         self.check()?;
         match *self.wrapped.borrow() {
-            Some(ref widget) => widget.draw(context),
+            Some(ref widget) => widget.draw(context, resource_manager),
             None => Ok(())
         }
     }

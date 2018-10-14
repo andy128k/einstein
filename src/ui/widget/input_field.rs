@@ -8,6 +8,7 @@ use sdl::video::{Surface, SurfaceFlag};
 use sdl2::pixels::Color;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
+use resources::manager::ResourceManager;
 use resources::fonts::text_font;
 use error::*;
 
@@ -127,7 +128,7 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let font = text_font()?;
         context.text(&self.text.borrow(), font, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
 

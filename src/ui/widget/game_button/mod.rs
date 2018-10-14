@@ -5,6 +5,7 @@ use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::button::*;
 use ui::utils::load_image;
+use resources::manager::ResourceManager;
 use resources::fonts::*;
 
 const BUTTON_BG_BYTES: &[u8] = include_bytes!("./btn.bmp");
@@ -31,7 +32,7 @@ pub struct GameButton {
 }
 
 impl ButtonRenderer for GameButton {
-    fn draw(&self, context: &Context, highlighted: bool) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Result<()> {
         RESOURCES.with(|res| {
             let image = if highlighted {
                 &res.game_button_bg_highlighted

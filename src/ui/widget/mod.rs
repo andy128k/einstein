@@ -1,3 +1,4 @@
+pub mod common;
 pub mod widget;
 pub mod dialog;
 pub mod modal;

@@ -5,6 +5,7 @@ use error::*;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness};
+use resources::manager::ResourceManager;
 
 pub struct Slider {
     rect: Rect,
@@ -117,7 +118,7 @@ impl Widget<f32> for Slider {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let rect = self.rect;
 
         context.relative(Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4))

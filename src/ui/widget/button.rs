@@ -3,9 +3,10 @@ use sdl::event::{Key, Mouse};
 use error::*;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
+use resources::manager::ResourceManager;
 
 pub trait ButtonRenderer {
-    fn draw(&self, context: &Context, highlighted: bool) -> Result<()>;
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Result<()>;
 }
 
 pub struct Button<R: ButtonRenderer, A> {
@@ -58,7 +59,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
-        self.renderer.draw(context, self.highlighted.get())
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+        self.renderer.draw(context, resource_manager, self.highlighted.get())
     }
 }

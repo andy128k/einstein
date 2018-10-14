@@ -3,23 +3,24 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
 use ui::widget::title::Title;
-use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 use storage::{Scores};
 use util::time::sec_to_str;
 
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Modal<()>> {
     let rect = Rect::new(240, 125, 320, 350);
+    let bg = BackgroundPattern::Blue;
 
     let mut container = Modal::<()>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(Rect::new0(320, 350), BLUE_PATTERN)?
+        Window::new(Rect::new0(320, 350), bg)
     ));
 
     container.push(WidgetMapAction::no_action(
@@ -51,7 +52,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     }
 
     container.push(
-        new_dialog_button2(Rect::new(115, 310, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Escape), ())?
+        DialogButton::new(Rect::new(115, 310, 90, 25), bg, messages.ok, Some(Key::Escape), ())
     );
 
     Ok(container)

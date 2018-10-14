@@ -1,6 +1,7 @@
 use error::*;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
+use resources::manager::ResourceManager;
 
 pub struct AnyKey<A> {
     action: A
@@ -29,7 +30,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         }
     }
 
-    fn draw(&self, _context: &Context) -> Result<()> {
+    fn draw(&self, _context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         Ok(())
     }
 }

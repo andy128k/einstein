@@ -1,6 +1,7 @@
 use sdl::event::{Key, Mouse};
 use error::*;
 use ui::context::{Context, Rect};
+use resources::manager::ResourceManager;
 pub use algebra::*;
 
 pub enum Event {
@@ -99,7 +100,7 @@ pub trait Widget<A> {
     fn on_event(&mut self, _event: &Event) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
-    fn draw(&self, context: &Context) -> Result<()>;
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()>;
 }
 
 pub type WidgetPtr<A> = Box<Widget<A>>;
@@ -117,8 +118,8 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).on_event(event)
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
-        (**self).draw(context)
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+        (**self).draw(context, resource_manager)
     }
 }
 
@@ -166,7 +167,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
-        self.wrapped.draw(context)
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+        self.wrapped.draw(context, resource_manager)
     }
 }

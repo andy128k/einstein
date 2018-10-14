@@ -5,6 +5,7 @@ use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
+use resources::manager::ResourceManager;
 use resources::thing::ThingImages;
 use error::*;
 
@@ -45,10 +46,10 @@ impl Widget<PuzzleAction> for Puzzle {
         Ok(reaction)
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         for child in &self.cells {
             let c = context.relative(child.get_rect());
-            child.draw(&c)?;
+            child.draw(&c, resource_manager)?;
         }
         Ok(())
     }

@@ -5,23 +5,24 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 
 pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<String>> {
     let rect = Rect::new(170, 280, 460, 100);
+    let bg = BackgroundPattern::Blue;
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
     let container = Modal::<String>::new(rect)
         .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(460, 100), BLUE_PATTERN)?
+            Window::new(Rect::new0(460, 100), bg)
         ))
         .add(WidgetMapAction::no_action(
             Label::new(Rect::new(10, 20, 150, 26), messages.enter_name, yellow, HorizontalAlign::Left)
@@ -39,7 +40,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<S
         .add({
             let state2 = state.clone();
             WidgetMapAction::new(
-                new_dialog_button2(Rect::new(178, 60, 90, 25), BLUE_PATTERN, messages.ok, Some(Key::Return), ())?,
+                DialogButton::new(Rect::new(178, 60, 90, 25), bg, messages.ok, Some(Key::Return), ()),
                 move |_| {
                     let result: String = state2.borrow().clone();
                     Ok(EventReaction::action(result))

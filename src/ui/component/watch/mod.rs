@@ -5,10 +5,11 @@ use cell::RefCell;
 use sdl2::pixels::Color;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
+use ui::component::game::GamePrivate;
+use resources::manager::ResourceManager;
 use resources::fonts::text_font;
 use error::*;
 use util::time::sec_to_str;
-use ui::component::game::GamePrivate;
 
 pub struct Watch {
     rect: Rect,
@@ -43,7 +44,7 @@ impl Widget<Nothing> for Watch {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let duration = self.state.borrow().get_current_duration();
         self.last_duration.set(Some(duration));
 

@@ -9,6 +9,7 @@ use ui::widget::widget::*;
 use ui::utils::load_image;
 use ui::rule::draw_thing;
 use ui::component::game::GamePrivate;
+use resources::manager::ResourceManager;
 use resources::thing::ThingImages;
 use error::*;
 
@@ -152,7 +153,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let row = self.row;
         let col = self.col;
 

@@ -4,6 +4,7 @@ use sdl::event::Key;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
@@ -11,7 +12,6 @@ use ui::widget::page_view::*;
 use ui::widget::modal::Modal;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
-use resources::background::BLUE_PATTERN;
 use resources::rules::{get_rules, TextItem};
 use resources::messages::Messages;
 
@@ -44,6 +44,7 @@ impl DescriptionPrivate {
             .into_iter().map(Rc::new).collect();
 
         let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
+        let bg = BackgroundPattern::Blue;
 
         let current_page = Rc::new(RefCell::new(pages[0].clone()));
 
@@ -55,7 +56,7 @@ impl DescriptionPrivate {
 
         let container = Modal::<()>::new(rect)
             .add(WidgetMapAction::no_action(
-                Window::new(Rect::new0(WIDTH as u32, HEIGHT as u32), BLUE_PATTERN)?
+                Window::new(Rect::new0(WIDTH as u32, HEIGHT as u32), bg)
             ))
             .add(WidgetMapAction::no_action(
                 Title {
@@ -69,7 +70,7 @@ impl DescriptionPrivate {
             .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    new_dialog_button2(Rect::new(10, 465, 80, 25), BLUE_PATTERN, messages.prev, None, ())?,
+                    DialogButton::new(Rect::new(10, 465, 80, 25), bg, messages.prev, None, ()),
                     move |_| {
                         state2.borrow_mut().prev();
                         Ok(EventReaction::empty())
@@ -79,7 +80,7 @@ impl DescriptionPrivate {
             .add({
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    new_dialog_button2(Rect::new(100, 465, 80, 25), BLUE_PATTERN, messages.next, None, ())?,
+                    DialogButton::new(Rect::new(100, 465, 80, 25), bg, messages.next, None, ()),
                     move |_| {
                         state2.borrow_mut().next();
                         Ok(EventReaction::empty())
@@ -87,7 +88,7 @@ impl DescriptionPrivate {
                 )
             })
             .add(
-                new_dialog_button2(Rect::new(510, 465, 80, 25), BLUE_PATTERN, messages.close, Some(Key::Escape), ())?
+                DialogButton::new(Rect::new(510, 465, 80, 25), bg, messages.close, Some(Key::Escape), ())
             );
 
         Ok(container)

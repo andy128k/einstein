@@ -3,6 +3,7 @@ use error::*;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::utils::load_image;
+use resources::manager::ResourceManager;
 
 pub struct Image {
     rect: Rect,
@@ -23,7 +24,7 @@ impl Widget<Nothing> for Image {
         self.rect
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         context.tiles(&self.image);
         Ok(())
     }

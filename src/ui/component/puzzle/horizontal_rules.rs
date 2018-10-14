@@ -6,9 +6,10 @@ use sdl::event::{Mouse};
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
-use resources::thing::ThingImages;
 use ui::utils::load_image;
 use ui::component::game::{GamePrivate};
+use resources::manager::ResourceManager;
+use resources::thing::ThingImages;
 use error::*;
 
 const TILE_BG: &[u8] = include_bytes!("./tile.bmp");
@@ -135,7 +136,7 @@ impl Widget<Nothing> for HorizontalRules {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         // let num_cols = ((self.get_client_rect().width() as i32 + TILE_GAP_X) / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
         // let num_rows = ((self.get_client_rect().height() as i32 + TILE_GAP_Y) / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
         for i in 0..(HINTS_ROWS * HINTS_COLS) {

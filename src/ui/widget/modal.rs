@@ -1,5 +1,6 @@
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
+use resources::manager::ResourceManager;
 use error::*;
 
 pub struct Modal<A> {
@@ -44,9 +45,9 @@ impl<A> Widget<A> for Modal<A> where A: Clone {
         Ok(reaction)
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         for child in &self.children {
-            child.draw(&context.relative(child.get_rect()))?;
+            child.draw(&context.relative(child.get_rect()), resource_manager)?;
         }
         Ok(())
     }

@@ -6,6 +6,7 @@ use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::utils::{load_image, adjust_brightness};
+use resources::manager::ResourceManager;
 use resources::fonts::*;
 
 pub struct Checkbox {
@@ -59,7 +60,7 @@ impl Widget<bool> for Checkbox {
         }
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let image = if self.mouse_inside.get() {
             &self.highlighted
         } else {

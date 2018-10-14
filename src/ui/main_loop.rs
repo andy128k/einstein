@@ -4,12 +4,13 @@ use sdl::event::{Event, poll_event};
 use error::*;
 use ui::context::{Context, rect_to_rect1};
 use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
+use resources::manager::ResourceManager;
 
 #[derive(Clone)]
 pub struct MainLoopQuit;
 
-pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>) -> Result<()> {
-    widget.draw(context)?;
+pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>, resource_manager: &mut ResourceManager) -> Result<()> {
+    widget.draw(context, resource_manager)?;
     context.surface.update_rects(&[rect_to_rect1(context.rect)]);
 
     loop {
@@ -25,7 +26,7 @@ pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>) -> Result
             _ => EventReaction::empty()
         };
         if reaction.update.len() > 0 {
-            widget.draw(context)?;
+            widget.draw(context, resource_manager)?;
             // let rects = reaction.update.iter().map(|r| rect_to_rect1(*r)).collect::<Vec<_>>();
             // context.surface.update_rects(&rects);
             context.surface.update_rects(&[rect_to_rect1(context.rect)]);

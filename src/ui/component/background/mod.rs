@@ -4,6 +4,7 @@ use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
 use ui::utils::load_image;
+use resources::manager::ResourceManager;
 use resources::fonts::title_font;
 
 pub struct Background {
@@ -29,7 +30,7 @@ impl Widget<()> for Background {
 
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         context.tiles(&self.background);
         context.image(&self.title_background, 8, 10);
         let text = "Einstein Puzzle"; // i18n msg(L"einsteinPuzzle")

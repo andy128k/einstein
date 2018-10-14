@@ -4,8 +4,9 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::widget::*;
-use resources::fonts::*;
 use ui::page_layout::*;
+use resources::manager::ResourceManager;
+use resources::fonts::*;
 
 pub struct PageView {
     rect: Rect,
@@ -25,7 +26,7 @@ impl Widget<Nothing> for PageView {
         self.rect
     }
 
-    fn draw(&self, context: &Context) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         for item in (*self.page.borrow()).iter() {
             match *item {
                 PageItem::Text(ref text, x, y, w, h) => {

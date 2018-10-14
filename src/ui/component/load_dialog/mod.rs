@@ -2,6 +2,7 @@ use sdl::event::Key;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
@@ -14,11 +15,12 @@ use storage::SavedGame;
 
 pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<Modal<DialogResult<GamePrivate>>> {
     let rect = Rect::new(250, 90, 300, 420);
+    let bg = BackgroundPattern::Blue;
 
     let mut container = Modal::<DialogResult<GamePrivate>>::new(rect);
 
     container.push(WidgetMapAction::no_action(
-        Window::new(Rect::new0(300, 420), BLUE_PATTERN)?
+        Window::new(Rect::new0(300, 420), bg)
     ));
     container.push(WidgetMapAction::no_action(
         Title {
@@ -36,7 +38,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
         container.push({
             let game2: Option<SavedGame> = (*game).clone();
             WidgetMapAction::new(
-                new_dialog_button2(Rect::new(10, 60 + (i as i32) * 30, 280, 25), BLUE_PATTERN, &label, None, ())?,
+                DialogButton::new(Rect::new(10, 60 + (i as i32) * 30, 280, 25), bg, &label, None, ()),
                 move |_| {
                     if let Some(ref game3) = game2 {
                         Ok(EventReaction::action(DialogResult::Ok(game3.game.clone())))
@@ -49,7 +51,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
     }
 
     container.push(
-        new_dialog_button2(Rect::new(110, 380, 80, 25), BLUE_PATTERN, messages.cancel, Some(Key::Escape), DialogResult::Cancel)?
+        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.cancel, Some(Key::Escape), DialogResult::Cancel)
     );
 
     Ok(container)
