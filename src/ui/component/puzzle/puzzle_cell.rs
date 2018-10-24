@@ -4,13 +4,12 @@ use cell::RefCell;
 use sdl::video::Surface;
 use sdl::event::{Mouse};
 use rules::{Thing};
-use ui::context::{Context, Rect};
+use ui::context::{Context, Rect, Sprite};
 use ui::widget::widget::*;
 use ui::utils::load_image;
-use ui::rule::draw_thing;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
-use resources::thing::ThingImages;
+use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS};
 use error::*;
 
 const PUZZLE_SIZE: u8 = 6;
@@ -48,12 +47,11 @@ pub struct PuzzleCell {
     row: u8,
     col: u8,
     bg: Surface,
-    thing_images: Rc<ThingImages>,
     highlighted: Cell<Option<Option<u8>>>,
 }
 
 impl PuzzleCell {
-    pub fn new(x: i32, y: i32, state: Rc<RefCell<GamePrivate>>, row: u8, col: u8, thing_images: Rc<ThingImages>) -> Result<Self> {
+    pub fn new(x: i32, y: i32, state: Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Result<Self> {
         let bg = load_image(EMPTY_FIELD_ICON)?;
         Ok(Self {
             x,
@@ -62,7 +60,6 @@ impl PuzzleCell {
             row,
             col,
             bg,
-            thing_images,
             highlighted: Cell::new(None),
         })
     }
@@ -160,7 +157,16 @@ impl Widget<PuzzleAction> for PuzzleCell {
         if let Some(value) = self.state.borrow().possibilities.get_defined(col, row) {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
-            draw_thing(context, &self.thing_images, thing, highlight)?;
+
+            let atlas = if highlight {
+                resource_manager.image_highlighted("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS)
+            } else {
+                resource_manager.image("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS)
+            };
+            let rect = get_thing_rect(thing);
+            let sprite = Sprite { image: atlas, rect };
+            context.sprite(&sprite, 0, 0);
+
         } else {
             context.image(&self.bg, 0, 0);
 
@@ -169,8 +175,15 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 let thing = Thing { row, value: i };
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
-                    let image = self.thing_images.get_small_thing_image(thing, highlight);
-                    context.sprite(&image, choice_rect.left(), choice_rect.top());
+
+                    let atlas = if highlight {
+                        resource_manager.image_highlighted("SMALL_THINGS_ATLAS", SMALL_THINGS_ATLAS)
+                    } else {
+                        resource_manager.image("SMALL_THINGS_ATLAS", SMALL_THINGS_ATLAS)
+                    };
+                    let rect = get_small_thing_rect(thing);
+                    let sprite = Sprite { image: atlas, rect };
+                    context.sprite(&sprite, choice_rect.left(), choice_rect.top());
                 }
             }
         }
