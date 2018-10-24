@@ -1,4 +1,4 @@
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::brick::*;
@@ -22,7 +22,7 @@ impl ButtonRenderer for DialogButton {
 }
 
 impl DialogButton {
-    pub fn new<A>(rect: Rect, background: BackgroundPattern, text: &str, key: Option<Key>, action: A) -> Button<DialogButton, A> {
+    pub fn new<A>(rect: Rect, background: BackgroundPattern, text: &str, key: Option<Keycode>, action: A) -> Button<DialogButton, A> {
         Button::<DialogButton, A>::new(
             rect,
             key,

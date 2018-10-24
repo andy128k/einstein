@@ -1,4 +1,4 @@
-use sdl::event::Key;
+use sdl2::keyboard::Keycode;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
@@ -30,7 +30,7 @@ pub fn new_failure_dialog(messages: &Messages) -> Result<Container<FailureChoice
             DialogButton::new(Rect::new(130, 100, 90, 25), bg, messages.try_again, None, FailureChoice::TryAgain)
         )
         .add(
-            DialogButton::new(Rect::new(230, 100, 90, 25), bg, messages.exit, Some(Key::Escape), FailureChoice::Cancel)
+            DialogButton::new(Rect::new(230, 100, 90, 25), bg, messages.exit, Some(Keycode::Escape), FailureChoice::Cancel)
         );
 
     Ok(container)

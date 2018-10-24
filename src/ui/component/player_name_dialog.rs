@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use cell::RefCell;
-use sdl::event::Key;
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
@@ -36,7 +36,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Contain
         .add({
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Rect::new(178, 60, 90, 25), bg, messages.ok, Some(Key::Return), ()),
+                DialogButton::new(Rect::new(178, 60, 90, 25), bg, messages.ok, Some(Keycode::Return), ()),
                 move |_| {
                     let result: String = state2.borrow().clone();
                     Ok(EventReaction::action(result))

@@ -2,7 +2,6 @@ extern crate libc;
 #[macro_use] extern crate failure;
 extern crate itertools;
 extern crate rand;
-extern crate sdl;
 extern crate sdl2;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
@@ -32,15 +31,12 @@ use cell::RefCell;
 use dirs::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
-use sdl::sdl::{init, InitFlag, get_error, quit};
-use sdl::wm::set_caption;
-use sdl::event::{enable_key_repeat, RepeatDelay, RepeatInterval, enable_unicode};
-use sdl::video::{set_video_mode, SurfaceFlag, VideoFlag};
+use sdl2::{init};
 use sdl2::ttf::Sdl2TtfContext;
 use sdl2::mixer;
 use error::*;
 use resources::messages::get_messages;
-use ui::context::{Context, Rect};
+use ui::context::{Rect};
 use ui::component::menu::make_menu;
 use ui::main_loop::main_loop;
 
@@ -50,38 +46,36 @@ fn real_main() -> Result<()> {
 
     let state = Rc::new(RefCell::new(storage::Storage::load().unwrap_or_default()));
 
-    if !init(&[InitFlag::Video, InitFlag::Audio]) {
-        return Err(err_msg(get_error()));
-    }
-    set_caption("Einstein 3.0", "");
+    let sdl_context = sdl2::init().map_err(err_msg)?;
+    let video = sdl_context.video().map_err(err_msg)?;
+    let audio = sdl_context.audio().map_err(err_msg)?;
 
-    ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Key repeat is not set.");
-    enable_unicode(true);
+    let window = {
+        let mut builder = video.window("Einstein 3.0", 800, 600);
+        if state.borrow().fullscreen {
+            builder.fullscreen();
+        }
+        builder.position_centered().build()?
+    };
+    let mut canvas = window.into_canvas().build()?;
+
+    // ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Key repeat is not set.");
+    // enable_unicode(true);
 
     let ttf = sdl2::ttf::init()?;
 
-    let fullscreen = state.borrow().fullscreen;
     let volume = state.borrow().volume;
-
-    let flags: &[VideoFlag] = if fullscreen { &[VideoFlag::Fullscreen] } else { &[] };
-    let surface = Rc::new(set_video_mode(800, 600, 24, &[SurfaceFlag::SWSurface], flags).map_err(err_msg)?);
 
     {
         // mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
         // let audio = audio::Audio::new()?;
 
-        let context = Context {
-            surface: surface.clone(),
-            rect: Rect::new(0, 0, 800, 600)
-        };
-
-        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&ttf);
+        let texture_creator = canvas.texture_creator();
+        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
         let mut menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&context, &mut menu, &mut resource_manager)?;
+        main_loop(&sdl_context, &mut canvas, &mut menu, &mut resource_manager)?;
     }
-
-    quit();
 
     state.borrow_mut().save()?;
 

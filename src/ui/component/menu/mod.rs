@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use cell::RefCell;
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use error::*;
 use storage::*;
@@ -105,7 +105,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
     container.push(
-        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Key::Escape), MainLoopQuit)
+        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Keycode::Escape), MainLoopQuit)
     );
 
     container.push({

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
-use sdl::event::{Mouse};
+use sdl2::mouse::MouseButton;
 use rules::{Thing};
 use ui::context::Rect;
 use ui::widget::widget::*;
@@ -59,7 +59,7 @@ impl PuzzleCell {
         })
     }
 
-    fn on_mouse_button_down(&self, button: Mouse, x: i32, y: i32) -> EventReaction<PuzzleAction> {
+    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             return EventReaction::empty();
         }
@@ -75,14 +75,14 @@ impl PuzzleCell {
         let thing = Thing { row: self.row, value };
 
         match button {
-            Mouse::Left => {
+            MouseButton::Left => {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.set(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
                     // sound->play(L"laser.wav");
                 }
             },
-            Mouse::Right => {
+            MouseButton::Right => {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.exclude(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
@@ -107,7 +107,11 @@ impl PuzzleCell {
         }
 
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
-            self.highlighted.set(Some(None));
+            if self.get_client_rect().contains_point((x,y)) {
+                self.highlighted.set(Some(None));
+            } else {
+                self.highlighted.set(None);
+            }
         } else {
             match local_find_choice(x, y) {
                 Some(p) => self.highlighted.set(Some(Some(p))),

@@ -1,4 +1,4 @@
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::button::*;
@@ -23,7 +23,7 @@ impl ButtonRenderer for MenuButton {
     }
 }
 
-pub fn new_menu_button<A>(rect: Rect, text: &str, key: Option<Key>, action: A) -> Button<MenuButton, A> {
+pub fn new_menu_button<A>(rect: Rect, text: &str, key: Option<Keycode>, action: A) -> Button<MenuButton, A> {
     Button::<MenuButton, A>::new(
         rect,
         key,

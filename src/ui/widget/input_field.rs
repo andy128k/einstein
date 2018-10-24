@@ -2,7 +2,7 @@ use std::time::{Instant, Duration};
 use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
@@ -38,11 +38,11 @@ impl InputField {
         self.cursor_visible.set(true);
     }
 
-    fn on_key_down(&self, key: Key, ch: u16) -> EventReaction<String> {
+    fn on_key_down(&self, key: Keycode) -> EventReaction<String> {
         let cursor_pos = self.cursor_pos.get();
         let text_len = self.text.borrow().len();
-        match (key, ch) {
-            (Key::Backspace, _) => {
+        match key {
+            Keycode::Backspace => {
                 if cursor_pos > 0 {
                     self.text.borrow_mut().remove(cursor_pos - 1);
                     self.move_cursor(cursor_pos - 1); // TODO. char indicies
@@ -51,7 +51,7 @@ impl InputField {
                 }
                 EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
             },
-            (Key::Left, _) => {
+            Keycode::Left => {
                 if cursor_pos > 0 {
                     self.move_cursor(cursor_pos - 1);
                 } else {
@@ -59,7 +59,7 @@ impl InputField {
                 }
                 EventReaction::update(self.get_rect())
             },
-            (Key::Right, _) => {
+            Keycode::Right => {
                 if cursor_pos < text_len {
                     self.move_cursor(cursor_pos + 1);
                 } else {
@@ -67,31 +67,40 @@ impl InputField {
                 }
                 EventReaction::update(self.get_rect())
             },
-            (Key::Home, _) => {
+            Keycode::Home => {
                 self.move_cursor(0);
                 EventReaction::update(self.get_rect())
             },
-            (Key::End, _) => {
+            Keycode::End => {
                 self.move_cursor(text_len);
                 EventReaction::update(self.get_rect())
             },
-            (Key::Delete, _) => {
+            Keycode::Delete => {
                 if cursor_pos < text_len {
                     self.text.borrow_mut().remove(cursor_pos);
                 }
                 self.move_cursor(cursor_pos);
                 EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
             },
-            (_, ch) if ch > 32 => {
-                if text_len < self.max_len {
-                    self.text.borrow_mut().insert(cursor_pos, ::std::char::from_u32(ch as u32).unwrap());
-                    self.move_cursor(cursor_pos + 1);
-                } else {
-                    self.move_cursor(cursor_pos);
-                }
-                EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
-            },
             _ => EventReaction::empty(),
+        }
+    }
+
+    fn on_text_input(&self, text: &str) -> EventReaction<String> {
+        let cursor_pos = self.cursor_pos.get();
+        let text_len = self.text.borrow().len();
+        for ch in text.chars() {
+            if text_len < self.max_len {
+                self.text.borrow_mut().insert(cursor_pos, ::std::char::from_u32(ch as u32).unwrap());
+                self.move_cursor(cursor_pos + 1);
+            } else {
+                self.move_cursor(cursor_pos);
+            }
+        }
+        if !text.is_empty() {
+            EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
+        } else {
+            EventReaction::empty()
         }
     }
 
@@ -116,7 +125,8 @@ impl Widget<String> for InputField {
 
     fn on_event(&mut self, event: &Event) -> EventResult<String> {
         match *event {
-            Event::KeyDown(key, ch) => Ok(self.on_key_down(key, ch)),
+            Event::KeyDown(key) => Ok(self.on_key_down(key)),
+            Event::TextInput(ref text) => Ok(self.on_text_input(text)),
             Event::Tick => self.on_tick(),
             _ => Ok(EventReaction::empty()),
         }

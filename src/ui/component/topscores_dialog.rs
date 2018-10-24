@@ -1,4 +1,4 @@
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
@@ -43,7 +43,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     }
 
     container.push(
-        DialogButton::new(Rect::new(115, 310, 90, 25), bg, messages.ok, Some(Key::Escape), ())
+        DialogButton::new(Rect::new(115, 310, 90, 25), bg, messages.ok, Some(Keycode::Escape), ())
     );
 
     Ok(container)

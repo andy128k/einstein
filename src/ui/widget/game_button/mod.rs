@@ -1,4 +1,4 @@
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::button::*;
@@ -27,7 +27,7 @@ impl ButtonRenderer for GameButton {
     }
 }
 
-pub fn new_game_button<A>(rect: Rect, text: &str, key: Option<Key>, action: A) -> Button<GameButton, A> {
+pub fn new_game_button<A>(rect: Rect, text: &str, key: Option<Keycode>, action: A) -> Button<GameButton, A> {
     Button::<GameButton, A>::new(
         rect,
         key,

@@ -1,5 +1,5 @@
 use std::cell::Cell;
-use sdl::event::{Mouse};
+use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::common::*;
@@ -35,7 +35,7 @@ impl Widget<bool> for Checkbox {
     fn on_event(&mut self, event: &Event) -> EventResult<bool> {
         let rect = self.get_client_rect();
         match *event {
-            Event::MouseButtonDown(Mouse::Left, x, y) if rect.contains_point((x, y)) => {
+            Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
                 self.checked.set(!self.checked.get());
                 Ok(EventReaction::update_and_action(self.get_rect(), self.checked.get()))

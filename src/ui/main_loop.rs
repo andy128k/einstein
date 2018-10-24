@@ -1,40 +1,50 @@
 use std::thread::sleep;
 use std::time::Duration;
-use sdl::event::{Event, poll_event};
+use sdl2::Sdl;
+use sdl2::event::{Event};
+use sdl2::render::{Canvas, RenderTarget};
+use sdl2::video::Window;
+use failure::err_msg;
 use error::*;
-use ui::context::{Context, rect_to_rect1};
+use ui::context::{Rect};
 use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
 use resources::manager::ResourceManager;
 
 #[derive(Clone)]
 pub struct MainLoopQuit;
 
-pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>, resource_manager: &mut ResourceManager) -> Result<()> {
-    let b = widget.draw(resource_manager);
-    b.draw(context, resource_manager)?;
-    context.surface.update_rects(&[rect_to_rect1(context.rect)]);
+pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Widget<MainLoopQuit>, resource_manager: &mut ResourceManager) -> Result<()> {
+    let rect = Rect::new(0, 0, 800, 600);
 
+    canvas.clear();
+
+    let b = widget.draw(resource_manager);
+    b.draw(canvas, rect, resource_manager)?;
+    canvas.present();
+
+    let mut event_pump = sdl_context.event_pump().map_err(err_msg)?;
     loop {
         sleep(Duration::from_millis(5));
-        let event = poll_event();
-        let reaction = match event {
-            Event::None => widget.on_event(&WidgetEvent::Tick)?,
-            Event::Key(key, _, _, ch) => widget.on_event(&WidgetEvent::KeyDown(key, ch))?,
-            Event::MouseMotion(_, x, y, _, _) => widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32))?,
-            Event::MouseButton(mouse, true, x, y) => widget.on_event(&WidgetEvent::MouseButtonDown(mouse, x as i32, y as i32))?,
-            Event::MouseButton(mouse, false, x, y) => widget.on_event(&WidgetEvent::MouseButtonUp(mouse, x as i32, y as i32))?,
-            Event::Quit => return Ok(()),
-            _ => EventReaction::empty()
-        };
-        if reaction.update.len() > 0 {
-            let b = widget.draw(resource_manager);
-            b.draw(context, resource_manager)?;
-            // let rects = reaction.update.iter().map(|r| rect_to_rect1(*r)).collect::<Vec<_>>();
-            // context.surface.update_rects(&rects);
-            context.surface.update_rects(&[rect_to_rect1(context.rect)]);
-        }
-        if reaction.action.is_some() {
-            return Ok(());
+        widget.on_event(&WidgetEvent::Tick)?; // TODO: add timer
+
+        for event in event_pump.poll_iter() {
+            let reaction = match event {
+                Event::KeyDown { keycode: Some(key), .. } => widget.on_event(&WidgetEvent::KeyDown(key))?,
+                Event::TextInput { text, .. } => widget.on_event(&WidgetEvent::TextInput(text))?,
+                Event::MouseMotion { x, y, .. } => widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32))?,
+                Event::MouseButtonDown { mouse_btn, x, y, .. } => widget.on_event(&WidgetEvent::MouseButtonDown(mouse_btn, x, y))?,
+                Event::MouseButtonUp { mouse_btn, x, y, .. } => widget.on_event(&WidgetEvent::MouseButtonUp(mouse_btn, x, y))?,
+                Event::Quit { .. } => return Ok(()),
+                _ => EventReaction::empty()
+            };
+            if reaction.update.len() > 0 {
+                let b = widget.draw(resource_manager);
+                b.draw(canvas, rect, resource_manager)?;
+                canvas.present();
+            }
+            if reaction.action.is_some() {
+                return Ok(());
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use cell::RefCell;
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
@@ -67,7 +67,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            DialogButton::new(Rect::new(65, 220, 85, 25), bg, messages.ok, Some(Key::Return), ()),
+            DialogButton::new(Rect::new(65, 220, 85, 25), bg, messages.ok, Some(Keycode::Return), ()),
             move |_| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
@@ -76,7 +76,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
     });
     container.push(
         DialogButton::new(Rect::new(155, 220, 85, 25), bg, messages.cancel,
-            Some(Key::Escape),
+            Some(Keycode::Escape),
             DialogResult::Cancel
         )
     );

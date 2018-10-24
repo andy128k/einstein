@@ -1,63 +1,66 @@
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::cell::{RefCell, Ref};
-use sdl::video::Surface;
+use sdl2::surface::Surface;
+use sdl2::render::{TextureCreator, Texture};
 use sdl2::rwops::RWops;
 use sdl2::ttf::{Font, Sdl2TtfContext};
-use ui::utils::{load_image, adjust_brightness};
 
 pub trait ResourceManager {
-    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Surface>;
+    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture>;
     fn font(&self, point_size: u16) -> Ref<Font>;
 }
 
 const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
-pub struct ResourceManagerImpl<'r> {
-    images: RefCell<HashMap<String, Surface>>,
+pub struct ResourceManagerImpl<'r, C> where C: 'r{
+    images: RefCell<HashMap<String, Texture<'r>>>,
     fonts: RefCell<HashMap<u16, Font<'r, 'r>>>,
+    texture_creator: &'r TextureCreator<C>,
     ttf_context: &'r Sdl2TtfContext,
     phantom_data: PhantomData<&'r str>,
 }
 
-impl<'r> ResourceManagerImpl<'r> {
-    pub fn new(ttf_context: &'r Sdl2TtfContext) -> Self {
+impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
+    pub fn new(texture_creator: &'r TextureCreator<C>, ttf_context: &'r Sdl2TtfContext) -> Self {
         ResourceManagerImpl {
             images: RefCell::new(HashMap::new()),
             fonts: RefCell::new(HashMap::new()),
+            texture_creator,
             ttf_context,
             phantom_data: PhantomData,
         }
     }
 
-    fn image_normal(&self, name: &'static str, data: &[u8]) -> Ref<Surface> {
+    fn load_image(&self, data: &[u8]) -> Result<Texture<'r>, ::failure::Error> {
+        let mut rw = RWops::from_bytes(data).map_err(::failure::err_msg)?;
+        let surface = Surface::load_bmp_rw(&mut rw).map_err(::failure::err_msg)?;
+        let texture = self.texture_creator.create_texture_from_surface(surface)?;
+        Ok(texture)
+    }
+
+    fn image_normal(&self, name: &'static str, data: &[u8]) -> Ref<Texture<'r>> {
         let key = name.to_owned();
         if self.images.borrow().get(&key).is_none() {
-            self.images.borrow_mut().insert(key.clone(), load_image(data).unwrap());
+            let mut img = self.load_image(data).unwrap();
+            img.set_color_mod(230, 230, 230); // TODO: remove this hack
+            self.images.borrow_mut().insert(key.clone(), img);
         }
         Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
 
-    fn highlight(&self, name: &'static str, data: &[u8]) {
-        let key = format!("{}_HIGHLIGHTED", name);
-        let h = {
-            let img = self.image_normal(name, data);
-            adjust_brightness(&*img, 1.5)
-        };
-        self.images.borrow_mut().insert(key.clone(), h);
-    }
-
-    fn image_highlighted(&self, name: &'static str, data: &[u8]) -> Ref<Surface> {
+    fn image_highlighted(&self, name: &'static str, data: &[u8]) -> Ref<Texture> {
         let key = format!("{}_HIGHLIGHTED", name);
         if self.images.borrow().get(&key).is_none() {
-            self.highlight(name, data);
+            let img = self.load_image(data).unwrap();
+            self.images.borrow_mut().insert(key.clone(), img);
         }
         Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
 }
 
-impl<'r> ResourceManager for ResourceManagerImpl<'r> {
-    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Surface> {
+impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
+    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture> {
         if highlighted {
             self.image_highlighted(name, data)
         } else {

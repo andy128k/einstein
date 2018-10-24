@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use cell::RefCell;
-use sdl::event::Key;
+use sdl2::keyboard::Keycode;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
@@ -48,7 +48,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     }
 
     container.push(
-        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.close, Some(Key::Escape), DialogResult::Cancel)
+        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.close, Some(Keycode::Escape), DialogResult::Cancel)
     );
 
     container.push({

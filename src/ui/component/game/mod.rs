@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
 use cell::RefCell;
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;
 use ui::context::Rect;
@@ -273,7 +273,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     });
 
     container.push(
-        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Key::Escape), ())
+        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Keycode::Escape), ())
     );
 
     container.push({

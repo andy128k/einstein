@@ -1,4 +1,4 @@
-use sdl::event::{Key};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
@@ -32,7 +32,7 @@ pub fn create_about_dialog(messages: &Messages) -> Result<Container<()>> {
         ))
         .add(
             DialogButton::new(Rect::new(140, 240, 80, 25), bg, messages.ok,
-                Some(Key::Escape), // Return also
+                Some(Keycode::Escape), // Return also
                 ()
             )
         );

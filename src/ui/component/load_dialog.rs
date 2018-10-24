@@ -1,4 +1,4 @@
-use sdl::event::Key;
+use sdl2::keyboard::Keycode;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
@@ -43,7 +43,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
     }
 
     container.push(
-        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.cancel, Some(Key::Escape), DialogResult::Cancel)
+        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.cancel, Some(Keycode::Escape), DialogResult::Cancel)
     );
 
     Ok(container)

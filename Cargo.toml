@@ -7,7 +7,6 @@ authors = ["Andrey Kutejko <andy128k@gmail.com>"]
 libc = "*"
 failure = "*"
 itertools = "*"
-sdl = { path = "../rust-sdl" }
 sdl2 = { version = "*", default-features = false, features = ["ttf", "mixer"] }
 rand = "*"
 serde = "*"
@@ -20,6 +19,3 @@ dirs = "1.0.4"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["winnls"] }
-
-[build-dependencies]
-cc = "*"

@@ -1,5 +1,6 @@
 use itertools::join;
 use regex::Regex;
+use sdl2::render::{Texture, TextureQuery};
 use sdl2::ttf::Font;
 use util::group_by_weight::group_by_weight;
 use resources::manager::ResourceManager;
@@ -99,10 +100,9 @@ impl PagesBuilder {
 
     pub fn add_image(&mut self, image: &'static str, content: &'static [u8], resource_manager: &dyn ResourceManager) -> Result<()> {
         let img = resource_manager.image(image, content, false);
-        let width = img.get_width();
-        let height = img.get_height();
-        let x = (self.page_width - width) / 2;
-        self.add_item(16, PageItem::Image(image, content, x, 0, width, height));
+        let TextureQuery { width, height, .. } = img.query();
+        let x = (self.page_width - width as u16) / 2;
+        self.add_item(16, PageItem::Image(image, content, x, 0, width as u16, height as u16));
         Ok(())
     }
 

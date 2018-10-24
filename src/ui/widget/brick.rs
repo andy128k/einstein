@@ -1,6 +1,9 @@
 use sdl2::pixels::Color;
+use sdl2::render::{Canvas, Texture, TextureQuery};
+use sdl2::video::Window;
+use sdl2::ttf::Font;
 use ui::widget::common::*;
-use ui::context::{Context, Sprite, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{rect_to_rect2, Rect, HorizontalAlign, VerticalAlign};
 use resources::manager::ResourceManager;
 use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 
@@ -94,68 +97,175 @@ impl Brick {
         self.children.push(child);
     }
 
-    pub fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
+    pub fn draw(&self, canvas: &mut Canvas<Window>, rect: Rect, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
         match self.background {
             Some(BackgroundPattern::Color(color)) => {
-                context.fill(color)
+                canvas.set_draw_color(color);
+                canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(::failure::err_msg)?;
             },
             Some(BackgroundPattern::Blue) => {
                 let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, false);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::BlueHighlighted) => {
                 let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, true);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Green) => {
                 let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, false);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::GreenHighlighted) => {
                 let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, true);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::White) => {
                 let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, false);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::WhiteHighlighted) => {
                 let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, true);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Red) => {
                 let image = resource_manager.image("RED_PATTERN", RED_PATTERN, false);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::RedHighlighted) => {
                 let image = resource_manager.image("RED_PATTERN", RED_PATTERN, true);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Custom(name, bytes, highlight)) => {
                 let image = resource_manager.image(name, bytes, highlight);
-                context.tiles(&*image);
+                tiles(canvas, rect, &*image)?;
             },
-            Some(BackgroundPattern::Sprite(name, bytes, highlight, rect)) => {
+            Some(BackgroundPattern::Sprite(name, bytes, highlight, s_rect)) => {
                 let image = resource_manager.image(name, bytes, highlight);
-                let sprite = Sprite { image: &*image, rect };
-                context.sprite(&sprite, 0, 0);
+                sprite(canvas, rect, &*image, s_rect)?;
             },
             None => {},
         }
         if let Some(ref text) = self.text {
             let font = resource_manager.font(text.font_size.0);
-            context.text(&text.text, &font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
+            render_text(canvas, rect, &text.text, &font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
         }
         match self.border {
-            Some(Border::Raised) => context.bevel(true, 1),
-            Some(Border::Sunken) => context.bevel(false, 1),
-            Some(Border::Etched) => context.etched(),
+            Some(Border::Raised) => bevel(canvas, rect, Color::RGB(255, 255, 255), Color::RGB(128, 128, 128))?,
+            Some(Border::Sunken) => bevel(canvas, rect, Color::RGB(128, 128, 128), Color::RGB(255, 255, 255))?,
+            Some(Border::Etched) => etched(canvas, rect, Color::RGB(255, 255, 255), Color::RGB(128, 128, 128))?,
             None => {},
         }
         for child in &self.children {
-            let child_context = context.relative(child.rect);
-            child.draw(&child_context, resource_manager)?;
+            let child_rect = child.rect.offset(rect.left(), rect.top()).intersection(&rect).unwrap_or_default();
+            child.draw(canvas, child_rect, resource_manager)?;
         }
         Ok(())
     }
+}
+
+fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect: Rect) -> Result<(), ::failure::Error> {
+    let clip = Rect::new(
+            rect.left(),
+            rect.top(),
+            src_rect.width(),
+            src_rect.height()
+        )
+        .intersection(&rect)
+        .unwrap();
+
+    canvas.set_clip_rect(Some(rect_to_rect2(clip)));
+    canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(clip))).map_err(::failure::err_msg)?;
+    canvas.set_clip_rect(None);
+    Ok(())
+}
+
+fn tiles(canvas: &mut Canvas<Window>, rect: Rect, tile: &Texture) -> Result<(), ::failure::Error> {
+    canvas.set_clip_rect(Some(rect_to_rect2(rect)));
+
+    let q = tile.query();
+    let tile_width = q.width;
+    let tile_height = q.height;
+
+    let cw = (rect.width() + tile_width - 1) / tile_width;
+    let ch = (rect.height() + tile_height - 1) / tile_height;
+
+    for j in 0..ch {
+        for i in 0..cw {
+            let r = Rect::new(rect.left() + ((i * tile_width) as i32), rect.top() + ((j * tile_height) as i32), tile_width, tile_height);
+            canvas.copy(&tile, None, rect_to_rect2(r)).map_err(::failure::err_msg)?;
+        }
+    }
+
+    canvas.set_clip_rect(None);
+
+    Ok(())
+}
+
+fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
+    text: &str,
+    font: &Font, color: Color, shadow: bool,
+    horizontal_align: HorizontalAlign, vertical_align: VerticalAlign) -> Result<(), ::failure::Error>
+{
+    if text.is_empty() {
+        return Ok(());
+    }
+
+    canvas.set_clip_rect(Some(rect_to_rect2(rect)));
+
+    let (w, h) = font.size_of(text)?;
+
+    let x = match horizontal_align {
+        HorizontalAlign::Left => rect.left(),
+        HorizontalAlign::Center => rect.left() + (rect.width().saturating_sub(w) as i32) / 2,
+        HorizontalAlign::Right => rect.left() + (rect.width().saturating_sub(w) as i32)
+    };
+
+    let y = match vertical_align {
+        VerticalAlign::Top => rect.top(),
+        VerticalAlign::Middle => rect.top() + (rect.height().saturating_sub(h) as i32) / 2,
+        VerticalAlign::Bottom => rect.top() + (rect.height().saturating_sub(h) as i32)
+    };
+
+    let texture_creator = canvas.texture_creator();
+    if shadow {
+        let shadow_surface = font.render(text).blended(Color::RGBA(1, 1, 1, 1))?;
+        let shadow_texture = texture_creator.create_texture_from_surface(shadow_surface)?;
+        let TextureQuery { width, height, .. } = shadow_texture.query();
+        canvas.copy(&shadow_texture, None, rect_to_rect2(Rect::new(x + 1, y + 1, width, height))).map_err(::failure::err_msg)?;
+    }
+    {
+        let text_surface = font.render(text).blended(color)?;
+        let text_texture = texture_creator.create_texture_from_surface(text_surface)?;
+        let TextureQuery { width, height, .. } = text_texture.query();
+        canvas.copy(&text_texture, None, rect_to_rect2(Rect::new(x, y, width, height))).map_err(::failure::err_msg)?;
+    }
+
+    canvas.set_clip_rect(None);
+
+    Ok(())
+}
+
+fn bevel(canvas: &mut Canvas<Window>, rect: Rect, top_left: Color, bottom_right: Color) -> Result<(), ::failure::Error> {
+    let left = rect.left();
+    let top = rect.top();
+    let width = rect.width();
+    let height = rect.height();
+    let right = left + (width as i32) - 1;
+    let bottom = top + (height as i32) - 1;
+
+    canvas.set_draw_color(top_left);
+    canvas.draw_line((left, top), (left,  bottom)).map_err(::failure::err_msg)?;
+    canvas.draw_line((left, top), (right, top)).map_err(::failure::err_msg)?;
+    canvas.set_draw_color(bottom_right);
+    canvas.draw_line((right, top + 1), (right, bottom)).map_err(::failure::err_msg)?;
+    canvas.draw_line((left + 1, bottom), (right, bottom)).map_err(::failure::err_msg)?;
+
+    Ok(())
+}
+
+fn etched(canvas: &mut Canvas<Window>, rect: Rect, top_left: Color, bottom_right: Color) -> Result<(), ::failure::Error> {
+    let inner_rect = Rect::new(rect.left() + 1, rect.top() + 1, rect.width() - 2, rect.height() - 2);
+    bevel(canvas, inner_rect, top_left, bottom_right)?;
+    bevel(canvas, rect, bottom_right, top_left)?;
+    Ok(())
 }

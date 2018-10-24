@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::Cell;
 use cell::RefCell;
-use sdl::event::{Mouse};
+use sdl2::mouse::MouseButton;
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::*;
@@ -90,7 +90,7 @@ impl Widget<Nothing> for HorizontalRules {
 
     fn on_event(&mut self, event: &Event) -> EventResult<Nothing> {
         match *event {
-            Event::MouseButtonDown(Mouse::Right, x, y) => {
+            Event::MouseButtonDown(MouseButton::Right, x, y) => {
                 match self.get_rule_index(x, y) {
                     Some(no) => {
                         if self.state.borrow_mut().toggle_horizontal_rule(no).is_some() {

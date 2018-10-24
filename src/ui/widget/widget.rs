@@ -1,4 +1,5 @@
-use sdl::event::{Key, Mouse};
+use sdl2::keyboard::Keycode;
+use sdl2::mouse::MouseButton;
 use error::*;
 use ui::context::Rect;
 use ui::widget::brick::Brick;
@@ -7,10 +8,11 @@ pub use algebra::*;
 
 pub enum Event {
     Tick,
-    MouseButtonDown(Mouse, i32, i32),
-    MouseButtonUp(Mouse, i32, i32),
+    MouseButtonDown(MouseButton, i32, i32),
+    MouseButtonUp(MouseButton, i32, i32),
     MouseMove(i32, i32),
-    KeyDown(Key, u16),
+    KeyDown(Keycode),
+    TextInput(String),
 }
 
 impl Event {
@@ -20,7 +22,8 @@ impl Event {
             Event::MouseButtonDown(mouse, x, y) => Event::MouseButtonDown(mouse, x - rect.left(), y - rect.top()),
             Event::MouseButtonUp(mouse, x, y) => Event::MouseButtonUp(mouse, x - rect.left(), y - rect.top()),
             Event::MouseMove(x, y) => Event::MouseMove(x - rect.left(), y - rect.top()),
-            Event::KeyDown(key, ch) => Event::KeyDown(key, ch),
+            Event::KeyDown(key) => Event::KeyDown(key),
+            Event::TextInput(ref text) => Event::TextInput(text.clone()),
         }
     }
 }

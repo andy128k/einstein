@@ -1,5 +1,5 @@
 use std::cell::Cell;
-use sdl::event::{Mouse};
+use sdl2::mouse::MouseButton;
 use ui::context::Rect;
 use ui::widget::common::*;
 use ui::widget::brick::*;
@@ -93,7 +93,7 @@ impl Widget<f32> for Slider {
 
     fn on_event(&mut self, event: &Event) -> EventResult<f32> {
         match *event {
-            Event::MouseButtonDown(Mouse::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
+            Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
                 self.drag_start(x, y);
                 Ok(EventReaction::empty())
             },
