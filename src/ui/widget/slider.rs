@@ -1,34 +1,28 @@
 use std::cell::Cell;
-use sdl::video::Surface;
 use sdl::event::{Mouse};
 use error::*;
 use ui::context::{Context, Rect};
+use ui::widget::common::BackgroundPattern;
 use ui::widget::widget::*;
-use ui::utils::{load_image, adjust_brightness};
 use resources::manager::ResourceManager;
 
 pub struct Slider {
     rect: Rect,
-    background: Surface,
-    background_highlighted: Surface,
+    background: BackgroundPattern,
     value: Cell<f32>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
 }
 
 impl Slider {
-    pub fn new(rect: Rect, bg: &[u8], value: f32) -> Result<Self> {
-        let background = load_image(bg)?;
-        let background_highlighted = adjust_brightness(&background, 1.5);
-
-        Ok(Self {
+    pub fn new(rect: Rect, background: BackgroundPattern, value: f32) -> Self {
+        Self {
             rect,
             background,
-            background_highlighted,
             value: Cell::new(value),
             highlight: Cell::new(false),
             dragging: Cell::new(None),
-        })
+        }
     }
 
     fn value_to_x(&self, value: f32) -> i32 {
@@ -127,11 +121,12 @@ impl Widget<f32> for Slider {
         let x = self.value_to_x(self.value.get());
         let slider_rect = Rect::new(x as i32, 0, rect.height(), rect.height());
         let slider_context = context.relative(slider_rect);
-        if self.highlight.get() {
-            slider_context.tiles(&self.background_highlighted);
+        let bg = if self.highlight.get() {
+            self.background.load_highlighted(resource_manager)
         } else {
-            slider_context.tiles(&self.background);
-        }
+            self.background.load(resource_manager)
+        };
+        slider_context.tiles(bg);
         slider_context.etched();
         Ok(())
     }

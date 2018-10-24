@@ -1,34 +1,28 @@
 use std::cell::Cell;
-use sdl::video::Surface;
 use sdl::event::{Mouse};
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::widget::common::BackgroundPattern;
 use ui::widget::widget::*;
-use ui::utils::{load_image, adjust_brightness};
 use resources::manager::ResourceManager;
 use resources::fonts::*;
 
 pub struct Checkbox {
     rect: Rect,
-    image: Surface,
-    highlighted: Surface,
+    background: BackgroundPattern,
     checked: Cell<bool>,
     mouse_inside: Cell<bool>,
 }
 
 impl Checkbox {
-    pub fn new(x: i32, y: i32, bg: &[u8], checked: bool) -> Result<Self> {
-        let image = load_image(bg)?;
-        let highlighted = adjust_brightness(&image, 1.5);
-
-        Ok(Self{
+    pub fn new(x: i32, y: i32, background: BackgroundPattern, checked: bool) -> Self {
+        Self{
             rect: Rect::new(x, y, 20, 20),
-            image,
-            highlighted,
+            background,
             checked: Cell::new(checked),
             mouse_inside: Cell::new(false),
-        })
+        }
     }
 }
 
@@ -62,9 +56,9 @@ impl Widget<bool> for Checkbox {
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let image = if self.mouse_inside.get() {
-            &self.highlighted
+            self.background.load_highlighted(resource_manager)
         } else {
-            &self.image
+            self.background.load(resource_manager)
         };
         context.tiles(image);
         context.etched();

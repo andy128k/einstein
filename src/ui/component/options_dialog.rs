@@ -14,7 +14,6 @@ use ui::widget::slider::*;
 use ui::widget::window::*;
 use ui::widget::title::Title;
 use ui::component::dialog::*;
-use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 use storage::Storage;
 
@@ -49,7 +48,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            Checkbox::new(15, 90, BLUE_PATTERN, state.borrow().fullscreen)?,
+            Checkbox::new(15, 90, bg, state.borrow().fullscreen),
             move |value| {
                 state2.borrow_mut().fullscreen = *value;
                 Ok(EventReaction::empty())
@@ -65,7 +64,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
     container.push({
         let state2 = state.clone();
         WidgetMapAction::new(
-            Slider::new(Rect::new(110, 162, 160, 16), BLUE_PATTERN, state.borrow().volume_float)?,
+            Slider::new(Rect::new(110, 162, 160, 16), bg, state.borrow().volume_float),
             move |value| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;

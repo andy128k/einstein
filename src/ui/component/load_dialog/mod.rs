@@ -9,7 +9,6 @@ use ui::widget::modal::Modal;
 use ui::widget::title::Title;
 use ui::component::game::GamePrivate;
 use ui::component::dialog::DialogResult;
-use resources::background::BLUE_PATTERN;
 use resources::messages::Messages;
 use storage::SavedGame;
 
