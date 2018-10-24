@@ -1,15 +1,13 @@
 use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
-use sdl::video::Surface;
 use sdl::event::{Mouse};
 use rules::{Thing};
 use ui::context::{Context, Rect, Sprite};
 use ui::widget::widget::*;
-use ui::utils::load_image;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
-use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS};
+use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
 use error::*;
 
 const PUZZLE_SIZE: u8 = 6;
@@ -32,8 +30,6 @@ fn local_find_choice(x: i32, y: i32) -> Option<u8> {
     None
 }
 
-const EMPTY_FIELD_ICON: &[u8] = include_bytes!("./tile.bmp");
-
 #[derive(Clone)]
 pub enum PuzzleAction {
     Victory,
@@ -46,20 +42,17 @@ pub struct PuzzleCell {
     state: Rc<RefCell<GamePrivate>>,
     row: u8,
     col: u8,
-    bg: Surface,
     highlighted: Cell<Option<Option<u8>>>,
 }
 
 impl PuzzleCell {
     pub fn new(x: i32, y: i32, state: Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Result<Self> {
-        let bg = load_image(EMPTY_FIELD_ICON)?;
         Ok(Self {
             x,
             y,
             state,
             row,
             col,
-            bg,
             highlighted: Cell::new(None),
         })
     }
@@ -168,7 +161,10 @@ impl Widget<PuzzleAction> for PuzzleCell {
             context.sprite(&sprite, 0, 0);
 
         } else {
-            context.image(&self.bg, 0, 0);
+            {
+                let bg = resource_manager.image("EMPTY_TILE", EMPTY_TILE);
+                context.image(bg, 0, 0);
+            }
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);

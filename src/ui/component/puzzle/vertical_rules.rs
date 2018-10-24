@@ -1,25 +1,19 @@
 use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
-use sdl::video::Surface;
 use sdl::event::{Mouse};
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::rule::{draw_rule};
-use ui::utils::load_image;
 use ui::component::game::{GamePrivate};
 use resources::manager::ResourceManager;
-use resources::thing::ThingImages;
+use resources::thing::{EMPTY_TILE};
 use error::*;
-
-const TILE_BG: &[u8] = include_bytes!("./tile.bmp");
 
 pub struct VerticalRules {
     rect: Rect,
     state: Rc<RefCell<GamePrivate>>,
     highlighted: Cell<Option<usize>>,
-    tile: Surface,
-    thing_images: Rc<ThingImages>,
 }
 
 const TILE_GAP: i32 =      4;
@@ -28,31 +22,30 @@ const TILE_HEIGHT: i32 =  48;
 
 impl VerticalRules {
     pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
-        let tile = load_image(TILE_BG)?;
-
         Ok(Self {
             rect,
             state,
             highlighted: Cell::new(None),
-            tile,
-            thing_images: ThingImages::new()?
         })
     }
 
-    fn draw_cell(&self, context: &Context, index: usize) -> Result<()> {
+    fn draw_cell(&self, context: &Context, resource_manager: &mut ResourceManager, index: usize) -> Result<()> {
         let rect = self.rect(index);
         let c = context.relative(rect);
 
         if let Some(vertical_rule) = self.state.borrow().vertical_rules.get(index) {
             if self.state.borrow().show_excluded == vertical_rule.is_excluded {
                 let rule = &self.state.borrow().rules[vertical_rule.original_index];
-                draw_rule(&self.thing_images, &rule, &c, self.highlighted.get() == Some(index))?;
+                draw_rule(&c, resource_manager, &rule, self.highlighted.get() == Some(index))?;
                 return Ok(());
             }
         }
 
-        c.image(&self.tile, 0, 0);
-        c.image(&self.tile, 0, TILE_HEIGHT);
+        {
+            let tile = resource_manager.image("EMPTY_TILE", EMPTY_TILE);
+            c.image(tile, 0, 0);
+            c.image(tile, 0, TILE_HEIGHT);
+        }
         Ok(())
     }
 
@@ -117,7 +110,7 @@ impl Widget<Nothing> for VerticalRules {
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
         for i in 0..num {
-            self.draw_cell(context, i)?;
+            self.draw_cell(context, resource_manager, i)?;
         }
         Ok(())
     }

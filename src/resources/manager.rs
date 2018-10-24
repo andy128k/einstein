@@ -36,4 +36,12 @@ impl<'r> ResourceManager<'r> {
         }
         self.images.get(&key).unwrap()
     }
+
+    pub fn image_h(&mut self, name: &'static str, data: &[u8], highlighted: bool) -> &Surface {
+        if highlighted {
+            self.image_highlighted(name, data)
+        } else {
+            self.image(name, data)
+        }
+    }
 }
