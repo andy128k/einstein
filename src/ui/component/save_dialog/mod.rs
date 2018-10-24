@@ -6,7 +6,7 @@ use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
-use ui::widget::dialog::*;
+use ui::widget::conditional::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
 use ui::widget::title::Title;

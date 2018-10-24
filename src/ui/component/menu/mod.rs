@@ -7,7 +7,7 @@ use storage::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::menu_button::*;
-use ui::widget::dialog::*;
+use ui::widget::conditional::*;
 use ui::widget::modal::Modal;
 use ui::widget::image::*;
 use ui::widget::label::*;

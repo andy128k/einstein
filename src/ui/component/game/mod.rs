@@ -6,7 +6,7 @@ use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::dialog::*;
+use ui::widget::conditional::*;
 use ui::widget::title::Title;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;

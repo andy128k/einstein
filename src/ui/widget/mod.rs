@@ -1,6 +1,6 @@
 pub mod common;
 pub mod widget;
-pub mod dialog;
+pub mod conditional;
 pub mod modal;
 pub mod image;
 pub mod window;
