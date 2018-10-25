@@ -4,7 +4,6 @@ pub mod conditional;
 pub mod modal;
 pub mod image;
 pub mod window;
-pub mod title;
 pub mod label;
 pub mod button;
 pub mod dialog_button;

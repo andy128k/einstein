@@ -5,7 +5,7 @@ use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use ui::widget::title::Title;
+use ui::widget::label::Label;
 use ui::widget::dialog_button::*;
 use resources::messages::Messages;
 
@@ -25,7 +25,7 @@ pub fn new_failure_dialog(messages: &Messages) -> Result<Modal<FailureChoice>> {
             Window::new(Rect::new0(360, 140), bg)
         ))
         .add(WidgetMapAction::no_action(
-            Title { rect: Rect::new(30, 10, 300, 100), text: messages.loose.to_string() }
+            Label::title(Rect::new(30, 10, 300, 100), messages.loose)
         ))
         .add(
             DialogButton::new(Rect::new(30, 100, 90, 25), bg, messages.start_new, None, FailureChoice::StartNew)

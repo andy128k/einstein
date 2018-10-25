@@ -7,7 +7,7 @@ use puzzle_gen::generate_puzzle;
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::conditional::*;
-use ui::widget::title::Title;
+use ui::widget::label::Label;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
 use ui::widget::modal::Modal;
@@ -210,10 +210,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     ));
 
     container.push(WidgetMapAction::no_action(
-        Title {
-            text: messages.einstein_puzzle.to_string(),
-            rect: Rect::new(20, 10, 500, 47),
-        }
+        Label::title(Rect::new(20, 10, 500, 47), messages.einstein_puzzle)
     ));
 
     container.push(WidgetMapAction::no_action(

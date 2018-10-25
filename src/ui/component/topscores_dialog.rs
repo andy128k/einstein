@@ -8,7 +8,6 @@ use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use ui::widget::title::Title;
 use resources::messages::Messages;
 use storage::{Scores};
 use util::time::sec_to_str;
@@ -24,10 +23,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
     ));
 
     container.push(WidgetMapAction::no_action(
-        Title {
-            text: messages.top_scores.to_string(),
-            rect: Rect::new(10, 10, 300, 40),
-        }
+        Label::title(Rect::new(10, 10, 300, 40), messages.top_scores)
     ));
 
     let mut pos = 50;

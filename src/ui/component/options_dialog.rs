@@ -12,7 +12,6 @@ use ui::widget::modal::Modal;
 use ui::widget::checkbox::*;
 use ui::widget::slider::*;
 use ui::widget::window::*;
-use ui::widget::title::Title;
 use ui::component::dialog::*;
 use resources::messages::Messages;
 use storage::Storage;
@@ -40,10 +39,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Moda
         Window::new(Rect::new0(300, 260), bg)
     ));
     container.push(WidgetMapAction::no_action(
-        Title {
-            text: messages.options.to_string(),
-            rect: Rect::new(0, 5, 300, 40),
-        }
+        Label::title(Rect::new(0, 5, 300, 40), messages.options)
     ));
     container.push({
         let state2 = state.clone();

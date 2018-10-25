@@ -11,7 +11,6 @@ use ui::widget::conditional::*;
 use ui::widget::modal::Modal;
 use ui::widget::image::*;
 use ui::widget::label::*;
-use ui::widget::title::*;
 use ui::main_loop::MainLoopQuit;
 use ui::component::dialog::*;
 use ui::component::game::{new_game_widget, GamePrivate};
@@ -41,10 +40,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     ));
 
     container.push(WidgetMapAction::no_action(
-        Title {
-            text: messages.einstein_flowix.to_owned(),
-            rect: Rect::new(0, 30, 800, 30),
-        }
+        Label::title(Rect::new(0, 30, 800, 30), messages.einstein_flowix)
     ));
 
     container.push(WidgetMapAction::no_action(

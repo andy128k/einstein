@@ -7,7 +7,7 @@ use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
 use ui::widget::window::*;
-use ui::widget::title::Title;
+use ui::widget::label::Label;
 use ui::widget::page_view::*;
 use ui::widget::modal::Modal;
 use ui::page_layout::{Page, PagesBuilder};
@@ -59,10 +59,7 @@ impl DescriptionPrivate {
                 Window::new(Rect::new0(WIDTH as u32, HEIGHT as u32), bg)
             ))
             .add(WidgetMapAction::no_action(
-                Title {
-                    text: messages.rules.to_string(),
-                    rect: Rect::new(150, 10, 300, 40),
-                }
+                Label::title(Rect::new(150, 10, 300, 40), messages.rules)
             ))
             .add(WidgetMapAction::no_action(
                 PageView::new(Rect::new(15, 50, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)

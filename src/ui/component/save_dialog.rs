@@ -9,7 +9,7 @@ use ui::widget::dialog_button::*;
 use ui::widget::conditional::*;
 use ui::widget::window::*;
 use ui::widget::modal::Modal;
-use ui::widget::title::Title;
+use ui::widget::label::Label;
 use ui::component::game_name_dialog::*;
 use ui::component::dialog::DialogResult;
 use resources::messages::Messages;
@@ -26,10 +26,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     ));
 
     container.push(WidgetMapAction::no_action(
-        Title {
-            text: messages.save_game.to_string(),
-            rect: Rect::new(0, 5, 300, 40),
-        }
+        Label::title(Rect::new(0, 5, 300, 40), messages.save_game)
     ));
 
     let ask_name: Rc<RefCell<Option<(usize, String)>>> = Rc::new(RefCell::new(None));
