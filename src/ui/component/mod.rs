@@ -11,7 +11,6 @@ pub mod failure_dialog;
 pub mod save_dialog;
 pub mod load_dialog;
 pub mod puzzle;
-pub mod background;
 pub mod game;
 pub mod menu;
 pub mod about_dialog;

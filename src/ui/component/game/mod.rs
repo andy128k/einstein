@@ -6,11 +6,12 @@ use rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use puzzle_gen::generate_puzzle;
 use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::common::*;
 use ui::widget::conditional::*;
 use ui::widget::label::Label;
 use ui::widget::game_button::new_game_button;
 use ui::widget::image::Image;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::component::dialog::DialogResult;
 use ui::component::puzzle::puzzle::new_puzzle_widget;
 use ui::component::puzzle::puzzle_cell::PuzzleAction;
@@ -60,7 +61,7 @@ pub struct GamePrivate {
     pub hinted: bool,
 }
 
-const RAIN_TILE: &[u8] = include_bytes!("./rain.bmp");
+const RAIN: &[u8] = include_bytes!("./rain.bmp");
 const TITLE_BG: &[u8] = include_bytes!("./title.bmp");
 
 impl GamePrivate {
@@ -187,7 +188,27 @@ const TITLE_PADDING_TOP: u32 =    7;
 const WATCH_WIDTH: u32 =        100;
 const WATCH_HEIGHT: u32 =        34;
 
-pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Modal<()>> {
+fn game_popup<W, A, F>(trigger: &Rc<RefCell<Option<()>>>, create_widget: F, messages: &'static Messages) -> impl Widget<A>
+    where
+        F: Fn() -> Result<W> + 'static,
+        W: Widget<A> + 'static,
+        A: Clone + 'static,
+{
+    let screen_rect = Rect::new(0, 0, 800, 600);
+    ConditionalWidget::new(
+        trigger.clone(),
+        move |_| Ok(Container::container(screen_rect, BackgroundPattern::Custom("RAIN", RAIN))
+            .add(WidgetMapAction::no_action(
+                Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?
+            ))
+            .add(WidgetMapAction::no_action(
+                Label::title(Rect::new(20, 10, 500, 47), messages.einstein_puzzle)
+            ))
+            .add((create_widget)()?))
+    )
+}
+
+pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Container<()>> {
     let screen_rect = Rect::new(0, 0, 800, 600);
 
     let save_game_trigger = Rc::new(RefCell::new(None));
@@ -199,11 +220,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Modal::<()>::new(screen_rect);
-
-    container.push(WidgetMapAction::no_action(
-        Image::new(screen_rect, RAIN_TILE)?
-    ));
+    let mut container = Container::<()>::modal(screen_rect, BackgroundPattern::Custom("RAIN_TILE", RAIN));
 
     container.push(WidgetMapAction::no_action(
         Image::new(Rect::new(8, 10, 783, 47), TITLE_BG)?
@@ -332,10 +349,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let pause_trigger2 = pause_trigger.clone();
         WidgetMapAction::new(
-            ConditionalWidget::new(
-                pause_trigger.clone(),
-                move |_| new_pause_dialog(messages)
-            ),
+            game_popup(&pause_trigger, move || new_pause_dialog(messages), messages),
             move |_| {
                 *pause_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
@@ -348,10 +362,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_help_trigger.clone(),
-                move |_| new_help_dialog(messages)
-            ),
+            game_popup(&show_help_trigger, move || new_help_dialog(messages), messages),
             move |_| {
                 *show_help_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
@@ -366,10 +377,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
         WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_opts_trigger.clone(),
-                move |_| new_options_dialog(&storage1.borrow(), messages)
-            ),
+            game_popup(&show_opts_trigger, move || new_options_dialog(&storage1.borrow(), messages), messages),
             move |result| {
                 *show_opts_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
@@ -393,9 +401,10 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let save_game_trigger2 = save_game_trigger.clone();
         WidgetMapAction::new(
-            ConditionalWidget::new(
-                save_game_trigger.clone(),
-                move |_| new_save_game_dialog(&storage1.borrow().saved_games, messages)
+            game_popup(
+                &save_game_trigger,
+                move || new_save_game_dialog(&storage1.borrow().saved_games, messages),
+                messages
             ),
             move |result| {
                 *save_game_trigger2.borrow_mut() = None;

@@ -8,6 +8,7 @@ pub enum BackgroundPattern {
     Green,
     White,
     Red,
+    Custom(&'static str, &'static [u8]),
 }
 
 impl BackgroundPattern {
@@ -17,6 +18,7 @@ impl BackgroundPattern {
             BackgroundPattern::Green => resource_manager.image("GREEN_PATTERN", GREEN_PATTERN),
             BackgroundPattern::White => resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN),
             BackgroundPattern::Red => resource_manager.image("RED_PATTERN", RED_PATTERN),
+            BackgroundPattern::Custom(name, bytes) => resource_manager.image(name, bytes),
         }
     }
 
@@ -26,6 +28,7 @@ impl BackgroundPattern {
             BackgroundPattern::Green => resource_manager.image_highlighted("GREEN_PATTERN", GREEN_PATTERN),
             BackgroundPattern::White => resource_manager.image_highlighted("MARBLE_PATTERN", MARBLE_PATTERN),
             BackgroundPattern::Red => resource_manager.image_highlighted("RED_PATTERN", RED_PATTERN),
+            BackgroundPattern::Custom(name, bytes) => resource_manager.image_highlighted(name, bytes),
         }
     }
 }

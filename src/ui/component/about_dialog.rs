@@ -6,19 +6,15 @@ use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use resources::messages::Messages;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn create_about_dialog(messages: &Messages) -> Result<Modal<()>> {
+pub fn create_about_dialog(messages: &Messages) -> Result<Container<()>> {
     let rect = Rect::new(220, 160, 360, 280);
     let bg = BackgroundPattern::Blue;
-    let container = Modal::<()>::new(rect)
-        .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(360, 280), bg)
-        ))
+    let container = Container::<()>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::title(Rect::new(30, 5, 300, 40), messages.about)
         ))

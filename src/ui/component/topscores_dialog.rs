@@ -6,21 +6,16 @@ use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use resources::messages::Messages;
 use storage::{Scores};
 use util::time::sec_to_str;
 
-pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Modal<()>> {
+pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
     let rect = Rect::new(240, 125, 320, 350);
     let bg = BackgroundPattern::Blue;
 
-    let mut container = Modal::<()>::new(rect);
-
-    container.push(WidgetMapAction::no_action(
-        Window::new(Rect::new0(320, 350), bg)
-    ));
+    let mut container = Container::<()>::modal(rect, bg);
 
     container.push(WidgetMapAction::no_action(
         Label::title(Rect::new(10, 10, 300, 40), messages.top_scores)

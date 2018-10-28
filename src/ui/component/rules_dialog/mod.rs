@@ -6,10 +6,9 @@ use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
-use ui::widget::window::*;
 use ui::widget::label::Label;
 use ui::widget::page_view::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::page_layout::{Page, PagesBuilder};
 use resources::fonts::*;
 use resources::rules::{get_rules, TextItem};
@@ -39,7 +38,7 @@ struct DescriptionPrivate {
 }
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<Modal<()>> {
+    fn new(messages: &Messages, text: &[TextItem]) -> Result<Container<()>> {
         let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
             .into_iter().map(Rc::new).collect();
 
@@ -54,10 +53,7 @@ impl DescriptionPrivate {
             current_page: current_page.clone()
         }));
 
-        let container = Modal::<()>::new(rect)
-            .add(WidgetMapAction::no_action(
-                Window::new(Rect::new0(WIDTH as u32, HEIGHT as u32), bg)
-            ))
+        let container = Container::<()>::modal(rect, bg)
             .add(WidgetMapAction::no_action(
                 Label::title(Rect::new(150, 10, 300, 40), messages.rules)
             ))
@@ -106,6 +102,6 @@ impl DescriptionPrivate {
     }
 }
 
-pub fn new_help_dialog(messages: &Messages) -> Result<Modal<()>> {
+pub fn new_help_dialog(messages: &Messages) -> Result<Container<()>> {
     DescriptionPrivate::new(messages, get_rules())
 }

@@ -30,6 +30,10 @@ impl Rect {
         Rect(self.0 + dx, self.1 + dy, self.2, self.3)
     }
 
+    pub fn relative(&self) -> Self {
+        Rect(0, 0, self.2, self.3)
+    }
+
     pub fn intersection(&self, other: &Self) -> Option<Rect> {
         let left   = i32::max(self.0, other.0);
         let right  = i32::min(self.0 + self.2 as i32, other.0 + other.2 as i32);

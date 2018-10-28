@@ -4,8 +4,7 @@ use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::any_key::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::context::{Rect, HorizontalAlign};
 use resources::fonts::*;
 
@@ -15,9 +14,7 @@ pub enum MessageType {
     Failure
 }
 
-pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Modal<()>> {
-    let screen_rect = Rect::new(0, 0, 800, 600);
-
+pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Container<()>> {
     let font = text_font()?;
     let (text_width, text_height) = font.size_of(message)?;
     let width = text_width + 100;
@@ -36,10 +33,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (BackgroundPattern::Red, Color::RGB(255, 255, 255))
     };
 
-    let container = Modal::<()>::new(screen_rect)
-        .add(WidgetMapAction::no_action(
-            Window::new(rect, bg)
-        ))
+    let container = Container::<()>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::new(Rect::new0(width, height), message, color, HorizontalAlign::Center)
         ))

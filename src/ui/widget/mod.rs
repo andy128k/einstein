@@ -1,7 +1,7 @@
 pub mod common;
 pub mod widget;
 pub mod conditional;
-pub mod modal;
+pub mod container;
 pub mod image;
 pub mod window;
 pub mod label;

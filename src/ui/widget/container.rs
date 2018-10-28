@@ -1,16 +1,23 @@
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
+use ui::widget::common::*;
 use resources::manager::ResourceManager;
 use error::*;
 
-pub struct Modal<A> {
+pub struct Container<A> {
     rect: Rect,
-    children: Vec<WidgetPtr<A>>
+    background: BackgroundPattern,
+    children: Vec<WidgetPtr<A>>,
+    modal: bool,
 }
 
-impl<A> Modal<A> {
-    pub fn new(rect: Rect) -> Self {
-        Self { rect, children: Vec::new() }
+impl<A> Container<A> {
+    pub fn container(rect: Rect, background: BackgroundPattern) -> Self {
+        Container { rect, background, children: Vec::new(), modal: false }
+    }
+
+    pub fn modal(rect: Rect, background: BackgroundPattern) -> Self {
+        Container { rect, background, children: Vec::new(), modal: true }
     }
 
     pub fn add<W: Widget<A> + 'static>(mut self, child: W) -> Self {
@@ -23,7 +30,7 @@ impl<A> Modal<A> {
     }
 }
 
-impl<A> Widget<A> for Modal<A> where A: Clone {
+impl<A> Widget<A> for Container<A> where A: Clone {
     fn is_relative(&self) -> bool {
         true
     }
@@ -41,14 +48,26 @@ impl<A> Widget<A> for Modal<A> where A: Clone {
                 break;
             }
         }
-        reaction.terminated = true;
+        reaction.terminated = self.modal;
         Ok(reaction)
     }
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+        {
+            let bg = self.background.load(resource_manager);
+            context.tiles(bg);
+        }
+        match self.background {
+            BackgroundPattern::Custom(..) => {},
+            _ => {
+                context.bevel(true, 1);
+            },
+        }
+
         for child in &self.children {
             child.draw(&context.relative(child.get_rect()), resource_manager)?;
         }
+
         Ok(())
     }
 }

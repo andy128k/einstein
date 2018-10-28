@@ -6,10 +6,10 @@ use error::*;
 use storage::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::*;
 use ui::widget::menu_button::*;
 use ui::widget::conditional::*;
-use ui::widget::modal::Modal;
-use ui::widget::image::*;
+use ui::widget::container::Container;
 use ui::widget::label::*;
 use ui::main_loop::MainLoopQuit;
 use ui::component::dialog::*;
@@ -23,7 +23,7 @@ use resources::messages::Messages;
 
 const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
 
-pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<Modal<MainLoopQuit>> {
+pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<Container<MainLoopQuit>> {
     let rect = Rect::new(0, 0, 800, 600);
 
     let new_game_trigger = Rc::new(RefCell::new(None));
@@ -33,11 +33,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Modal::<MainLoopQuit>::new(rect);
-
-    container.push(WidgetMapAction::no_action(
-        Image::new(rect, MENU_BG)?
-    ));
+    let mut container = Container::<MainLoopQuit>::modal(rect, BackgroundPattern::Custom("MENU_BG", MENU_BG));
 
     container.push(WidgetMapAction::no_action(
         Label::title(Rect::new(0, 30, 800, 30), messages.einstein_flowix)

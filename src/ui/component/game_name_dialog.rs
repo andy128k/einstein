@@ -9,12 +9,11 @@ use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::component::dialog::DialogResult;
 use resources::messages::Messages;
 
-pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResult<String>>> {
+pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<DialogResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);
     let bg = BackgroundPattern::Blue;
     let yellow = Color::RGB(255, 255, 0);
@@ -23,10 +22,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Modal<DialogResu
         name.to_string()
     ));
 
-    let container = Modal::<DialogResult<String>>::new(rect)
-        .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(460, 100), bg)
-        ))
+    let container = Container::<DialogResult<String>>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::new(Rect::new(10, 20, 150, 26), messages.enter_game, yellow, HorizontalAlign::Left)
         ))

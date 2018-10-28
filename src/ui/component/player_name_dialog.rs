@@ -9,21 +9,17 @@ use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use resources::messages::Messages;
 
-pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Modal<String>> {
+pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Container<String>> {
     let rect = Rect::new(170, 280, 460, 100);
     let bg = BackgroundPattern::Blue;
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container = Modal::<String>::new(rect)
-        .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(460, 100), bg)
-        ))
+    let container = Container::<String>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::new(Rect::new(10, 20, 150, 26), messages.enter_name, yellow, HorizontalAlign::Left)
         ))

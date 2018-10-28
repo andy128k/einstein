@@ -4,23 +4,19 @@ use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::dialog_button::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::widget::label::Label;
 use ui::component::game::GamePrivate;
 use ui::component::dialog::DialogResult;
 use resources::messages::Messages;
 use storage::SavedGame;
 
-pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<Modal<DialogResult<GamePrivate>>> {
+pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<Container<DialogResult<GamePrivate>>> {
     let rect = Rect::new(250, 90, 300, 420);
     let bg = BackgroundPattern::Blue;
 
-    let mut container = Modal::<DialogResult<GamePrivate>>::new(rect);
+    let mut container = Container::<DialogResult<GamePrivate>>::modal(rect, bg);
 
-    container.push(WidgetMapAction::no_action(
-        Window::new(Rect::new0(300, 420), bg)
-    ));
     container.push(WidgetMapAction::no_action(
         Label::title(Rect::new(0, 5, 300, 40), messages.load_game)
     ));

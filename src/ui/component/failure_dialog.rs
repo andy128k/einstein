@@ -3,8 +3,7 @@ use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::widget::label::Label;
 use ui::widget::dialog_button::*;
 use resources::messages::Messages;
@@ -16,14 +15,11 @@ pub enum FailureChoice {
     Cancel
 }
 
-pub fn new_failure_dialog(messages: &Messages) -> Result<Modal<FailureChoice>> {
+pub fn new_failure_dialog(messages: &Messages) -> Result<Container<FailureChoice>> {
     let rect = Rect::new(220, 240, 360, 140);
     let bg = BackgroundPattern::Red;
 
-    let container = Modal::<FailureChoice>::new(rect)
-        .add(WidgetMapAction::no_action(
-            Window::new(Rect::new0(360, 140), bg)
-        ))
+    let container = Container::<FailureChoice>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::title(Rect::new(30, 10, 300, 100), messages.loose)
         ))

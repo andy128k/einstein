@@ -4,24 +4,16 @@ use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::common::BackgroundPattern;
 use ui::widget::label::*;
-use ui::widget::window::*;
-use ui::widget::modal::Modal;
+use ui::widget::container::Container;
 use ui::widget::any_key::*;
 use resources::messages::Messages;
-use ui::component::background::*;
 
-pub fn new_pause_dialog(messages: &Messages) -> Result<Modal<()>> {
-    let rect = Rect::new(0, 0, 800, 600);
+pub fn new_pause_dialog(messages: &Messages) -> Result<Container<()>> {
+    let rect = Rect::new(280, 275, 240, 50);
 
-    let container = Modal::<()>::new(rect)
+    let container = Container::<()>::modal(rect, BackgroundPattern::Green)
         .add(WidgetMapAction::no_action(
-            Background::new()?
-        ))
-        .add(WidgetMapAction::no_action(
-            Window::new(Rect::new(280, 275, 240, 50), BackgroundPattern::Green)
-        ))
-        .add(WidgetMapAction::no_action(
-            Label::new(Rect::new(280, 275, 240, 50), messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center)
+            Label::new(rect.relative(), messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center)
         ))
         .add(
             AnyKey::new(())
