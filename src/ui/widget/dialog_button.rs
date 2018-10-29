@@ -15,7 +15,7 @@ pub struct DialogButton {
 impl ButtonRenderer for DialogButton {
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Result<()> {
         let image = if highlighted {
-            self.background.load_highlighted(resource_manager)
+            self.background.highlighted().load(resource_manager)
         } else {
             self.background.load(resource_manager)
         };

@@ -56,7 +56,7 @@ impl Widget<bool> for Checkbox {
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let image = if self.mouse_inside.get() {
-            self.background.load_highlighted(resource_manager)
+            self.background.highlighted().load(resource_manager)
         } else {
             self.background.load(resource_manager)
         };

@@ -122,7 +122,7 @@ impl Widget<f32> for Slider {
         let slider_rect = Rect::new(x as i32, 0, rect.height(), rect.height());
         let slider_context = context.relative(slider_rect);
         let bg = if self.highlight.get() {
-            self.background.load_highlighted(resource_manager)
+            self.background.highlighted().load(resource_manager)
         } else {
             self.background.load(resource_manager)
         };
