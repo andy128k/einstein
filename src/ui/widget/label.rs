@@ -1,7 +1,8 @@
 use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
-use ui::widget::common::FontSize;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::widget::widget::*;
 use resources::manager::ResourceManager;
 use resources::fonts::*;
@@ -46,14 +47,15 @@ impl Widget<Nothing> for Label {
         self.rect
     }
 
-    fn draw(&self, context: &Context, _resource_manager: &mut ResourceManager) -> Result<()> {
-        let font = match self.font_size {
-            FontSize::Text => text_font()?,
-            FontSize::Button => button_font()?,
-            FontSize::Menu => menu_font()?,
-            FontSize::Title => title_font()?,
-        };
-        context.text(&self.text, font, self.color, true, self.horizontal_align, self.vertical_align)?;
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+        let brick = Brick::new(self.get_rect())
+            .text(Text::new(&self.text)
+                .font_size(self.font_size)
+                .color(self.color)
+                .shadow()
+                .halign(self.horizontal_align)
+                .valign(self.vertical_align));
+        brick.draw(context, resource_manager)?;
         Ok(())
     }
 }

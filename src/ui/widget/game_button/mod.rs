@@ -1,28 +1,29 @@
 use sdl::event::{Key};
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect};
 use ui::widget::button::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
-use resources::fonts::*;
 
 const BUTTON_BG_BYTES: &[u8] = include_bytes!("./btn.bmp");
 const BUTTON_BG_HIGHLIGHTED_BYTES: &[u8] = include_bytes!("./btn-highlighted.bmp");
 
 pub struct GameButton {
+    rect: Rect,
     text: String,
 }
 
 impl ButtonRenderer for GameButton {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         let image = if highlighted {
-            resource_manager.image("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES)
+            BackgroundPattern::Custom("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES)
         } else {
-            resource_manager.image("BUTTON_BG_BYTES", BUTTON_BG_BYTES)
+            BackgroundPattern::Custom("BUTTON_BG_BYTES", BUTTON_BG_BYTES)
         };
-        context.image(image, 0, 0);
-        context.text(&self.text, button_font()?, Color::RGB(255, 255, 0), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
-        Ok(())
+        Brick::new(self.rect)
+            .background(image)
+            .text(Text::new(&self.text).font_size(FontSize::Button).color(Color::RGB(255, 255, 0)).shadow())
     }
 }
 
@@ -32,6 +33,7 @@ pub fn new_game_button<A>(rect: Rect, text: &str, key: Option<Key>, action: A) -
         key,
         action,
         GameButton {
+            rect,
             text: text.to_string(),
         }
     )

@@ -1,9 +1,15 @@
-use sdl::video::Surface;
-use resources::manager::ResourceManager;
-use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
+use sdl2::pixels::Color;
+
+#[derive(Clone, Copy)]
+pub enum Border {
+    Raised,
+    Sunken,
+    Etched,
+}
 
 #[derive(Clone, Copy)]
 pub enum BackgroundPattern {
+    Color(Color),
     Blue,
     BlueHighlighted,
     Green,
@@ -15,28 +21,26 @@ pub enum BackgroundPattern {
     Custom(&'static str, &'static [u8]),
 }
 
+fn gamma(v: u8, k: f64) -> u8 {
+    (255.0 * (v as f64 / 255.0).powf(1.0 / k)).round().min(255.0) as u8
+}
+
+const GAMMA_K: f64 = 1.5;
+
 impl BackgroundPattern {
     pub fn highlighted(&self) -> Self {
         match self {
+            BackgroundPattern::Color(Color { r, g, b, a }) => BackgroundPattern::Color(Color {
+                r: gamma(*r, GAMMA_K),
+                g: gamma(*g, GAMMA_K),
+                b: gamma(*b, GAMMA_K),
+                a: *a,
+            }),
             BackgroundPattern::Blue => BackgroundPattern::BlueHighlighted,
             BackgroundPattern::Green => BackgroundPattern::GreenHighlighted,
             BackgroundPattern::White => BackgroundPattern::WhiteHighlighted,
             BackgroundPattern::Red => BackgroundPattern::RedHighlighted,
             other => *other,
-        }
-    }
-
-    pub fn load<'r>(&self, resource_manager: &'r mut ResourceManager) -> &'r Surface {
-        match self {
-            BackgroundPattern::Blue => resource_manager.image("BLUE_PATTERN", BLUE_PATTERN),
-            BackgroundPattern::BlueHighlighted => resource_manager.image_highlighted("BLUE_PATTERN", BLUE_PATTERN),
-            BackgroundPattern::Green => resource_manager.image("GREEN_PATTERN", GREEN_PATTERN),
-            BackgroundPattern::GreenHighlighted => resource_manager.image_highlighted("GREEN_PATTERN", GREEN_PATTERN),
-            BackgroundPattern::White => resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN),
-            BackgroundPattern::WhiteHighlighted => resource_manager.image_highlighted("MARBLE_PATTERN", MARBLE_PATTERN),
-            BackgroundPattern::Red => resource_manager.image("RED_PATTERN", RED_PATTERN),
-            BackgroundPattern::RedHighlighted => resource_manager.image_highlighted("RED_PATTERN", RED_PATTERN),
-            BackgroundPattern::Custom(name, bytes) => resource_manager.image(name, bytes),
         }
     }
 }

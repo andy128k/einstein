@@ -1,6 +1,7 @@
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
 use ui::widget::common::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 use error::*;
 
@@ -53,16 +54,17 @@ impl<A> Widget<A> for Container<A> where A: Clone {
     }
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        {
-            let bg = self.background.load(resource_manager);
-            context.tiles(bg);
-        }
+        let mut brick = Brick::new(self.get_rect())
+            .background(self.background);
+
         match self.background {
             BackgroundPattern::Custom(..) => {},
             _ => {
-                context.bevel(true, 1);
+                brick = brick.border(Border::Raised);
             },
         }
+
+        brick.draw(context, resource_manager)?;
 
         for child in &self.children {
             child.draw(&context.relative(child.get_rect()), resource_manager)?;

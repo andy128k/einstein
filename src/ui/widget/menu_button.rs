@@ -1,24 +1,25 @@
 use sdl::event::{Key};
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect};
 use ui::widget::button::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
-use resources::fonts::*;
 
 pub struct MenuButton {
+    rect: Rect,
     text: String,
 }
 
 impl ButtonRenderer for MenuButton {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Result<()> {
+    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         let color = if highlighted {
             Color::RGB(150, 255, 255)
         } else {
             Color::RGB(30, 255, 255)
         };
-        context.text(&self.text, menu_font()?, color, true, HorizontalAlign::Center, VerticalAlign::Middle)?;
-        Ok(())
+        Brick::new(self.rect)
+            .text(Text::new(&self.text).font_size(FontSize::Menu).color(color).shadow())
     }
 }
 
@@ -28,6 +29,7 @@ pub fn new_menu_button<A>(rect: Rect, text: &str, key: Option<Key>, action: A) -
         key,
         action,
         MenuButton {
+            rect,
             text: text.to_string(),
         }
     )

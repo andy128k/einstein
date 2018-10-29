@@ -3,11 +3,12 @@ use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Rect, HorizontalAlign};
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
-use resources::fonts::text_font;
 use error::*;
 use util::time::sec_to_str;
 
@@ -50,8 +51,11 @@ impl Widget<Nothing> for Watch {
 
         let s = sec_to_str(duration.as_secs() as u32);
 
-        context.fill(Color::RGB(48, 0, 255));
-        context.text(&s, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Right, VerticalAlign::Middle)?;
+        let brick = Brick::new(self.get_rect())
+            .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))
+            .text(Text::new(s).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right));
+
+        brick.draw(context, resource_manager)?;
         Ok(())
     }
 }

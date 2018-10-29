@@ -2,11 +2,11 @@ use std::cell::Cell;
 use sdl::event::{Mouse};
 use sdl2::pixels::Color;
 use error::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
-use ui::widget::common::BackgroundPattern;
+use ui::context::{Context, Rect};
+use ui::widget::common::*;
 use ui::widget::widget::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
-use resources::fonts::*;
 
 pub struct Checkbox {
     rect: Rect,
@@ -55,16 +55,13 @@ impl Widget<bool> for Checkbox {
     }
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        let image = if self.mouse_inside.get() {
-            self.background.highlighted().load(resource_manager)
-        } else {
-            self.background.load(resource_manager)
-        };
-        context.tiles(image);
-        context.etched();
+        let mut brick = Brick::new(self.get_rect())
+            .background(if self.mouse_inside.get() { self.background.highlighted() } else { self.background })
+            .border(Border::Etched);
         if self.checked.get() {
-            context.text("X", text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Center, VerticalAlign::Middle)?;
+            brick = brick.text(Text::new("X").color(Color::RGB(255, 255, 255)).shadow());
         }
+        brick.draw(context, resource_manager)?;
         Ok(())
     }
 }

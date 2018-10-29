@@ -2,7 +2,8 @@ use std::cell::Cell;
 use sdl::event::{Mouse};
 use error::*;
 use ui::context::{Context, Rect};
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::widget::widget::*;
 use resources::manager::ResourceManager;
 
@@ -114,20 +115,23 @@ impl Widget<f32> for Slider {
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let rect = self.rect;
-
-        context.relative(Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4))
-            .bevel(false, 1);
-
+        let scale_rect = Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4);
         let x = self.value_to_x(self.value.get());
         let slider_rect = Rect::new(x as i32, 0, rect.height(), rect.height());
-        let slider_context = context.relative(slider_rect);
-        let bg = if self.highlight.get() {
-            self.background.highlighted().load(resource_manager)
-        } else {
-            self.background.load(resource_manager)
-        };
-        slider_context.tiles(bg);
-        slider_context.etched();
+
+        let scale = Brick::new(scale_rect)
+            .border(Border::Sunken);
+
+        let slider = Brick::new(slider_rect)
+            .background(if self.highlight.get() { self.background.highlighted() } else { self.background })
+            .border(Border::Etched);
+
+        let all = Brick::new(rect)
+            .add(scale)
+            .add(slider);
+
+        all.draw(context, resource_manager)?;
+
         Ok(())
     }
 }

@@ -1,7 +1,8 @@
 use error::*;
 use ui::context::{Context, Rect};
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::{BackgroundPattern, Border};
+use ui::widget::brick::Brick;
 use resources::manager::ResourceManager;
 
 pub struct Window {
@@ -23,9 +24,10 @@ impl Widget<Nothing> for Window {
     }
 
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        let bg = self.background.load(resource_manager);
-        context.tiles(bg);
-        context.bevel(true, 1);
+        let brick = Brick::new(self.get_rect())
+            .background(self.background)
+            .border(Border::Raised);
+        brick.draw(context, resource_manager)?;
         Ok(())
     }
 }
