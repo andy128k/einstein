@@ -1,6 +1,6 @@
 use sdl::event::{Key};
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::button::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
@@ -12,7 +12,7 @@ pub struct MenuButton {
 }
 
 impl ButtonRenderer for MenuButton {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         let color = if highlighted {
             Color::RGB(150, 255, 255)
         } else {

@@ -2,19 +2,18 @@ use std::time::{Instant, Duration};
 use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
-use failure::err_msg;
 use sdl::event::{Key};
-use sdl::video::{Surface, SurfaceFlag};
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 use resources::fonts::text_font;
 use error::*;
 
 pub struct InputField {
     rect: Rect,
-    cursor: Surface,
     max_len: usize,
     text: Rc<RefCell<String>>,
     cursor_pos: Cell<usize>,
@@ -24,12 +23,8 @@ pub struct InputField {
 
 impl InputField {
     pub fn new(rect: Rect, text: &str, max_len: usize) -> Result<Self> {
-        let cursor = Surface::new(&[SurfaceFlag::SWSurface], 2, rect.height() as isize - 8, 32, 0, 0, 0, 0).map_err(err_msg)?;
-        cursor.fill(::sdl::video::Color::RGB(33, 33, 33));
-
         Ok(Self {
             rect,
-            cursor,
             max_len,
             text: Rc::new(RefCell::new(text.to_string())),
             cursor_pos: Cell::new(text.len()),
@@ -128,22 +123,23 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        let font = text_font()?;
-        context.text(&self.text.borrow(), font, Color::RGB(255, 255, 0), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        let mut brick = Brick::new(self.get_rect())
+            .border(Border::Sunken)
+            .text(Text::new(&self.text.borrow()).font_size(FontSize::Text).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
 
         if self.cursor_visible.get() {
             let cursor_pos = self.cursor_pos.get();
             let pos = if cursor_pos > 0 {
-                font.size_of(&self.text.borrow()[0..cursor_pos])?.0
+                text_font().unwrap().size_of(&self.text.borrow()[0..cursor_pos]).unwrap().0
             } else {
                 0
             };
-            context.image(&self.cursor, pos as i32, 4);
+            let cursor_rect = Rect::new(pos as i32, 4, 2, self.get_rect().height() - 8);
+            let cursor = Brick::new(cursor_rect).background(BackgroundPattern::Color(Color::RGB(33, 33, 33)));
+            brick.push(cursor);
         }
 
-        context.bevel(false, 1);
-
-        Ok(())
+        brick
     }
 }

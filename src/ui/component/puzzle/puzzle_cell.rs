@@ -5,6 +5,8 @@ use sdl::event::{Mouse};
 use rules::{Thing};
 use ui::context::{Context, Rect, Sprite};
 use ui::widget::widget::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
 use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
@@ -143,28 +145,20 @@ impl Widget<PuzzleAction> for PuzzleCell {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
         let row = self.row;
         let col = self.col;
+
+        let mut brick = Brick::new(self.get_rect());
 
         if let Some(value) = self.state.borrow().possibilities.get_defined(col, row) {
             let thing = Thing { row, value };
             let highlight = self.highlighted.get() == Some(None);
 
-            let atlas = if highlight {
-                resource_manager.image_highlighted("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS)
-            } else {
-                resource_manager.image("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS)
-            };
             let rect = get_thing_rect(thing);
-            let sprite = Sprite { image: atlas, rect };
-            context.sprite(&sprite, 0, 0);
-
+            brick = brick.background(BackgroundPattern::Sprite("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS, highlight, rect));
         } else {
-            {
-                let bg = resource_manager.image("EMPTY_TILE", EMPTY_TILE);
-                context.image(bg, 0, 0);
-            }
+            brick = brick.background(BackgroundPattern::Custom("EMPTY_TILE", EMPTY_TILE, false));
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);
@@ -172,17 +166,14 @@ impl Widget<PuzzleAction> for PuzzleCell {
                 if self.state.borrow().possibilities.is_possible(col as u8, thing) {
                     let highlight = self.highlighted.get() == Some(Some(i));
 
-                    let atlas = if highlight {
-                        resource_manager.image_highlighted("SMALL_THINGS_ATLAS", SMALL_THINGS_ATLAS)
-                    } else {
-                        resource_manager.image("SMALL_THINGS_ATLAS", SMALL_THINGS_ATLAS)
-                    };
                     let rect = get_small_thing_rect(thing);
-                    let sprite = Sprite { image: atlas, rect };
-                    context.sprite(&sprite, choice_rect.left(), choice_rect.top());
+                    brick.push(
+                        Brick::new(choice_rect)
+                            .background(BackgroundPattern::Sprite("SMALL_THINGS_ATLAS", SMALL_THINGS_ATLAS, highlight, rect))
+                    );
                 }
             }
         }
-        Ok(())
+        brick
     }
 }

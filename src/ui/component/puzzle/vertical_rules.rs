@@ -2,12 +2,14 @@ use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
 use sdl::event::{Mouse};
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::rule::{draw_rule};
 use ui::component::game::{GamePrivate};
 use resources::manager::ResourceManager;
-use resources::thing::{EMPTY_TILE};
+use resources::thing::EMPTY_TILE;
 use error::*;
 
 pub struct VerticalRules {
@@ -29,24 +31,19 @@ impl VerticalRules {
         })
     }
 
-    fn draw_cell(&self, context: &Context, resource_manager: &mut ResourceManager, index: usize) -> Result<()> {
+    fn draw_cell(&self, resource_manager: &mut ResourceManager, index: usize) -> Brick {
         let rect = self.rect(index);
-        let c = context.relative(rect);
 
         if let Some(vertical_rule) = self.state.borrow().vertical_rules.get(index) {
             if self.state.borrow().show_excluded == vertical_rule.is_excluded {
                 let rule = &self.state.borrow().rules[vertical_rule.original_index];
-                draw_rule(&c, resource_manager, &rule, self.highlighted.get() == Some(index))?;
-                return Ok(());
+                return Brick::new(rect)
+                    .add(draw_rule(resource_manager, &rule, self.highlighted.get() == Some(index)));
             }
         }
 
-        {
-            let tile = resource_manager.image("EMPTY_TILE", EMPTY_TILE);
-            c.image(tile, 0, 0);
-            c.image(tile, 0, TILE_HEIGHT);
-        }
-        Ok(())
+        Brick::new(rect)
+            .background(BackgroundPattern::Custom("EMPTY_TILE", EMPTY_TILE, false))
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
@@ -107,11 +104,13 @@ impl Widget<Nothing> for VerticalRules {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        let mut brick = Brick::new(self.get_rect());
         let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
         for i in 0..num {
-            self.draw_cell(context, resource_manager, i)?;
+            let b = self.draw_cell(resource_manager, i);
+            brick.push(b);
         }
-        Ok(())
+        brick
     }
 }

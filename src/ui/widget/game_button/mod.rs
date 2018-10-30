@@ -1,6 +1,6 @@
 use sdl::event::{Key};
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::button::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
@@ -15,11 +15,11 @@ pub struct GameButton {
 }
 
 impl ButtonRenderer for GameButton {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         let image = if highlighted {
-            BackgroundPattern::Custom("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES)
+            BackgroundPattern::Custom("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES, false)
         } else {
-            BackgroundPattern::Custom("BUTTON_BG_BYTES", BUTTON_BG_BYTES)
+            BackgroundPattern::Custom("BUTTON_BG_BYTES", BUTTON_BG_BYTES, false)
         };
         Brick::new(self.rect)
             .background(image)

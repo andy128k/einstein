@@ -1,13 +1,12 @@
 use std::cell::Cell;
 use sdl::event::{Key, Mouse};
-use error::*;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 
 pub trait ButtonRenderer {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick;
+    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick;
 }
 
 pub struct Button<R: ButtonRenderer, A> {
@@ -60,9 +59,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        let brick = self.renderer.draw(context, resource_manager, self.highlighted.get());
-        brick.draw(context, resource_manager)?;
-        Ok(())
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        self.renderer.draw(resource_manager, self.highlighted.get())
     }
 }

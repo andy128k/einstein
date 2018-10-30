@@ -1,8 +1,9 @@
 use std::rc::Rc;
 use cell::RefCell;
 use rules::{PUZZLE_SIZE};
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::brick::*;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
 use resources::manager::ResourceManager;
@@ -45,12 +46,13 @@ impl Widget<PuzzleAction> for Puzzle {
         Ok(reaction)
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        let mut brick = Brick::new(self.get_rect());
         for child in &self.cells {
-            let c = context.relative(child.get_rect());
-            child.draw(&c, resource_manager)?;
+            let cb = child.draw(resource_manager);
+            brick.push(cb);
         }
-        Ok(())
+        brick
     }
 }
 

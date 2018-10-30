@@ -1,8 +1,7 @@
 use std::cell::Cell;
 use sdl::event::{Mouse};
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::common::*;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
@@ -54,14 +53,13 @@ impl Widget<bool> for Checkbox {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect())
             .background(if self.mouse_inside.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);
         if self.checked.get() {
             brick = brick.text(Text::new("X").color(Color::RGB(255, 255, 255)).shadow());
         }
-        brick.draw(context, resource_manager)?;
-        Ok(())
+        brick
     }
 }

@@ -1,7 +1,6 @@
 use std::cell::Cell;
 use sdl::event::{Mouse};
-use error::*;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use ui::widget::widget::*;
@@ -113,7 +112,7 @@ impl Widget<f32> for Slider {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
         let rect = self.rect;
         let scale_rect = Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4);
         let x = self.value_to_x(self.value.get());
@@ -126,12 +125,8 @@ impl Widget<f32> for Slider {
             .background(if self.highlight.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);
 
-        let all = Brick::new(rect)
+        Brick::new(rect)
             .add(scale)
-            .add(slider);
-
-        all.draw(context, resource_manager)?;
-
-        Ok(())
+            .add(slider)
     }
 }

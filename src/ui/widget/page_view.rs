@@ -1,21 +1,65 @@
 use std::rc::Rc;
 use cell::RefCell;
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
+use ui::widget::common::*;
+use ui::widget::brick::*;
 use ui::page_layout::*;
 use resources::manager::ResourceManager;
+use resources::rules::TextItem;
 use resources::fonts::*;
+
+pub struct PageViewState {
+    text: &'static [TextItem<'static>],
+    pages: Vec<Page>,
+    current_page_index: usize,
+}
+
+impl PageViewState {
+    pub fn new(text: &'static [TextItem<'static>]) -> Rc<RefCell<Self>> {
+        Rc::new(RefCell::new(Self { text, pages: vec![], current_page_index: 0 }))
+    }
+
+    pub fn current_page(&self) -> Option<&Page> {
+        self.pages.get(self.current_page_index)
+    }
+
+    pub fn prev(&mut self) {
+        if self.current_page_index > 0 {
+            self.current_page_index -= 1;
+        }
+    }
+
+    pub fn next(&mut self) {
+        if self.current_page_index + 1 < self.pages.len() {
+            self.current_page_index += 1;
+        }
+    }
+
+    fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
+        if self.pages.is_empty() {
+            let font = text_font()?;
+            let mut pages = PagesBuilder::new(page_width as u16, page_height as u16);
+            for text_item in self.text {
+                match *text_item {
+                    TextItem::Text(ref content) => pages.add_text(content, font)?,
+                    TextItem::Image(image_name, image) => pages.add_image(image_name, image, resource_manager)?,
+                }
+            }
+        }
+        Ok(())
+    }
+}
 
 pub struct PageView {
     rect: Rect,
-    page: Rc<RefCell<Rc<Page>>>,
+    state: Rc<RefCell<PageViewState>>,
 }
 
 impl PageView {
-    pub fn new(rect: Rect, page: Rc<RefCell<Rc<Page>>>) -> Self {
-        Self { rect, page }
+    pub fn new(rect: Rect, state: &Rc<RefCell<PageViewState>>) -> Self {
+        Self { rect, state: state.clone() }
     }
 }
 
@@ -26,18 +70,28 @@ impl Widget<Nothing> for PageView {
         self.rect
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        for item in (*self.page.borrow()).iter() {
-            match *item {
-                PageItem::Text(ref text, x, y, w, h) => {
-                    context.relative(Rect::new(x as i32, y as i32, w as u32, h as u32))
-                        .text(text, text_font()?, Color::RGB(255, 255, 255), true, HorizontalAlign::Left, VerticalAlign::Middle)?;
-                },
-                PageItem::Image(ref image, x, y, _w, _h) => {
-                    context.image(image, x as i32, y as i32);
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        self.state.borrow_mut().make_pages(self.get_client_rect().width(), self.get_client_rect().height(), resource_manager).unwrap();
+
+        let mut brick = Brick::new(self.get_rect());
+        if let Some(items) = self.state.borrow().current_page() {
+            for item in items {
+                match *item {
+                    PageItem::Text(ref text, x, y, w, h) => {
+                        brick.push(
+                            Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
+                                .text(Text::new(&text).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).shadow().halign(HorizontalAlign::Left))
+                        );
+                    },
+                    PageItem::Image(image_name, image_bytes, x, y, w, h) => {
+                        brick.push(
+                            Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
+                                .background(BackgroundPattern::Custom(image_name, image_bytes, false))
+                        );
+                    }
                 }
             }
         }
-        Ok(())
+        brick
     }
 }

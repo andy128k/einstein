@@ -3,13 +3,12 @@ use std::rc::Rc;
 use std::cell::{Cell};
 use cell::RefCell;
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect, HorizontalAlign};
+use ui::context::{Rect, HorizontalAlign};
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
-use error::*;
 use util::time::sec_to_str;
 
 const GAME_TITLE: &[u8] = include_bytes!("./title.bmp");
@@ -49,7 +48,7 @@ impl Widget<Nothing> for GameTitle {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
         let duration = self.state.borrow().get_current_duration();
         self.last_duration.set(Some(duration));
         let s = sec_to_str(duration.as_secs() as u32);
@@ -61,15 +60,12 @@ impl Widget<Nothing> for GameTitle {
             self.get_rect().height() - (2 * 7)
         );
 
-        let brick = Brick::new(self.get_rect())
-            .background(BackgroundPattern::Custom("GAME_TITLE", GAME_TITLE))
+        Brick::new(self.get_rect())
+            .background(BackgroundPattern::Custom("GAME_TITLE", GAME_TITLE, false))
             .text(Text::new(&self.title).font_size(FontSize::Title).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
             .add(Brick::new(watch_rect)
                 .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))
                 .text(Text::new(s).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right))
-            );
-
-        brick.draw(context, resource_manager)?;
-        Ok(())
+            )
     }
 }

@@ -1,9 +1,8 @@
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
-use error::*;
 
 pub struct Container<A> {
     rect: Rect,
@@ -53,7 +52,7 @@ impl<A> Widget<A> for Container<A> where A: Clone {
         Ok(reaction)
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect())
             .background(self.background);
 
@@ -64,12 +63,11 @@ impl<A> Widget<A> for Container<A> where A: Clone {
             },
         }
 
-        brick.draw(context, resource_manager)?;
-
         for child in &self.children {
-            child.draw(&context.relative(child.get_rect()), resource_manager)?;
+            let cb = child.draw(resource_manager);
+            brick.push(cb);
         }
 
-        Ok(())
+        brick
     }
 }

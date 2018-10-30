@@ -1,11 +1,9 @@
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use ui::widget::widget::*;
 use resources::manager::ResourceManager;
-use resources::fonts::*;
 
 pub struct Label {
     text: String,
@@ -47,15 +45,13 @@ impl Widget<Nothing> for Label {
         self.rect
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        let brick = Brick::new(self.get_rect())
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        Brick::new(self.get_rect())
             .text(Text::new(&self.text)
                 .font_size(self.font_size)
                 .color(self.color)
                 .shadow()
                 .halign(self.horizontal_align)
-                .valign(self.vertical_align));
-        brick.draw(context, resource_manager)?;
-        Ok(())
+                .valign(self.vertical_align))
     }
 }

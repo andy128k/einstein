@@ -1,8 +1,9 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
 use cell::RefCell;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 use error::*;
 
@@ -61,11 +62,11 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        self.check()?;
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        self.check().unwrap();
         match *self.wrapped.borrow() {
-            Some(ref widget) => widget.draw(context, resource_manager),
-            None => Ok(())
+            Some(ref widget) => widget.draw(resource_manager),
+            None => Brick::new(self.get_rect())
         }
     }
 }

@@ -1,6 +1,7 @@
 use sdl::event::{Key, Mouse};
 use error::*;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
+use ui::widget::brick::Brick;
 use resources::manager::ResourceManager;
 pub use algebra::*;
 
@@ -100,7 +101,7 @@ pub trait Widget<A> {
     fn on_event(&mut self, _event: &Event) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()>;
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick;
 }
 
 pub type WidgetPtr<A> = Box<Widget<A>>;
@@ -118,8 +119,8 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).on_event(event)
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        (**self).draw(context, resource_manager)
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        (**self).draw(resource_manager)
     }
 }
 
@@ -167,7 +168,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         }
     }
 
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        self.wrapped.draw(context, resource_manager)
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        self.wrapped.draw(resource_manager)
     }
 }

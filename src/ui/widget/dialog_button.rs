@@ -1,6 +1,6 @@
 use sdl::event::{Key};
 use sdl2::pixels::Color;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::brick::*;
 use ui::widget::button::*;
 use ui::widget::common::*;
@@ -13,7 +13,7 @@ pub struct DialogButton {
 }
 
 impl ButtonRenderer for DialogButton {
-    fn draw(&self, context: &Context, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         Brick::new(self.rect)
             .background(if highlighted { self.background.highlighted() } else { self.background })
             .border(Border::Etched)

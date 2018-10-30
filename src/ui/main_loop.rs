@@ -10,7 +10,8 @@ use resources::manager::ResourceManager;
 pub struct MainLoopQuit;
 
 pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>, resource_manager: &mut ResourceManager) -> Result<()> {
-    widget.draw(context, resource_manager)?;
+    let b = widget.draw(resource_manager);
+    b.draw(context, resource_manager)?;
     context.surface.update_rects(&[rect_to_rect1(context.rect)]);
 
     loop {
@@ -26,7 +27,8 @@ pub fn main_loop(context: &Context, widget: &mut Widget<MainLoopQuit>, resource_
             _ => EventReaction::empty()
         };
         if reaction.update.len() > 0 {
-            widget.draw(context, resource_manager)?;
+            let b = widget.draw(resource_manager);
+            b.draw(context, resource_manager)?;
             // let rects = reaction.update.iter().map(|r| rect_to_rect1(*r)).collect::<Vec<_>>();
             // context.surface.update_rects(&rects);
             context.surface.update_rects(&[rect_to_rect1(context.rect)]);

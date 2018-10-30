@@ -1,4 +1,4 @@
 pub enum TextItem<'a> {
     Text(&'a str),
-    Image(&'a [u8]),
+    Image(&'a str, &'a [u8]),
 }

@@ -1,6 +1,6 @@
 use sdl2::pixels::Color;
 use ui::widget::common::*;
-use ui::context::{Context, Rect, HorizontalAlign, VerticalAlign};
+use ui::context::{Context, Sprite, Rect, HorizontalAlign, VerticalAlign};
 use resources::manager::ResourceManager;
 use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 use resources::fonts::*;
@@ -91,6 +91,10 @@ impl Brick {
         self
     }
 
+    pub fn push(&mut self, child: Self) {
+        self.children.push(child);
+    }
+
     pub fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
         match self.background {
             Some(BackgroundPattern::Color(color)) => {
@@ -128,9 +132,14 @@ impl Brick {
                 let image = resource_manager.image_highlighted("RED_PATTERN", RED_PATTERN);
                 context.tiles(image);
             },
-            Some(BackgroundPattern::Custom(name, bytes)) => {
-                let image = resource_manager.image(name, bytes);
+            Some(BackgroundPattern::Custom(name, bytes, highlight)) => {
+                let image = resource_manager.image_h(name, bytes, highlight);
                 context.tiles(image);
+            },
+            Some(BackgroundPattern::Sprite(name, bytes, highlight, rect)) => {
+                let image = resource_manager.image_h(name, bytes, highlight);
+                let sprite = Sprite { image, rect };
+                context.sprite(&sprite, 0, 0);
             },
             None => {},
         }

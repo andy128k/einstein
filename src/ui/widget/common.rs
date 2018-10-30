@@ -1,4 +1,5 @@
 use sdl2::pixels::Color;
+use ui::context::Rect;
 
 #[derive(Clone, Copy)]
 pub enum Border {
@@ -18,7 +19,8 @@ pub enum BackgroundPattern {
     WhiteHighlighted,
     Red,
     RedHighlighted,
-    Custom(&'static str, &'static [u8]),
+    Custom(&'static str, &'static [u8], bool),
+    Sprite(&'static str, &'static [u8], bool, Rect),
 }
 
 fn gamma(v: u8, k: f64) -> u8 {
@@ -40,6 +42,8 @@ impl BackgroundPattern {
             BackgroundPattern::Green => BackgroundPattern::GreenHighlighted,
             BackgroundPattern::White => BackgroundPattern::WhiteHighlighted,
             BackgroundPattern::Red => BackgroundPattern::RedHighlighted,
+            BackgroundPattern::Custom(name, bytes, _) => BackgroundPattern::Custom(name, bytes, true),
+            BackgroundPattern::Sprite(name, bytes, _, rect) => BackgroundPattern::Sprite(name, bytes, true, *rect),
             other => *other,
         }
     }

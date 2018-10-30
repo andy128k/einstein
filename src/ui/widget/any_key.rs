@@ -1,6 +1,6 @@
-use error::*;
-use ui::context::{Context, Rect};
+use ui::context::Rect;
 use ui::widget::widget::*;
+use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 
 pub struct AnyKey<A> {
@@ -30,7 +30,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         }
     }
 
-    fn draw(&self, _context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
-        Ok(())
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+        Brick::new(self.get_rect())
     }
 }

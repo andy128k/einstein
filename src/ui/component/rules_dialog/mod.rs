@@ -9,8 +9,6 @@ use ui::widget::dialog_button::*;
 use ui::widget::label::Label;
 use ui::widget::page_view::*;
 use ui::widget::container::Container;
-use ui::page_layout::{Page, PagesBuilder};
-use resources::fonts::*;
 use resources::rules::{get_rules, TextItem};
 use resources::messages::Messages;
 
@@ -19,38 +17,19 @@ const HEIGHT: u16 = 500;
 const CLIENT_WIDTH: u16 = 570;
 const CLIENT_HEIGHT: u16 = 390;
 
-fn make_pages(text: &[TextItem], page_width: u16, page_height: u16) -> Result<Vec<Page>> {
-    let font = text_font()?;
-    let mut pages = PagesBuilder::new(page_width, page_height);
-    for text_item in text {
-        match *text_item {
-            TextItem::Text(ref content) => pages.add_text(content, font)?,
-            TextItem::Image(ref image) => pages.add_image(image)?
-        }
-    }
-    Ok(pages.build())
-}
-
 struct DescriptionPrivate {
-    pages: Vec<Rc<Page>>,
-    current_page_index: usize,
-    current_page: Rc<RefCell<Rc<Page>>>
+    page_view_state: Rc<RefCell<PageViewState>>,
 }
 
 impl DescriptionPrivate {
-    fn new(messages: &Messages, text: &[TextItem]) -> Result<Container<()>> {
-        let pages: Vec<Rc<Page>> = make_pages(text, CLIENT_WIDTH, CLIENT_HEIGHT)?
-            .into_iter().map(Rc::new).collect();
+    fn new(messages: &Messages, text: &'static [TextItem]) -> Result<Container<()>> {
+        let page_view_state = PageViewState::new(text);
 
         let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
         let bg = BackgroundPattern::Blue;
 
-        let current_page = Rc::new(RefCell::new(pages[0].clone()));
-
         let state = Rc::new(RefCell::new(DescriptionPrivate {
-            pages,
-            current_page_index: 0,
-            current_page: current_page.clone()
+            page_view_state: page_view_state.clone(),
         }));
 
         let container = Container::<()>::modal(rect, bg)
@@ -58,7 +37,7 @@ impl DescriptionPrivate {
                 Label::title(Rect::new(150, 10, 300, 40), messages.rules)
             ))
             .add(WidgetMapAction::no_action(
-                PageView::new(Rect::new(15, 50, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), current_page)
+                PageView::new(Rect::new(15, 50, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), &page_view_state)
             ))
             .add({
                 let state2 = state.clone();
@@ -88,17 +67,11 @@ impl DescriptionPrivate {
     }
 
     fn prev(&mut self) {
-        if self.current_page_index > 0 {
-            self.current_page_index -= 1;
-            *self.current_page.borrow_mut() = self.pages[self.current_page_index].clone();
-        }
+        self.page_view_state.borrow_mut().prev();
     }
 
     fn next(&mut self) {
-        if self.current_page_index + 1 < self.pages.len() {
-            self.current_page_index += 1;
-            *self.current_page.borrow_mut() = self.pages[self.current_page_index].clone();
-        }
+        self.page_view_state.borrow_mut().next();
     }
 }
 
