@@ -1,5 +1,4 @@
 use rules::{Rule, Thing};
-use resources::manager::ResourceManager;
 use resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
 use ui::context::Rect;
 use ui::widget::common::*;
@@ -25,7 +24,7 @@ fn draw_thing(rect: Rect, thing: Thing, highlighted: bool) -> Brick {
         .background(BackgroundPattern::Sprite("LARGE_THINGS_ATLAS", LARGE_THINGS_ATLAS, highlighted, get_thing_rect(thing)))
 }
 
-pub fn draw_rule(resource_manager: &mut ResourceManager, rule: &Rule, highlighted: bool) -> Brick {
+pub fn draw_rule(rule: &Rule, highlighted: bool) -> Brick {
     match *rule {
         Rule::Near(thing1, thing2) => {
             Brick::new(RECT_WIDE)

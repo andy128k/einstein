@@ -48,7 +48,7 @@ impl Widget<Nothing> for GameTitle {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
         let duration = self.state.borrow().get_current_duration();
         self.last_duration.set(Some(duration));
         let s = sec_to_str(duration.as_secs() as u32);

@@ -123,7 +123,7 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect())
             .border(Border::Sunken)
             .text(Text::new(&self.text.borrow()).font_size(FontSize::Text).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));

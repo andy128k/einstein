@@ -53,7 +53,7 @@ impl Widget<bool> for Checkbox {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect())
             .background(if self.mouse_inside.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);

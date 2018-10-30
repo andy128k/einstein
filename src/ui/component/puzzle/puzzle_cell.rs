@@ -3,7 +3,7 @@ use std::cell::{Cell};
 use cell::RefCell;
 use sdl::event::{Mouse};
 use rules::{Thing};
-use ui::context::{Context, Rect, Sprite};
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;

@@ -31,14 +31,14 @@ impl VerticalRules {
         })
     }
 
-    fn draw_cell(&self, resource_manager: &mut ResourceManager, index: usize) -> Brick {
+    fn draw_cell(&self, index: usize) -> Brick {
         let rect = self.rect(index);
 
         if let Some(vertical_rule) = self.state.borrow().vertical_rules.get(index) {
             if self.state.borrow().show_excluded == vertical_rule.is_excluded {
                 let rule = &self.state.borrow().rules[vertical_rule.original_index];
                 return Brick::new(rect)
-                    .add(draw_rule(resource_manager, &rule, self.highlighted.get() == Some(index)));
+                    .add(draw_rule(&rule, self.highlighted.get() == Some(index)));
             }
         }
 
@@ -104,11 +104,11 @@ impl Widget<Nothing> for VerticalRules {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect());
         let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
         for i in 0..num {
-            let b = self.draw_cell(resource_manager, i);
+            let b = self.draw_cell(i);
             brick.push(b);
         }
         brick

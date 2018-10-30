@@ -15,7 +15,7 @@ pub struct GameButton {
 }
 
 impl ButtonRenderer for GameButton {
-    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, _resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
         let image = if highlighted {
             BackgroundPattern::Custom("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES, false)
         } else {
