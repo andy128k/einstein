@@ -12,23 +12,27 @@ use resources::manager::ResourceManager;
 use error::*;
 use util::time::sec_to_str;
 
-pub struct Watch {
+const GAME_TITLE: &[u8] = include_bytes!("./title.bmp");
+
+pub struct GameTitle {
     rect: Rect,
+    title: String,
     state: Rc<RefCell<GamePrivate>>,
     last_duration: Cell<Option<Duration>>,
 }
 
-impl Watch {
-    pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Self {
-        Self {
+impl GameTitle {
+    pub fn new(rect: Rect, title: &str, state: Rc<RefCell<GamePrivate>>) -> Self {
+        GameTitle {
             rect,
+            title: title.to_owned(),
             state,
             last_duration: Cell::new(None)
         }
     }
 }
 
-impl Widget<Nothing> for Watch {
+impl Widget<Nothing> for GameTitle {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
@@ -48,12 +52,22 @@ impl Widget<Nothing> for Watch {
     fn draw(&self, context: &Context, resource_manager: &mut ResourceManager) -> Result<()> {
         let duration = self.state.borrow().get_current_duration();
         self.last_duration.set(Some(duration));
-
         let s = sec_to_str(duration.as_secs() as u32);
 
+        let watch_rect = Rect::new(
+            (self.get_rect().width() - 7 - 100) as i32,
+            7,
+            100,
+            self.get_rect().height() - (2 * 7)
+        );
+
         let brick = Brick::new(self.get_rect())
-            .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))
-            .text(Text::new(s).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right));
+            .background(BackgroundPattern::Custom("GAME_TITLE", GAME_TITLE))
+            .text(Text::new(&self.title).font_size(FontSize::Title).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
+            .add(Brick::new(watch_rect)
+                .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))
+                .text(Text::new(s).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right))
+            );
 
         brick.draw(context, resource_manager)?;
         Ok(())

@@ -1,6 +1,5 @@
 pub mod dialog;
 pub mod message_dialog;
-pub mod watch;
 pub mod rules_dialog;
 pub mod topscores_dialog;
 pub mod player_name_dialog;
@@ -10,6 +9,7 @@ pub mod pause_dialog;
 pub mod failure_dialog;
 pub mod save_dialog;
 pub mod load_dialog;
+pub mod game_title;
 pub mod puzzle;
 pub mod game;
 pub mod menu;
