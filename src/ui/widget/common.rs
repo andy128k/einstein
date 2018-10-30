@@ -50,9 +50,10 @@ impl BackgroundPattern {
 }
 
 #[derive(Clone, Copy)]
-pub enum FontSize {
-    Text,
-    Button,
-    Menu,
-    Title,
+pub struct FontSize(pub u16);
+
+impl FontSize {
+    pub const TEXT: FontSize = FontSize(16);
+    pub const BUTTON: FontSize = FontSize(14);
+    pub const TITLE: FontSize = FontSize(26);
 }

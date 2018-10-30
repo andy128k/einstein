@@ -17,7 +17,7 @@ impl ButtonRenderer for DialogButton {
         Brick::new(self.rect)
             .background(if highlighted { self.background.highlighted() } else { self.background })
             .border(Border::Etched)
-            .text(Text::new(&self.text).font_size(FontSize::Button).color(Color::RGB(255, 255, 0)).shadow())
+            .text(Text::new(&self.text).font_size(FontSize::BUTTON).color(Color::RGB(255, 255, 0)).shadow())
     }
 }
 

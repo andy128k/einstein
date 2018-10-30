@@ -1,17 +1,25 @@
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use sdl::video::Surface;
+use sdl2::rwops::RWops;
+use sdl2::ttf::{Font, Sdl2TtfContext};
 use ui::utils::{load_image, adjust_brightness};
+
+const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
 pub struct ResourceManager<'r> {
     images: HashMap<String, Surface>,
+    fonts: HashMap<u16, Font<'r, 'r>>,
+    ttf_context: &'r Sdl2TtfContext,
     phantom_data: PhantomData<&'r str>,
 }
 
 impl<'r> ResourceManager<'r> {
-    pub fn new() -> Self {
+    pub fn new(ttf_context: &'r Sdl2TtfContext) -> Self {
         Self {
             images: HashMap::new(),
+            fonts: HashMap::new(),
+            ttf_context,
             phantom_data: PhantomData,
         }
     }
@@ -43,5 +51,14 @@ impl<'r> ResourceManager<'r> {
         } else {
             self.image(name, data)
         }
+    }
+
+    pub fn font(&mut self, point_size: u16) -> &Font<'r, 'r> {
+        if self.fonts.get(&point_size).is_none() {
+            let ops = RWops::from_bytes(FONT_DUMP).unwrap();
+            let font = self.ttf_context.load_font_from_rwops(ops, point_size).unwrap();
+            self.fonts.insert(point_size, font);
+        }
+        self.fonts.get(&point_size).unwrap()
     }
 }

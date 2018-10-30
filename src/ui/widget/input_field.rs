@@ -9,7 +9,6 @@ use ui::widget::widget::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
-use resources::fonts::text_font;
 use error::*;
 
 pub struct InputField {
@@ -123,15 +122,17 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+        let font_size = FontSize::TEXT;
+
         let mut brick = Brick::new(self.get_rect())
             .border(Border::Sunken)
-            .text(Text::new(&self.text.borrow()).font_size(FontSize::Text).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
+            .text(Text::new(&self.text.borrow()).font_size(font_size).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
 
         if self.cursor_visible.get() {
             let cursor_pos = self.cursor_pos.get();
             let pos = if cursor_pos > 0 {
-                text_font().unwrap().size_of(&self.text.borrow()[0..cursor_pos]).unwrap().0
+                resource_manager.font(font_size.0).size_of(&self.text.borrow()[0..cursor_pos]).unwrap().0
             } else {
                 0
             };

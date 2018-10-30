@@ -8,7 +8,6 @@ use ui::widget::brick::*;
 use ui::page_layout::*;
 use resources::manager::ResourceManager;
 use resources::rules::TextItem;
-use resources::fonts::*;
 
 pub struct PageViewState {
     text: &'static [TextItem<'static>],
@@ -39,14 +38,14 @@ impl PageViewState {
 
     fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
         if self.pages.is_empty() {
-            let font = text_font()?;
             let mut pages = PagesBuilder::new(page_width as u16, page_height as u16);
             for text_item in self.text {
                 match *text_item {
-                    TextItem::Text(ref content) => pages.add_text(content, font)?,
+                    TextItem::Text(ref content) => pages.add_text(content, resource_manager.font(FontSize::TEXT.0))?,
                     TextItem::Image(image_name, image) => pages.add_image(image_name, image, resource_manager)?,
                 }
             }
+            self.pages = pages.build();
         }
         Ok(())
     }
@@ -80,7 +79,7 @@ impl Widget<Nothing> for PageView {
                     PageItem::Text(ref text, x, y, w, h) => {
                         brick.push(
                             Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
-                                .text(Text::new(&text).font_size(FontSize::Text).color(Color::RGB(255, 255, 255)).shadow().halign(HorizontalAlign::Left))
+                                .text(Text::new(&text).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).shadow().halign(HorizontalAlign::Left))
                         );
                     },
                     PageItem::Image(image_name, image_bytes, x, y, w, h) => {

@@ -3,7 +3,6 @@ use ui::widget::common::*;
 use ui::context::{Context, Sprite, Rect, HorizontalAlign, VerticalAlign};
 use resources::manager::ResourceManager;
 use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
-use resources::fonts::*;
 
 pub struct Text {
     text: String,
@@ -18,7 +17,7 @@ impl Text {
     pub fn new(text: impl ToString) -> Self {
         Self {
             text: text.to_string(),
-            font_size: FontSize::Text,
+            font_size: FontSize::TEXT,
             color: Color::RGB(0, 0, 0),
             horizontal_align: HorizontalAlign::Center,
             vertical_align: VerticalAlign::Middle,
@@ -144,12 +143,7 @@ impl Brick {
             None => {},
         }
         if let Some(ref text) = self.text {
-            let font = match text.font_size {
-                FontSize::Text => text_font()?,
-                FontSize::Button => button_font()?,
-                FontSize::Menu => menu_font()?,
-                FontSize::Title => title_font()?,
-            };
+            let font = resource_manager.font(text.font_size.0);
             context.text(&text.text, font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
         }
         match self.border {

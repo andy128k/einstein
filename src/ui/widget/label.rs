@@ -19,7 +19,7 @@ impl Label {
         Self {
             text: text.to_string(),
             rect,
-            font_size: FontSize::Text,
+            font_size: FontSize::TEXT,
             color,
             horizontal_align,
             vertical_align: VerticalAlign::Middle,
@@ -30,7 +30,7 @@ impl Label {
         Self {
             text: text.to_string(),
             rect,
-            font_size: FontSize::Title,
+            font_size: FontSize::TITLE,
             color: Color::RGB(255, 255, 0),
             horizontal_align: HorizontalAlign::Center,
             vertical_align: VerticalAlign::Middle,

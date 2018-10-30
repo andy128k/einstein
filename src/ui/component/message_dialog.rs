@@ -6,7 +6,6 @@ use ui::widget::label::*;
 use ui::widget::any_key::*;
 use ui::widget::container::Container;
 use ui::context::{Rect, HorizontalAlign};
-use resources::fonts::*;
 
 pub enum MessageType {
     Neutral,
@@ -15,10 +14,8 @@ pub enum MessageType {
 }
 
 pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Container<()>> {
-    let font = text_font()?;
-    let (text_width, text_height) = font.size_of(message)?;
-    let width = text_width + 100;
-    let height = text_height + 100;
+    let width = 500;
+    let height = 400;
 
     let rect = Rect::new(
         ((800 - width) / 2) as i32,
