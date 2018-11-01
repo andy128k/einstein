@@ -37,7 +37,7 @@ pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Wi
                 Event::Quit { .. } => return Ok(()),
                 _ => EventReaction::empty()
             };
-            if reaction.update.len() > 0 {
+            if reaction.update {
                 let b = widget.draw(resource_manager);
                 b.draw(canvas, rect, resource_manager)?;
                 canvas.present();

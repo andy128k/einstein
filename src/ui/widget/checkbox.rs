@@ -38,13 +38,13 @@ impl Widget<bool> for Checkbox {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
                 // sound->play(L"click.wav"); TODO
                 self.checked.set(!self.checked.get());
-                Ok(EventReaction::update_and_action(self.get_rect(), self.checked.get()))
+                Ok(EventReaction::update_and_action(self.checked.get()))
             },
             Event::MouseMove(x, y) => {
                 let to_highlight = rect.contains_point((x, y));
                 if self.mouse_inside.get() != to_highlight {
                     self.mouse_inside.set(to_highlight);
-                    Ok(EventReaction::update(self.get_rect()))
+                    Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }

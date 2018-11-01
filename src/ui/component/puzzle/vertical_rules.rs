@@ -74,7 +74,7 @@ impl Widget<Nothing> for VerticalRules {
                     Some(no) => {
                         if self.state.borrow_mut().toggle_vertical_rule(no).is_some() {
                             // sound->play(L"whizz.wav");
-                            Ok(EventReaction::update(self.rect(no)))
+                            Ok(EventReaction::update())
                         } else {
                             Ok(EventReaction::empty())
                         }
@@ -85,17 +85,8 @@ impl Widget<Nothing> for VerticalRules {
             Event::MouseMove(x, y) => {
                 let no = self.get_rule_index(x, y);
                 if no != self.highlighted.get() {
-                    let mut rects = Vec::new();
-                    if let Some(index) = self.highlighted.get() { // && isActive
-                        rects.push(self.rect(index));
-                    }
-                    if let Some(index) = no { // && isActive
-                        self.highlighted.set(Some(index));
-                        rects.push(self.rect(index));
-                    } else {
-                        self.highlighted.set(None);
-                    }
-                    Ok(EventReaction::updates(&rects))
+                    self.highlighted.set(no);
+                    Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }

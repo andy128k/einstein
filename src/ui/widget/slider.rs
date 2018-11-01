@@ -99,11 +99,11 @@ impl Widget<f32> for Slider {
             },
             Event::MouseButtonUp(..) => {
                 self.drag_stop();
-                Ok(EventReaction::update_and_action(self.get_rect(), self.value.get()))
+                Ok(EventReaction::update_and_action(self.value.get()))
             },
             Event::MouseMove(x, y) => {
                 if self.on_mouse_move(x, y) {
-                    Ok(EventReaction::update(self.get_rect()))
+                    Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }

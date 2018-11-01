@@ -97,7 +97,7 @@ impl PuzzleCell {
         } else if self.state.borrow().possibilities.is_solved() {
             EventReaction::action(PuzzleAction::Victory)
         } else {
-            EventReaction::update(self.get_rect())
+            EventReaction::update()
         }
     }
 
@@ -140,7 +140,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
             Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y)),
             Event::MouseMove(x, y) => {
                 if self.on_mouse_move(x, y) {
-                    Ok(EventReaction::update(self.get_rect()))
+                    Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }

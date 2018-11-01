@@ -49,7 +49,7 @@ impl InputField {
                 } else {
                     self.move_cursor(cursor_pos);
                 }
-                EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
+                EventReaction::update_and_action(self.text.borrow().clone())
             },
             Keycode::Left => {
                 if cursor_pos > 0 {
@@ -57,7 +57,7 @@ impl InputField {
                 } else {
                     self.move_cursor(cursor_pos);
                 }
-                EventReaction::update(self.get_rect())
+                EventReaction::update()
             },
             Keycode::Right => {
                 if cursor_pos < text_len {
@@ -65,22 +65,22 @@ impl InputField {
                 } else {
                     self.move_cursor(cursor_pos);
                 }
-                EventReaction::update(self.get_rect())
+                EventReaction::update()
             },
             Keycode::Home => {
                 self.move_cursor(0);
-                EventReaction::update(self.get_rect())
+                EventReaction::update()
             },
             Keycode::End => {
                 self.move_cursor(text_len);
-                EventReaction::update(self.get_rect())
+                EventReaction::update()
             },
             Keycode::Delete => {
                 if cursor_pos < text_len {
                     self.text.borrow_mut().remove(cursor_pos);
                 }
                 self.move_cursor(cursor_pos);
-                EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
+                EventReaction::update_and_action(self.text.borrow().clone())
             },
             _ => EventReaction::empty(),
         }
@@ -98,7 +98,7 @@ impl InputField {
             }
         }
         if !text.is_empty() {
-            EventReaction::update_and_action(self.get_rect(), self.text.borrow().clone())
+            EventReaction::update_and_action(self.text.borrow().clone())
         } else {
             EventReaction::empty()
         }
@@ -109,7 +109,7 @@ impl InputField {
         if now - self.last_cursor.get() > Duration::from_millis(1000) {
             self.cursor_visible.set(!self.cursor_visible.get());
             self.last_cursor.set(now);
-            Ok(EventReaction::update(self.get_rect()))
+            Ok(EventReaction::update())
         } else {
             Ok(EventReaction::empty())
         }

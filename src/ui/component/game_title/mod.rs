@@ -39,7 +39,7 @@ impl Widget<Nothing> for GameTitle {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
-                    Ok(EventReaction::update(self.get_rect()))
+                    Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }

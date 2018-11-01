@@ -29,7 +29,7 @@ impl Event {
 }
 
 pub struct EventReaction<A> {
-    pub update: Vec<Rect>,
+    pub update: bool,
     pub action: Option<A>,
     pub terminated: bool,
 }
@@ -37,31 +37,23 @@ pub struct EventReaction<A> {
 impl<A> EventReaction<A> {
     pub fn empty() -> Self {
         Self {
-            update: Vec::new(),
+            update: false,
             action: None,
             terminated: false
         }
     }
 
-    pub fn update(rect: Rect) -> Self {
+    pub fn update() -> Self {
         Self {
-            update: vec![rect],
+            update: true,
             action: None,
             terminated: false
         }
     }
 
-    pub fn updates(rects: &[Rect]) -> Self {
+    pub fn update_and_action(action: A) -> Self {
         Self {
-            update: rects.to_vec(),
-            action: None,
-            terminated: false
-        }
-    }
-
-    pub fn update_and_action(rect: Rect, action: A) -> Self {
-        Self {
-            update: vec![rect],
+            update: true,
             action: Some(action),
             terminated: false
         }
@@ -69,7 +61,7 @@ impl<A> EventReaction<A> {
 
     pub fn action(action: A) -> Self {
         Self {
-            update: vec![],
+            update: false,
             action: Some(action),
             terminated: false
         }
@@ -80,7 +72,7 @@ impl<A> EventReaction<A> where A: Clone {
     pub fn add(&mut self, reaction2: &EventReaction<A>) {
         if !self.terminated {
             self.terminated |= reaction2.terminated;
-            self.update.extend(reaction2.update.iter());
+            self.update |= reaction2.update;
             self.action = match (&self.action, &reaction2.action) {
                 (&None, &None) => None,
                 (&Some(ref a), &None) => Some((*a).clone()),
@@ -159,7 +151,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         let reaction = self.wrapped.on_event(event)?;
         if let Some(ref action) = reaction.action {
             let mut reaction2 = (self.convert)(action)?;
-            reaction2.update.splice(0..0, reaction.update.into_iter());
+            reaction2.update |= reaction.update;
             reaction2.terminated |= reaction.terminated;
             Ok(reaction2)
         } else {
