@@ -45,7 +45,7 @@ impl Widget<Nothing> for Label {
         self.rect
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         Brick::new(self.get_rect())
             .text(Text::new(&self.text)
                 .font_size(self.font_size)

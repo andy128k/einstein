@@ -30,7 +30,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         }
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         Brick::new(self.get_rect())
     }
 }

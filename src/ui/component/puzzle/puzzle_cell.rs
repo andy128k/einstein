@@ -145,7 +145,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         }
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let row = self.row;
         let col = self.col;
 

@@ -1,64 +1,76 @@
 use std::collections::HashMap;
 use std::marker::PhantomData;
+use std::cell::{RefCell, Ref};
 use sdl::video::Surface;
 use sdl2::rwops::RWops;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 use ui::utils::{load_image, adjust_brightness};
 
+pub trait ResourceManager {
+    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Surface>;
+    fn font(&self, point_size: u16) -> Ref<Font>;
+}
+
 const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
-pub struct ResourceManager<'r> {
-    images: HashMap<String, Surface>,
-    fonts: HashMap<u16, Font<'r, 'r>>,
+pub struct ResourceManagerImpl<'r> {
+    images: RefCell<HashMap<String, Surface>>,
+    fonts: RefCell<HashMap<u16, Font<'r, 'r>>>,
     ttf_context: &'r Sdl2TtfContext,
     phantom_data: PhantomData<&'r str>,
 }
 
-impl<'r> ResourceManager<'r> {
+impl<'r> ResourceManagerImpl<'r> {
     pub fn new(ttf_context: &'r Sdl2TtfContext) -> Self {
-        Self {
-            images: HashMap::new(),
-            fonts: HashMap::new(),
+        ResourceManagerImpl {
+            images: RefCell::new(HashMap::new()),
+            fonts: RefCell::new(HashMap::new()),
             ttf_context,
             phantom_data: PhantomData,
         }
     }
 
-    pub fn image(&mut self, name: &'static str, data: &[u8]) -> &Surface {
-        self.images.entry(name.to_owned()).or_insert_with(|| load_image(data).unwrap())
+    fn image_normal(&self, name: &'static str, data: &[u8]) -> Ref<Surface> {
+        let key = name.to_owned();
+        if self.images.borrow().get(&key).is_none() {
+            self.images.borrow_mut().insert(key.clone(), load_image(data).unwrap());
+        }
+        Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
 
-    fn highlight(&mut self, name: &'static str, data: &[u8]) {
+    fn highlight(&self, name: &'static str, data: &[u8]) {
         let key = format!("{}_HIGHLIGHTED", name);
         let h = {
-            let img = self.image(name, data);
-            adjust_brightness(img, 1.5)
+            let img = self.image_normal(name, data);
+            adjust_brightness(&*img, 1.5)
         };
-        self.images.insert(key.clone(), h);
+        self.images.borrow_mut().insert(key.clone(), h);
     }
 
-    pub fn image_highlighted(&mut self, name: &'static str, data: &[u8]) -> &Surface {
+    fn image_highlighted(&self, name: &'static str, data: &[u8]) -> Ref<Surface> {
         let key = format!("{}_HIGHLIGHTED", name);
-        if self.images.get(&key).is_none() {
+        if self.images.borrow().get(&key).is_none() {
             self.highlight(name, data);
         }
-        self.images.get(&key).unwrap()
+        Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
+}
 
-    pub fn image_h(&mut self, name: &'static str, data: &[u8], highlighted: bool) -> &Surface {
+impl<'r> ResourceManager for ResourceManagerImpl<'r> {
+    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Surface> {
         if highlighted {
             self.image_highlighted(name, data)
         } else {
-            self.image(name, data)
+            self.image_normal(name, data)
         }
     }
 
-    pub fn font(&mut self, point_size: u16) -> &Font<'r, 'r> {
-        if self.fonts.get(&point_size).is_none() {
+    fn font(&self, point_size: u16) -> Ref<Font> {
+        if self.fonts.borrow().get(&point_size).is_none() {
             let ops = RWops::from_bytes(FONT_DUMP).unwrap();
             let font = self.ttf_context.load_font_from_rwops(ops, point_size).unwrap();
-            self.fonts.insert(point_size, font);
+            self.fonts.borrow_mut().insert(point_size, font);
         }
-        self.fonts.get(&point_size).unwrap()
+        Ref::map(self.fonts.borrow(), |r| r.get(&point_size).unwrap())
     }
 }

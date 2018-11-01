@@ -12,7 +12,7 @@ pub struct MenuButton {
 }
 
 impl ButtonRenderer for MenuButton {
-    fn draw(&self, _resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick {
         let color = if highlighted {
             Color::RGB(150, 255, 255)
         } else {

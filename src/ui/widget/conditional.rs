@@ -62,7 +62,7 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         self.check().unwrap();
         match *self.wrapped.borrow() {
             Some(ref widget) => widget.draw(resource_manager),

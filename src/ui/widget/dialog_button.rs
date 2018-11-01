@@ -13,7 +13,7 @@ pub struct DialogButton {
 }
 
 impl ButtonRenderer for DialogButton {
-    fn draw(&self, _resource_manager: &mut ResourceManager, highlighted: bool) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick {
         Brick::new(self.rect)
             .background(if highlighted { self.background.highlighted() } else { self.background })
             .border(Border::Etched)

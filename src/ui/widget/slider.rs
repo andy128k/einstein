@@ -112,7 +112,7 @@ impl Widget<f32> for Slider {
         }
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let rect = self.rect;
         let scale_rect = Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4);
         let x = self.value_to_x(self.value.get());

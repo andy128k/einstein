@@ -101,7 +101,7 @@ pub trait Widget<A> {
     fn on_event(&mut self, _event: &Event) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick;
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick;
 }
 
 pub type WidgetPtr<A> = Box<Widget<A>>;
@@ -119,7 +119,7 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).on_event(event)
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         (**self).draw(resource_manager)
     }
 }
@@ -168,7 +168,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         self.wrapped.draw(resource_manager)
     }
 }

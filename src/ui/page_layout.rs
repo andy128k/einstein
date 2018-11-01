@@ -97,8 +97,8 @@ impl PagesBuilder {
         Ok(())
     }
 
-    pub fn add_image(&mut self, image: &'static str, content: &'static [u8], resource_manager: &mut ResourceManager) -> Result<()> {
-        let img = resource_manager.image(image, content);
+    pub fn add_image(&mut self, image: &'static str, content: &'static [u8], resource_manager: &dyn ResourceManager) -> Result<()> {
+        let img = resource_manager.image(image, content, false);
         let width = img.get_width();
         let height = img.get_height();
         let x = (self.page_width - width) / 2;

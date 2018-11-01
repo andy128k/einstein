@@ -122,7 +122,7 @@ impl Widget<String> for InputField {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         let font_size = FontSize::TEXT;
 
         let mut brick = Brick::new(self.get_rect())

@@ -36,12 +36,12 @@ impl PageViewState {
         }
     }
 
-    fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
+    fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &dyn ResourceManager) -> Result<(), ::failure::Error> {
         if self.pages.is_empty() {
             let mut pages = PagesBuilder::new(page_width as u16, page_height as u16);
             for text_item in self.text {
                 match *text_item {
-                    TextItem::Text(ref content) => pages.add_text(content, resource_manager.font(FontSize::TEXT.0))?,
+                    TextItem::Text(ref content) => pages.add_text(content, &*resource_manager.font(FontSize::TEXT.0))?,
                     TextItem::Image(image_name, image) => pages.add_image(image_name, image, resource_manager)?,
                 }
             }
@@ -69,7 +69,7 @@ impl Widget<Nothing> for PageView {
         self.rect
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         self.state.borrow_mut().make_pages(self.get_client_rect().width(), self.get_client_rect().height(), resource_manager).unwrap();
 
         let mut brick = Brick::new(self.get_rect());

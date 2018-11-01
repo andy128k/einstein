@@ -81,7 +81,7 @@ fn real_main() -> Result<()> {
             rect: Rect::new(0, 0, 800, 600)
         };
 
-        let mut resource_manager = resources::manager::ResourceManager::new(&app_context.ttf);
+        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&app_context.ttf);
 
         let mut menu = make_menu(get_messages(), state.clone())?;
         main_loop(&context, &mut menu, &mut resource_manager)?;

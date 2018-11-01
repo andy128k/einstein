@@ -104,7 +104,7 @@ impl Widget<Nothing> for VerticalRules {
         }
     }
 
-    fn draw(&self, _resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect());
         let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
         for i in 0..num {

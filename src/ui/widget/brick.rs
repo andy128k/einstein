@@ -100,51 +100,51 @@ impl Brick {
                 context.fill(color)
             },
             Some(BackgroundPattern::Blue) => {
-                let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, false);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::BlueHighlighted) => {
-                let image = resource_manager.image_highlighted("BLUE_PATTERN", BLUE_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, true);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::Green) => {
-                let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, false);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::GreenHighlighted) => {
-                let image = resource_manager.image_highlighted("GREEN_PATTERN", GREEN_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, true);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::White) => {
-                let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, false);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::WhiteHighlighted) => {
-                let image = resource_manager.image_highlighted("MARBLE_PATTERN", MARBLE_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, true);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::Red) => {
-                let image = resource_manager.image("RED_PATTERN", RED_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("RED_PATTERN", RED_PATTERN, false);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::RedHighlighted) => {
-                let image = resource_manager.image_highlighted("RED_PATTERN", RED_PATTERN);
-                context.tiles(image);
+                let image = resource_manager.image("RED_PATTERN", RED_PATTERN, true);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::Custom(name, bytes, highlight)) => {
-                let image = resource_manager.image_h(name, bytes, highlight);
-                context.tiles(image);
+                let image = resource_manager.image(name, bytes, highlight);
+                context.tiles(&*image);
             },
             Some(BackgroundPattern::Sprite(name, bytes, highlight, rect)) => {
-                let image = resource_manager.image_h(name, bytes, highlight);
-                let sprite = Sprite { image, rect };
+                let image = resource_manager.image(name, bytes, highlight);
+                let sprite = Sprite { image: &*image, rect };
                 context.sprite(&sprite, 0, 0);
             },
             None => {},
         }
         if let Some(ref text) = self.text {
             let font = resource_manager.font(text.font_size.0);
-            context.text(&text.text, font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
+            context.text(&text.text, &font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
         }
         match self.border {
             Some(Border::Raised) => context.bevel(true, 1),

@@ -46,7 +46,7 @@ impl Widget<PuzzleAction> for Puzzle {
         Ok(reaction)
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect());
         for child in &self.cells {
             let cb = child.draw(resource_manager);

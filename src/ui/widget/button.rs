@@ -6,7 +6,7 @@ use ui::widget::brick::*;
 use resources::manager::ResourceManager;
 
 pub trait ButtonRenderer {
-    fn draw(&self, resource_manager: &mut ResourceManager, highlighted: bool) -> Brick;
+    fn draw(&self, resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick;
 }
 
 pub struct Button<R: ButtonRenderer, A> {
@@ -59,7 +59,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         }
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         self.renderer.draw(resource_manager, self.highlighted.get())
     }
 }

@@ -52,7 +52,7 @@ impl<A> Widget<A> for Container<A> where A: Clone {
         Ok(reaction)
     }
 
-    fn draw(&self, resource_manager: &mut ResourceManager) -> Brick {
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         let mut brick = Brick::new(self.get_rect())
             .background(self.background);
 
