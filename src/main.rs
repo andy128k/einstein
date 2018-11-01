@@ -63,13 +63,11 @@ fn real_main() -> Result<()> {
     // enable_unicode(true);
 
     let ttf = sdl2::ttf::init()?;
+    let audio = audio::Audio::new()?;
 
-    let volume = state.borrow().volume;
+    audio.set_volume(state.borrow().volume as f32 / 100.0);
 
     {
-        // mixer::init(mixer::InitFlag::empty()).map_err(err_msg)?;
-        // let audio = audio::Audio::new()?;
-
         let texture_creator = canvas.texture_creator();
         let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
