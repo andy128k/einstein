@@ -104,43 +104,43 @@ impl Brick {
                 canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(::failure::err_msg)?;
             },
             Some(BackgroundPattern::Blue) => {
-                let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, false);
+                let image = resource_manager.image(&BLUE_PATTERN, false);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::BlueHighlighted) => {
-                let image = resource_manager.image("BLUE_PATTERN", BLUE_PATTERN, true);
+                let image = resource_manager.image(&BLUE_PATTERN, true);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Green) => {
-                let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, false);
+                let image = resource_manager.image(&GREEN_PATTERN, false);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::GreenHighlighted) => {
-                let image = resource_manager.image("GREEN_PATTERN", GREEN_PATTERN, true);
+                let image = resource_manager.image(&GREEN_PATTERN, true);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::White) => {
-                let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, false);
+                let image = resource_manager.image(&MARBLE_PATTERN, false);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::WhiteHighlighted) => {
-                let image = resource_manager.image("MARBLE_PATTERN", MARBLE_PATTERN, true);
+                let image = resource_manager.image(&MARBLE_PATTERN, true);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Red) => {
-                let image = resource_manager.image("RED_PATTERN", RED_PATTERN, false);
+                let image = resource_manager.image(&RED_PATTERN, false);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::RedHighlighted) => {
-                let image = resource_manager.image("RED_PATTERN", RED_PATTERN, true);
+                let image = resource_manager.image(&RED_PATTERN, true);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Custom(name, bytes, highlight)) => {
-                let image = resource_manager.image(name, bytes, highlight);
+                let image = resource_manager.image1(name, bytes, highlight);
                 tiles(canvas, rect, &*image)?;
             },
             Some(BackgroundPattern::Sprite(name, bytes, highlight, s_rect)) => {
-                let image = resource_manager.image(name, bytes, highlight);
+                let image = resource_manager.image1(name, bytes, highlight);
                 sprite(canvas, rect, &*image, s_rect)?;
             },
             None => {},

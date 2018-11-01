@@ -99,7 +99,7 @@ impl PagesBuilder {
     }
 
     pub fn add_image(&mut self, image: &'static str, content: &'static [u8], resource_manager: &dyn ResourceManager) -> Result<()> {
-        let img = resource_manager.image(image, content, false);
+        let img = resource_manager.image1(image, content, false);
         let TextureQuery { width, height, .. } = img.query();
         let x = (self.page_width - width as u16) / 2;
         self.add_item(16, PageItem::Image(image, content, x, 0, width as u16, height as u16));

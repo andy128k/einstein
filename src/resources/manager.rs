@@ -1,3 +1,5 @@
+#![macro_use]
+
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::cell::{RefCell, Ref};
@@ -6,8 +8,24 @@ use sdl2::render::{TextureCreator, Texture};
 use sdl2::rwops::RWops;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 
+pub struct Resource {
+    pub name: &'static str,
+    pub data: &'static [u8],
+}
+
+#[macro_export]
+macro_rules! resource {
+    ( $path:expr ) => {
+        Resource {
+            name: $path,
+            data: include_bytes!($path),
+        }
+    };
+}
+
 pub trait ResourceManager {
-    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture>;
+    fn image1(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture>;
+    fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture>;
     fn font(&self, point_size: u16) -> Ref<Font>;
 }
 
@@ -60,11 +78,19 @@ impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
 }
 
 impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
-    fn image(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture> {
+    fn image1(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture> {
         if highlighted {
             self.image_highlighted(name, data)
         } else {
             self.image_normal(name, data)
+        }
+    }
+
+    fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture> {
+        if highlighted {
+            self.image_highlighted(resource.name, resource.data)
+        } else {
+            self.image_normal(resource.name, resource.data)
         }
     }
 
