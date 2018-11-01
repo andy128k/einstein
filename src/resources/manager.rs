@@ -7,6 +7,7 @@ use sdl2::surface::Surface;
 use sdl2::render::{TextureCreator, Texture};
 use sdl2::rwops::RWops;
 use sdl2::ttf::{Font, Sdl2TtfContext};
+use sdl2::mixer::{Chunk, LoaderRWops};
 
 pub struct Resource {
     pub name: &'static str,
@@ -27,6 +28,7 @@ pub trait ResourceManager {
     fn image1(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture>;
     fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture>;
     fn font(&self, point_size: u16) -> Ref<Font>;
+    fn chunk(&self, resource: &'static Resource) -> Ref<Chunk>;
 }
 
 const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
@@ -34,6 +36,7 @@ const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); /
 pub struct ResourceManagerImpl<'r, C> where C: 'r{
     images: RefCell<HashMap<String, Texture<'r>>>,
     fonts: RefCell<HashMap<u16, Font<'r, 'r>>>,
+    chunks: RefCell<HashMap<String, Chunk>>,
     texture_creator: &'r TextureCreator<C>,
     ttf_context: &'r Sdl2TtfContext,
     phantom_data: PhantomData<&'r str>,
@@ -44,6 +47,7 @@ impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
         ResourceManagerImpl {
             images: RefCell::new(HashMap::new()),
             fonts: RefCell::new(HashMap::new()),
+            chunks: RefCell::new(HashMap::new()),
             texture_creator,
             ttf_context,
             phantom_data: PhantomData,
@@ -101,5 +105,13 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
             self.fonts.borrow_mut().insert(point_size, font);
         }
         Ref::map(self.fonts.borrow(), |r| r.get(&point_size).unwrap())
+    }
+
+    fn chunk(&self, resource: &'static Resource) -> Ref<Chunk> {
+        if self.chunks.borrow().get(resource.name).is_none() {
+            let chunk = RWops::from_bytes(resource.data).unwrap().load_wav().unwrap();
+            self.chunks.borrow_mut().insert(resource.name.to_owned(), chunk);
+        }
+        Ref::map(self.chunks.borrow(), |r| r.get(resource.name).unwrap())
     }
 }
