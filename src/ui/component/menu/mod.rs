@@ -19,9 +19,10 @@ use ui::component::topscores_dialog::{create_topscores_dialog};
 use ui::component::rules_dialog::{new_help_dialog};
 use ui::component::options_dialog::{new_options_dialog};
 use ui::component::about_dialog::{create_about_dialog};
+use resources::manager::Resource;
 use resources::messages::Messages;
 
-const MENU_BG: &[u8] = include_bytes!("./nova.bmp");
+const MENU_BG: Resource = resource!("./nova.bmp");
 
 pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<Container<MainLoopQuit>> {
     let rect = Rect::new(0, 0, 800, 600);
@@ -33,7 +34,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<MainLoopQuit>::modal(rect, BackgroundPattern::Custom("MENU_BG", MENU_BG, false));
+    let mut container = Container::<MainLoopQuit>::modal(rect, BackgroundPattern::Custom(&MENU_BG, false));
 
     container.push(WidgetMapAction::no_action(
         Label::title(Rect::new(0, 30, 800, 30), messages.einstein_flowix)

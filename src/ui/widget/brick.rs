@@ -135,12 +135,12 @@ impl Brick {
                 let image = resource_manager.image(&RED_PATTERN, true);
                 tiles(canvas, rect, &*image)?;
             },
-            Some(BackgroundPattern::Custom(name, bytes, highlight)) => {
-                let image = resource_manager.image1(name, bytes, highlight);
+            Some(BackgroundPattern::Custom(resource, highlight)) => {
+                let image = resource_manager.image(&resource, highlight);
                 tiles(canvas, rect, &*image)?;
             },
-            Some(BackgroundPattern::Sprite(name, bytes, highlight, s_rect)) => {
-                let image = resource_manager.image1(name, bytes, highlight);
+            Some(BackgroundPattern::Sprite(resource, highlight, s_rect)) => {
+                let image = resource_manager.image(&resource, highlight);
                 sprite(canvas, rect, &*image, s_rect)?;
             },
             None => {},

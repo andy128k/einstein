@@ -20,6 +20,7 @@ pub mod locale;
 pub mod converge;
 pub mod rules;
 pub mod puzzle_gen;
+#[macro_use]
 pub mod resources;
 pub mod ui;
 pub mod storage;

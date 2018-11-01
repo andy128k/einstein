@@ -1,9 +1,10 @@
 use rules::Thing;
 use ui::context::Rect;
+use resources::manager::Resource;
 
-pub const LARGE_THINGS_ATLAS: &[u8] = include_bytes!("./large.bmp");
-pub const SMALL_THINGS_ATLAS: &[u8] = include_bytes!("./small.bmp");
-pub const EMPTY_TILE: &[u8] = include_bytes!("./tile.bmp");
+pub const LARGE_THINGS_ATLAS: Resource = resource!("./large.bmp");
+pub const SMALL_THINGS_ATLAS: Resource = resource!("./small.bmp");
+pub const EMPTY_TILE: Resource = resource!("./tile.bmp");
 
 const LARGE_TILE_WIDTH: i32 = 48;
 const LARGE_TILE_HEIGHT: i32 = 48;

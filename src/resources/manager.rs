@@ -17,7 +17,7 @@ pub struct Resource {
 #[macro_export]
 macro_rules! resource {
     ( $path:expr ) => {
-        Resource {
+        crate::resources::manager::Resource {
             name: $path,
             data: include_bytes!($path),
         }

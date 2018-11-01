@@ -8,10 +8,10 @@ use ui::widget::common::*;
 use ui::widget::brick::*;
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
-use resources::manager::ResourceManager;
+use resources::manager::{ResourceManager, Resource};
 use util::time::sec_to_str;
 
-const GAME_TITLE: &[u8] = include_bytes!("./title.bmp");
+const GAME_TITLE: Resource = resource!("./title.bmp");
 
 pub struct GameTitle {
     rect: Rect,
@@ -61,7 +61,7 @@ impl Widget<Nothing> for GameTitle {
         );
 
         Brick::new(self.get_rect())
-            .background(BackgroundPattern::Custom("GAME_TITLE", GAME_TITLE, false))
+            .background(BackgroundPattern::Custom(&GAME_TITLE, false))
             .text(Text::new(&self.title).font_size(FontSize::TITLE).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
             .add(Brick::new(watch_rect)
                 .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))

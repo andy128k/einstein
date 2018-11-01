@@ -4,10 +4,10 @@ use ui::context::Rect;
 use ui::widget::button::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
-use resources::manager::ResourceManager;
+use resources::manager::{ResourceManager, Resource};
 
-const BUTTON_BG_BYTES: &[u8] = include_bytes!("./btn.bmp");
-const BUTTON_BG_HIGHLIGHTED_BYTES: &[u8] = include_bytes!("./btn-highlighted.bmp");
+const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");
+const BUTTON_BG_HIGHLIGHTED_BYTES: Resource = resource!("./btn-highlighted.bmp");
 
 pub struct GameButton {
     rect: Rect,
@@ -17,9 +17,9 @@ pub struct GameButton {
 impl ButtonRenderer for GameButton {
     fn draw(&self, _resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick {
         let image = if highlighted {
-            BackgroundPattern::Custom("BUTTON_BG_HIGHLIGHTED_BYTES", BUTTON_BG_HIGHLIGHTED_BYTES, false)
+            BackgroundPattern::Custom(&BUTTON_BG_HIGHLIGHTED_BYTES, false)
         } else {
-            BackgroundPattern::Custom("BUTTON_BG_BYTES", BUTTON_BG_BYTES, false)
+            BackgroundPattern::Custom(&BUTTON_BG_BYTES, false)
         };
         Brick::new(self.rect)
             .background(image)

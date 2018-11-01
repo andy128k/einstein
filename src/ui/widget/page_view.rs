@@ -42,7 +42,7 @@ impl PageViewState {
             for text_item in self.text {
                 match *text_item {
                     TextItem::Text(ref content) => pages.add_text(content, &*resource_manager.font(FontSize::TEXT.0))?,
-                    TextItem::Image(image_name, image) => pages.add_image(image_name, image, resource_manager)?,
+                    TextItem::Image(ref image) => pages.add_image(image, resource_manager)?,
                 }
             }
             self.pages = pages.build();
@@ -82,10 +82,10 @@ impl Widget<Nothing> for PageView {
                                 .text(Text::new(&text).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).shadow().halign(HorizontalAlign::Left))
                         );
                     },
-                    PageItem::Image(image_name, image_bytes, x, y, w, h) => {
+                    PageItem::Image(ref image, x, y, w, h) => {
                         brick.push(
                             Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
-                                .background(BackgroundPattern::Custom(image_name, image_bytes, false))
+                                .background(BackgroundPattern::Custom(image, false))
                         );
                     }
                 }

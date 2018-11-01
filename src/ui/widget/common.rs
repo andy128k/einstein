@@ -1,5 +1,6 @@
 use sdl2::pixels::Color;
 use ui::context::Rect;
+use resources::manager::Resource;
 
 #[derive(Clone, Copy)]
 pub enum Border {
@@ -19,8 +20,8 @@ pub enum BackgroundPattern {
     WhiteHighlighted,
     Red,
     RedHighlighted,
-    Custom(&'static str, &'static [u8], bool),
-    Sprite(&'static str, &'static [u8], bool, Rect),
+    Custom(&'static Resource, bool),
+    Sprite(&'static Resource, bool, Rect),
 }
 
 fn gamma(v: u8, k: f64) -> u8 {
@@ -30,21 +31,21 @@ fn gamma(v: u8, k: f64) -> u8 {
 const GAMMA_K: f64 = 1.5;
 
 impl BackgroundPattern {
-    pub fn highlighted(&self) -> Self {
+    pub fn highlighted(self) -> Self {
         match self {
             BackgroundPattern::Color(Color { r, g, b, a }) => BackgroundPattern::Color(Color {
-                r: gamma(*r, GAMMA_K),
-                g: gamma(*g, GAMMA_K),
-                b: gamma(*b, GAMMA_K),
-                a: *a,
+                r: gamma(r, GAMMA_K),
+                g: gamma(g, GAMMA_K),
+                b: gamma(b, GAMMA_K),
+                a: a,
             }),
             BackgroundPattern::Blue => BackgroundPattern::BlueHighlighted,
             BackgroundPattern::Green => BackgroundPattern::GreenHighlighted,
             BackgroundPattern::White => BackgroundPattern::WhiteHighlighted,
             BackgroundPattern::Red => BackgroundPattern::RedHighlighted,
-            BackgroundPattern::Custom(name, bytes, _) => BackgroundPattern::Custom(name, bytes, true),
-            BackgroundPattern::Sprite(name, bytes, _, rect) => BackgroundPattern::Sprite(name, bytes, true, *rect),
-            other => *other,
+            BackgroundPattern::Custom(resource, _) => BackgroundPattern::Custom(resource, true),
+            BackgroundPattern::Sprite(resource, _, rect) => BackgroundPattern::Sprite(resource, true, rect),
+            other => other,
         }
     }
 }

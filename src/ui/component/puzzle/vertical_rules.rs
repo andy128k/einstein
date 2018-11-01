@@ -43,7 +43,7 @@ impl VerticalRules {
         }
 
         Brick::new(rect)
-            .background(BackgroundPattern::Custom("EMPTY_TILE", EMPTY_TILE, false))
+            .background(BackgroundPattern::Custom(&EMPTY_TILE, false))
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {

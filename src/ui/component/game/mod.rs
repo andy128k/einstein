@@ -24,6 +24,7 @@ use ui::component::failure_dialog::{new_failure_dialog, FailureChoice};
 use ui::component::message_dialog::{create_message_dialog, MessageType};
 use ui::component::player_name_dialog::new_player_name_dialog;
 use ui::component::topscores_dialog::create_topscores_dialog;
+use resources::manager::Resource;
 use resources::messages::Messages;
 use error::*;
 use storage::*;
@@ -59,7 +60,7 @@ pub struct GamePrivate {
     pub hinted: bool,
 }
 
-const RAIN: &[u8] = include_bytes!("./rain.bmp");
+const RAIN: Resource = resource!("./rain.bmp");
 
 impl GamePrivate {
     pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
@@ -186,7 +187,7 @@ fn game_popup<W, A, F>(trigger: &Rc<RefCell<Option<()>>>, create_widget: F, mess
     let screen_rect = Rect::new(0, 0, 800, 600);
     ConditionalWidget::new(
         trigger.clone(),
-        move |_| Ok(Container::container(screen_rect, BackgroundPattern::Custom("RAIN", RAIN, false))
+        move |_| Ok(Container::container(screen_rect, BackgroundPattern::Custom(&RAIN, false))
             .add(WidgetMapAction::no_action(
                 GameTitle::new(Rect::new(8, 10, 783, 47), messages.einstein_puzzle, state.clone())
             ))
@@ -206,7 +207,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<()>::modal(screen_rect, BackgroundPattern::Custom("RAIN", RAIN, false));
+    let mut container = Container::<()>::modal(screen_rect, BackgroundPattern::Custom(&RAIN, false));
 
     container.push(WidgetMapAction::no_action(
         GameTitle::new(Rect::new(8, 10, 783, 47), messages.einstein_puzzle, state.clone())
