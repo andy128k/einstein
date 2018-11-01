@@ -85,7 +85,7 @@ impl Widget<Nothing> for PageView {
                     PageItem::Image(ref image, x, y, w, h) => {
                         brick.push(
                             Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
-                                .background(BackgroundPattern::Custom(image, false))
+                                .background(Background::Pattern(image, false))
                         );
                     }
                 }

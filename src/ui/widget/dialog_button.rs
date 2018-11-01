@@ -9,7 +9,7 @@ use resources::manager::ResourceManager;
 pub struct DialogButton {
     rect: Rect,
     text: String,
-    background: BackgroundPattern,
+    background: Background,
 }
 
 impl ButtonRenderer for DialogButton {
@@ -22,7 +22,7 @@ impl ButtonRenderer for DialogButton {
 }
 
 impl DialogButton {
-    pub fn new<A>(rect: Rect, background: BackgroundPattern, text: &str, key: Option<Keycode>, action: A) -> Button<DialogButton, A> {
+    pub fn new<A>(rect: Rect, background: Background, text: &str, key: Option<Keycode>, action: A) -> Button<DialogButton, A> {
         Button::<DialogButton, A>::new(
             rect,
             key,

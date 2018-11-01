@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::input_field::*;
@@ -15,7 +15,7 @@ use resources::messages::Messages;
 
 pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<DialogResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(

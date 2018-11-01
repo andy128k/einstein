@@ -5,7 +5,6 @@ use sdl2::ttf::Font;
 use ui::widget::common::*;
 use ui::context::{rect_to_rect2, Rect, HorizontalAlign, VerticalAlign};
 use resources::manager::ResourceManager;
-use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 
 pub struct Text {
     text: String,
@@ -56,7 +55,7 @@ impl Text {
 
 pub struct Brick {
     rect: Rect,
-    background: Option<BackgroundPattern>,
+    background: Option<Background>,
     text: Option<Text>,
     border: Option<Border>,
     children: Vec<Brick>,
@@ -78,7 +77,7 @@ impl Brick {
         self
     }
 
-    pub fn background(mut self, background: BackgroundPattern) -> Self {
+    pub fn background(mut self, background: Background) -> Self {
         self.background = Some(background);
         self
     }
@@ -99,47 +98,15 @@ impl Brick {
 
     pub fn draw(&self, canvas: &mut Canvas<Window>, rect: Rect, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
         match self.background {
-            Some(BackgroundPattern::Color(color)) => {
+            Some(Background::Color(color)) => {
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(::failure::err_msg)?;
             },
-            Some(BackgroundPattern::Blue) => {
-                let image = resource_manager.image(&BLUE_PATTERN, false);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::BlueHighlighted) => {
-                let image = resource_manager.image(&BLUE_PATTERN, true);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::Green) => {
-                let image = resource_manager.image(&GREEN_PATTERN, false);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::GreenHighlighted) => {
-                let image = resource_manager.image(&GREEN_PATTERN, true);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::White) => {
-                let image = resource_manager.image(&MARBLE_PATTERN, false);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::WhiteHighlighted) => {
-                let image = resource_manager.image(&MARBLE_PATTERN, true);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::Red) => {
-                let image = resource_manager.image(&RED_PATTERN, false);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::RedHighlighted) => {
-                let image = resource_manager.image(&RED_PATTERN, true);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(BackgroundPattern::Custom(resource, highlight)) => {
+            Some(Background::Pattern(resource, highlight)) => {
                 let image = resource_manager.image(&resource, highlight);
                 tiles(canvas, rect, &*image)?;
             },
-            Some(BackgroundPattern::Sprite(resource, highlight, s_rect)) => {
+            Some(Background::Sprite(resource, highlight, s_rect)) => {
                 let image = resource_manager.image(&resource, highlight);
                 sprite(canvas, rect, &*image, s_rect)?;
             },

@@ -6,17 +6,17 @@ use resources::manager::ResourceManager;
 
 pub struct Container<A> {
     rect: Rect,
-    background: BackgroundPattern,
+    background: Background,
     children: Vec<WidgetPtr<A>>,
     modal: bool,
 }
 
 impl<A> Container<A> {
-    pub fn container(rect: Rect, background: BackgroundPattern) -> Self {
+    pub fn container(rect: Rect, background: Background) -> Self {
         Container { rect, background, children: Vec::new(), modal: false }
     }
 
-    pub fn modal(rect: Rect, background: BackgroundPattern) -> Self {
+    pub fn modal(rect: Rect, background: Background) -> Self {
         Container { rect, background, children: Vec::new(), modal: true }
     }
 
@@ -57,7 +57,7 @@ impl<A> Widget<A> for Container<A> where A: Clone {
             .background(self.background);
 
         match self.background {
-            BackgroundPattern::Custom(..) => {},
+            Background::Pattern(..) => {},
             _ => {
                 brick = brick.border(Border::Raised);
             },

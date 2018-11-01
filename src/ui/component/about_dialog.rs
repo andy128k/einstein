@@ -3,7 +3,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::container::Container;
@@ -13,7 +13,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn create_about_dialog(messages: &Messages) -> Result<Container<()>> {
     let rect = Rect::new(220, 160, 360, 280);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
     let container = Container::<()>::modal(rect, bg)
         .add(WidgetMapAction::no_action(
             Label::title(Rect::new(30, 5, 300, 40), messages.about)

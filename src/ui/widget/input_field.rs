@@ -147,7 +147,7 @@ impl Widget<String> for InputField {
                 0
             };
             let cursor_rect = Rect::new(pos as i32, 4, 2, self.get_rect().height() - 8);
-            let cursor = Brick::new(cursor_rect).background(BackgroundPattern::Color(Color::RGB(33, 33, 33)));
+            let cursor = Brick::new(cursor_rect).background(Background::Color(Color::RGB(33, 33, 33)));
             brick.push(cursor);
         }
 

@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::dialog_button::*;
 use ui::widget::conditional::*;
 use ui::widget::container::Container;
@@ -16,7 +16,7 @@ use storage::SavedGame;
 
 pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<Container<DialogResult<(usize, String)>>> {
     let rect = Rect::new(250, 90, 300, 420);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
 
     let mut container = Container::<DialogResult<(usize, String)>>::modal(rect, bg);
 

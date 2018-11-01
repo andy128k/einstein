@@ -61,10 +61,10 @@ impl Widget<Nothing> for GameTitle {
         );
 
         Brick::new(self.get_rect())
-            .background(BackgroundPattern::Custom(&GAME_TITLE, false))
+            .background(Background::Pattern(&GAME_TITLE, false))
             .text(Text::new(&self.title).font_size(FontSize::TITLE).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
             .add(Brick::new(watch_rect)
-                .background(BackgroundPattern::Color(Color::RGB(48, 0, 255)))
+                .background(Background::Color(Color::RGB(48, 0, 255)))
                 .text(Text::new(s).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right))
             )
     }

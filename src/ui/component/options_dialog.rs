@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::container::Container;
@@ -24,7 +24,7 @@ pub struct Options {
 
 pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Container<DialogResult<Options>>> {
     let rect = Rect::new(250, 170, 300, 260);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
 
     let state = Rc::new(RefCell::new(Options {
         fullscreen: storage.fullscreen,

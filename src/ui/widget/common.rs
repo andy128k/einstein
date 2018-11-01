@@ -1,6 +1,7 @@
 use sdl2::pixels::Color;
 use ui::context::Rect;
 use resources::manager::Resource;
+use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 
 #[derive(Clone, Copy)]
 pub enum Border {
@@ -10,18 +11,17 @@ pub enum Border {
 }
 
 #[derive(Clone, Copy)]
-pub enum BackgroundPattern {
+pub enum Background {
     Color(Color),
-    Blue,
-    BlueHighlighted,
-    Green,
-    GreenHighlighted,
-    White,
-    WhiteHighlighted,
-    Red,
-    RedHighlighted,
-    Custom(&'static Resource, bool),
+    Pattern(&'static Resource, bool),
     Sprite(&'static Resource, bool, Rect),
+}
+
+impl Background {
+    pub const BLUE_PATTERN: Self = Background::Pattern(&BLUE_PATTERN, false);
+    pub const GREEN_PATTERN: Self = Background::Pattern(&GREEN_PATTERN, false);
+    pub const WHITE_PATTERN: Self = Background::Pattern(&MARBLE_PATTERN, false);
+    pub const RED_PATTERN: Self = Background::Pattern(&RED_PATTERN, false);
 }
 
 fn gamma(v: u8, k: f64) -> u8 {
@@ -30,22 +30,17 @@ fn gamma(v: u8, k: f64) -> u8 {
 
 const GAMMA_K: f64 = 1.5;
 
-impl BackgroundPattern {
+impl Background {
     pub fn highlighted(self) -> Self {
         match self {
-            BackgroundPattern::Color(Color { r, g, b, a }) => BackgroundPattern::Color(Color {
+            Background::Color(Color { r, g, b, a }) => Background::Color(Color {
                 r: gamma(r, GAMMA_K),
                 g: gamma(g, GAMMA_K),
                 b: gamma(b, GAMMA_K),
                 a: a,
             }),
-            BackgroundPattern::Blue => BackgroundPattern::BlueHighlighted,
-            BackgroundPattern::Green => BackgroundPattern::GreenHighlighted,
-            BackgroundPattern::White => BackgroundPattern::WhiteHighlighted,
-            BackgroundPattern::Red => BackgroundPattern::RedHighlighted,
-            BackgroundPattern::Custom(resource, _) => BackgroundPattern::Custom(resource, true),
-            BackgroundPattern::Sprite(resource, _, rect) => BackgroundPattern::Sprite(resource, true, rect),
-            other => other,
+            Background::Pattern(resource, _) => Background::Pattern(resource, true),
+            Background::Sprite(resource, _, rect) => Background::Sprite(resource, true, rect),
         }
     }
 }

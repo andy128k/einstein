@@ -2,7 +2,7 @@ use sdl2::keyboard::Keycode;
 use error::*;
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::dialog_button::*;
 use ui::widget::container::Container;
 use ui::widget::label::Label;
@@ -13,7 +13,7 @@ use storage::SavedGame;
 
 pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messages) -> Result<Container<DialogResult<GamePrivate>>> {
     let rect = Rect::new(250, 90, 300, 420);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
 
     let mut container = Container::<DialogResult<GamePrivate>>::modal(rect, bg);
 

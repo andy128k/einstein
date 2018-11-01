@@ -46,7 +46,7 @@ impl HorizontalRules {
         }
 
         Brick::new(rect)
-            .background(BackgroundPattern::Custom(&EMPTY_TILE, false))
+            .background(Background::Pattern(&EMPTY_TILE, false))
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {

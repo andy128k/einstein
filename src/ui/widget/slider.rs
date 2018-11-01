@@ -8,14 +8,14 @@ use resources::manager::ResourceManager;
 
 pub struct Slider {
     rect: Rect,
-    background: BackgroundPattern,
+    background: Background,
     value: Cell<f32>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
 }
 
 impl Slider {
-    pub fn new(rect: Rect, background: BackgroundPattern, value: f32) -> Self {
+    pub fn new(rect: Rect, background: Background, value: f32) -> Self {
         Self {
             rect,
             background,

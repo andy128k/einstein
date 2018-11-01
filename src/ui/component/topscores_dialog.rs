@@ -3,7 +3,7 @@ use sdl2::pixels::Color;
 use error::*;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
-use ui::widget::common::BackgroundPattern;
+use ui::widget::common::Background;
 use ui::widget::label::*;
 use ui::widget::dialog_button::*;
 use ui::widget::container::Container;
@@ -13,7 +13,7 @@ use util::time::sec_to_str;
 
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
     let rect = Rect::new(240, 125, 320, 350);
-    let bg = BackgroundPattern::Blue;
+    let bg = Background::BLUE_PATTERN;
 
     let mut container = Container::<()>::modal(rect, bg);
 

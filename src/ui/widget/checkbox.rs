@@ -9,13 +9,13 @@ use resources::manager::ResourceManager;
 
 pub struct Checkbox {
     rect: Rect,
-    background: BackgroundPattern,
+    background: Background,
     checked: Cell<bool>,
     mouse_inside: Cell<bool>,
 }
 
 impl Checkbox {
-    pub fn new(x: i32, y: i32, background: BackgroundPattern, checked: bool) -> Self {
+    pub fn new(x: i32, y: i32, background: Background, checked: bool) -> Self {
         Self{
             rect: Rect::new(x, y, 20, 20),
             background,

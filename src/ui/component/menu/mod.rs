@@ -34,7 +34,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<MainLoopQuit>::modal(rect, BackgroundPattern::Custom(&MENU_BG, false));
+    let mut container = Container::<MainLoopQuit>::modal(rect, Background::Pattern(&MENU_BG, false));
 
     container.push(WidgetMapAction::no_action(
         Label::title(Rect::new(0, 30, 800, 30), messages.einstein_flowix)
