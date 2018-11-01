@@ -32,12 +32,8 @@ use cell::RefCell;
 use dirs::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
-use sdl2::{init};
-use sdl2::ttf::Sdl2TtfContext;
-use sdl2::mixer;
 use error::*;
 use resources::messages::get_messages;
-use ui::context::{Rect};
 use ui::component::menu::make_menu;
 use ui::main_loop::main_loop;
 
@@ -59,9 +55,6 @@ fn real_main() -> Result<()> {
         builder.position_centered().build()?
     };
     let mut canvas = window.into_canvas().build()?;
-
-    // ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Key repeat is not set.");
-    // enable_unicode(true);
 
     let ttf = sdl2::ttf::init()?;
     let audio = audio::Audio::new().map_err(err_msg)?;

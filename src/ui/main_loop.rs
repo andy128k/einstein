@@ -2,7 +2,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use sdl2::Sdl;
 use sdl2::event::{Event};
-use sdl2::render::{Canvas, RenderTarget};
+use sdl2::render::{Canvas};
 use sdl2::video::Window;
 use failure::err_msg;
 use error::*;
