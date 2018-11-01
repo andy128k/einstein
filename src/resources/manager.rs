@@ -25,7 +25,6 @@ macro_rules! resource {
 }
 
 pub trait ResourceManager {
-    fn image1(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture>;
     fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture>;
     fn font(&self, point_size: u16) -> Ref<Font>;
     fn chunk(&self, resource: &'static Resource) -> Ref<Chunk>;
@@ -82,14 +81,6 @@ impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
 }
 
 impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
-    fn image1(&self, name: &'static str, data: &[u8], highlighted: bool) -> Ref<Texture> {
-        if highlighted {
-            self.image_highlighted(name, data)
-        } else {
-            self.image_normal(name, data)
-        }
-    }
-
     fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture> {
         if highlighted {
             self.image_highlighted(resource.name, resource.data)
