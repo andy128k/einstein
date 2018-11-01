@@ -44,10 +44,6 @@ use ui::context::{Context, Rect};
 use ui::component::menu::make_menu;
 use ui::main_loop::main_loop;
 
-pub struct AppContext {
-    pub ttf: Sdl2TtfContext,
-}
-
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
     create_dir_all(home.join(".einstein"))?;
@@ -62,9 +58,7 @@ fn real_main() -> Result<()> {
     ensure!(enable_key_repeat(RepeatDelay::Default, RepeatInterval::Default), "Key repeat is not set.");
     enable_unicode(true);
 
-    let app_context = AppContext {
-        ttf: sdl2::ttf::init()?
-    };
+    let ttf = sdl2::ttf::init()?;
 
     let fullscreen = state.borrow().fullscreen;
     let volume = state.borrow().volume;
@@ -81,7 +75,7 @@ fn real_main() -> Result<()> {
             rect: Rect::new(0, 0, 800, 600)
         };
 
-        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&app_context.ttf);
+        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&ttf);
 
         let mut menu = make_menu(get_messages(), state.clone())?;
         main_loop(&context, &mut menu, &mut resource_manager)?;
