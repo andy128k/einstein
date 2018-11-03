@@ -3,6 +3,7 @@ use ui::widget::widget::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use audio::Audio;
 
 pub struct Container<A> {
     rect: Rect,
@@ -37,11 +38,11 @@ impl<A> Widget<A> for Container<A> where A: Clone {
 
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
         let mut reaction = EventReaction::empty();
         for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.get_rect());
-            let child_reaction = child.on_event(&event2)?;
+            let child_reaction = child.on_event(&event2, resource_manager, audio)?;
             // TODO -relative
             reaction.add(&child_reaction);
             if reaction.terminated {

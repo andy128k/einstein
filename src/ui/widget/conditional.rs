@@ -5,6 +5,7 @@ use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use audio::Audio;
 use error::*;
 
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
@@ -54,10 +55,10 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
         self.check()?;
         match *self.wrapped.borrow_mut() {
-            Some(ref mut widget) => widget.on_event(event),
+            Some(ref mut widget) => widget.on_event(event, resource_manager, audio),
             None => Ok(EventReaction::empty())
         }
     }

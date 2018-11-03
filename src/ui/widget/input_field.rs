@@ -9,6 +9,7 @@ use ui::widget::widget::*;
 use ui::widget::common::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use audio::Audio;
 use error::*;
 
 pub struct InputField {
@@ -123,7 +124,7 @@ impl Widget<String> for InputField {
         self.rect
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<String> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<String> {
         match *event {
             Event::KeyDown(key) => Ok(self.on_key_down(key)),
             Event::TextInput(ref text) => Ok(self.on_text_input(text)),

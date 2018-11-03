@@ -1,7 +1,10 @@
+use failure::err_msg;
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use resources::audio::CLICK;
+use audio::Audio;
 
 pub struct AnyKey<A> {
     action: A
@@ -20,10 +23,10 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         Rect::default()
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
-                // sound->play(L"click.wav");
+                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::action(self.action.clone()))
             },
             _ => Ok(EventReaction::empty()),

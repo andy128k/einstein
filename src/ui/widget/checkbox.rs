@@ -1,4 +1,5 @@
 use std::cell::Cell;
+use failure::err_msg;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use ui::context::Rect;
@@ -6,6 +7,8 @@ use ui::widget::common::*;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use resources::audio::CLICK;
+use audio::Audio;
 
 pub struct Checkbox {
     rect: Rect,
@@ -32,11 +35,11 @@ impl Widget<bool> for Checkbox {
         self.rect
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<bool> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<bool> {
         let rect = self.get_client_rect();
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
-                // sound->play(L"click.wav"); TODO
+                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 self.checked.set(!self.checked.get());
                 Ok(EventReaction::update_and_action(self.checked.get()))
             },

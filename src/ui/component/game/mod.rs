@@ -223,11 +223,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 state2.borrow_mut().stop();
                 match *puzzle_action {
                     PuzzleAction::Victory => {
-                        // sound->play(L"applause.wav");
                         *victory_trigger2.borrow_mut() = Some(());
                     },
                     PuzzleAction::Failure => {
-                        // sound->play(L"glasbk2.wav");
                         *failure_trigger2.borrow_mut() = Some(());
                     }
                 }

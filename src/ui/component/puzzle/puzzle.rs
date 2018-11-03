@@ -7,6 +7,7 @@ use ui::widget::brick::*;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
 use resources::manager::ResourceManager;
+use audio::Audio;
 use error::*;
 
 const FIELD_OFFSET_X: u16 =    12;
@@ -32,11 +33,11 @@ impl Widget<PuzzleAction> for Puzzle {
         )
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<PuzzleAction> {
         let mut reaction = EventReaction::empty();
         for child in self.cells.iter_mut() {
             let event2 = event.relative(child.get_rect());
-            let cell_reaction = child.on_event(&event2)?;
+            let cell_reaction = child.on_event(&event2, resource_manager, audio)?;
             // TODO -relative
             reaction.add(&cell_reaction);
             if reaction.terminated {

@@ -66,7 +66,7 @@ fn real_main() -> Result<()> {
         let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
         let mut menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&sdl_context, &mut canvas, &mut menu, &mut resource_manager)?;
+        main_loop(&sdl_context, &mut canvas, &mut menu, &mut resource_manager, &audio)?;
     }
 
     state.borrow_mut().save()?;

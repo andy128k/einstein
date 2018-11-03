@@ -1,10 +1,13 @@
 use std::cell::Cell;
+use failure::err_msg;
 use sdl2::keyboard::Keycode;
-use ui::context::Rect;
 use sdl2::mouse::MouseButton;
+use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::brick::*;
 use resources::manager::ResourceManager;
+use audio::Audio;
+use resources::audio::CLICK;
 
 pub trait ButtonRenderer {
     fn draw(&self, resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick;
@@ -37,14 +40,14 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
         self.rect
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
         match *event {
             Event::KeyDown(key) if Some(key) == self.key => {
-                // sound->play(L"click.wav"); TODO
+                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_client_rect().contains_point((x, y)) => {
-                // sound->play(L"click.wav"); TODO
+                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseMove(x, y) => {

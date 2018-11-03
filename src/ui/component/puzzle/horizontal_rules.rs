@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::cell::Cell;
 use cell::RefCell;
+use failure::err_msg;
 use sdl2::mouse::MouseButton;
 use ui::context::Rect;
 use ui::widget::widget::*;
@@ -10,6 +11,8 @@ use ui::rule::{draw_rule};
 use ui::component::game::{GamePrivate};
 use resources::manager::ResourceManager;
 use resources::thing::EMPTY_TILE;
+use resources::audio::WHIZZ;
+use audio::Audio;
 use error::*;
 
 pub struct HorizontalRules {
@@ -88,13 +91,13 @@ impl Widget<Nothing> for HorizontalRules {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<Nothing> {
         match *event {
             Event::MouseButtonDown(MouseButton::Right, x, y) => {
                 match self.get_rule_index(x, y) {
                     Some(no) => {
                         if self.state.borrow_mut().toggle_horizontal_rule(no).is_some() {
-                            // sound->play(L"whizz.wav");
+                            audio.play(&*resource_manager.chunk(&WHIZZ)).map_err(err_msg)?;
                             Ok(EventReaction::update())
                         } else {
                             Ok(EventReaction::empty())

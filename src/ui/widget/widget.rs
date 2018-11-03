@@ -4,6 +4,7 @@ use error::*;
 use ui::context::Rect;
 use ui::widget::brick::Brick;
 use resources::manager::ResourceManager;
+use audio::Audio;
 pub use algebra::*;
 
 pub enum Event {
@@ -93,7 +94,7 @@ pub trait Widget<A> {
         Rect::new(0, 0, rect.width(), rect.height())
     }
 
-    fn on_event(&mut self, _event: &Event) -> EventResult<A> {
+    fn on_event(&mut self, _event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick;
@@ -110,8 +111,8 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).get_rect()
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<A> {
-        (**self).on_event(event)
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+        (**self).on_event(event, resource_manager, audio)
     }
 
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
@@ -147,8 +148,8 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         self.wrapped.get_rect()
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<AT> {
-        let reaction = self.wrapped.on_event(event)?;
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<AT> {
+        let reaction = self.wrapped.on_event(event, resource_manager, audio)?;
         if let Some(ref action) = reaction.action {
             let mut reaction2 = (self.convert)(action)?;
             reaction2.update |= reaction.update;

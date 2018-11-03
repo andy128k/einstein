@@ -10,6 +10,8 @@ use ui::widget::brick::*;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
 use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
+use resources::audio::{LASER, APPLAUSE, GLASS};
+use audio::Audio;
 use error::*;
 
 const PUZZLE_SIZE: u8 = 6;
@@ -59,7 +61,7 @@ impl PuzzleCell {
         })
     }
 
-    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32) -> EventReaction<PuzzleAction> {
+    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             return EventReaction::empty();
         }
@@ -79,22 +81,24 @@ impl PuzzleCell {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.set(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
-                    // sound->play(L"laser.wav");
+                    audio.play(&*resource_manager.chunk(&LASER)).unwrap();
                 }
             },
             MouseButton::Right => {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.exclude(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
-                    // sound->play(L"laser.wav");
+                    audio.play(&*resource_manager.chunk(&LASER)).unwrap();
                 }
             },
             _ => {}
         }
 
         if !self.state.borrow().is_valid() {
+            audio.play(&*resource_manager.chunk(&GLASS)).unwrap();
             EventReaction::action(PuzzleAction::Failure)
         } else if self.state.borrow().possibilities.is_solved() {
+            audio.play(&*resource_manager.chunk(&APPLAUSE)).unwrap();
             EventReaction::action(PuzzleAction::Victory)
         } else {
             EventReaction::update()
@@ -135,9 +139,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
         )
     }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<PuzzleAction> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<PuzzleAction> {
         match *event {
-            Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y)),
+            Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y, resource_manager, audio)),
             Event::MouseMove(x, y) => {
                 if self.on_mouse_move(x, y) {
                     Ok(EventReaction::update())

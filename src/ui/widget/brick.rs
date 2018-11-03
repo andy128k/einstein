@@ -96,7 +96,7 @@ impl Brick {
         self.children.push(child);
     }
 
-    pub fn draw(&self, canvas: &mut Canvas<Window>, rect: Rect, resource_manager: &mut ResourceManager) -> Result<(), ::failure::Error> {
+    pub fn draw(&self, canvas: &mut Canvas<Window>, rect: Rect, resource_manager: &dyn ResourceManager) -> Result<(), ::failure::Error> {
         match self.background {
             Some(Background::Color(color)) => {
                 canvas.set_draw_color(color);

@@ -9,6 +9,7 @@ use ui::widget::brick::*;
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use resources::manager::{ResourceManager, Resource};
+use audio::Audio;
 use util::time::sec_to_str;
 
 const GAME_TITLE: Resource = resource!("./title.bmp");
@@ -35,7 +36,7 @@ impl Widget<Nothing> for GameTitle {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&mut self, event: &Event) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
