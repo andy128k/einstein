@@ -36,7 +36,7 @@ impl Widget<Nothing> for GameTitle {
     fn is_relative(&self) -> bool { true }
     fn get_rect(&self) -> Rect { self.rect }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {
