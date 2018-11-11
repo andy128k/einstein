@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
+use rand::thread_rng;
 use cell::RefCell;
 use sdl2::keyboard::Keycode;
 use rules::{Rule, SolvedPuzzle, Possibilities, apply};
@@ -64,7 +65,8 @@ const RAIN: Resource = resource!("./rain.bmp");
 
 impl GamePrivate {
     pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
-        let (solved_puzzle, rules) = generate_puzzle()?;
+        let mut rng = thread_rng();
+        let (solved_puzzle, rules) = generate_puzzle(&mut rng)?;
 
         let mut possibilities = Possibilities::new();
         for rule in &rules {

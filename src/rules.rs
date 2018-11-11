@@ -1,6 +1,6 @@
 use std::fmt;
 use itertools::all;
-use rand::{thread_rng, Rng};
+use rand::Rng;
 use converge::converge;
 
 fn only<T>(values: &[T]) -> Option<&T> {
@@ -38,13 +38,13 @@ impl fmt::Display for Thing {
 pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
 
 impl SolvedPuzzle {
-    pub fn random() -> Self {
+    pub fn random(rng: &mut impl Rng) -> Self {
         let mut values = [[0u8; PUZZLE_SIZE]; PUZZLE_SIZE];
         for r in 0..PUZZLE_SIZE {
             for c in 0..PUZZLE_SIZE {
                 values[r][c] = c as u8;
             }
-            thread_rng().shuffle(&mut values[r]);
+            rng.shuffle(&mut values[r]);
         }
         SolvedPuzzle(values)
     }
@@ -230,48 +230,48 @@ pub enum Rule {
     Between(Thing, Thing, Thing)
 }
 
-fn generate_near_rule(puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let first_col: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8 - 1);
+fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
 
     let thing1 = puzzle.get(row1, first_col);
     let thing2 = puzzle.get(row2, first_col + 1);
 
-    if thread_rng().gen() {
+    if rng.gen() {
         Rule::Near(thing1, thing2)
     } else {
         Rule::Near(thing2, thing1)
     }
 }
 
-fn generate_direction_rule(puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let col1: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8 - 1);
-    let col2: u8 = thread_rng().gen_range(col1 + 1, PUZZLE_SIZE as u8);
+fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let col1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
+    let col2: u8 = rng.gen_range(col1 + 1, PUZZLE_SIZE as u8);
 
     let thing1 = puzzle.get(row1, col1);
     let thing2 = puzzle.get(row2, col2);
     Rule::Direction(thing1, thing2)
 }
 
-fn generate_open_rule(puzzle: &SolvedPuzzle) -> Rule {
-    let row: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let col: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
+fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    let row: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
 
     let thing = puzzle.get(row, col);
     Rule::Open(col, thing)
 }
 
-fn generate_under_rule(puzzle: &SolvedPuzzle) -> Rule {
-    let col: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let row1: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
+fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
 
     let thing1 = puzzle.get(row1, col);
 
     loop {
-        let row2: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
+        let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
         if row1 != row2 {
             let thing2 = puzzle.get(row2, col);
             return Rule::Under(thing1, thing2);
@@ -279,30 +279,30 @@ fn generate_under_rule(puzzle: &SolvedPuzzle) -> Rule {
     }
 }
 
-fn generate_between_rule(puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let row3: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8);
-    let first_col: u8 = thread_rng().gen_range(0, PUZZLE_SIZE as u8 - 2);
+fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row3: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 2);
 
     let thing1 = puzzle.get(row1, first_col);
     let thing2 = puzzle.get(row2, first_col + 1);
     let thing3 = puzzle.get(row3, first_col + 2);
 
-    if thread_rng().gen() {
+    if rng.gen() {
         Rule::Between(thing1, thing2, thing3)
     } else {
         Rule::Between(thing3, thing2, thing1)
     }
 }
 
-pub fn generate_rule(puzzle: &SolvedPuzzle) -> Rule {
-    match thread_rng().gen_range(0, 14) {
-        0 | 1 | 2 | 3 => generate_near_rule(puzzle),
-        4 => generate_open_rule(puzzle),
-        5 | 6 => generate_under_rule(puzzle),
-        7 | 8 | 9 | 10 => generate_direction_rule(puzzle),
-        11 | 12 | 13 => generate_between_rule(puzzle),
+pub fn generate_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
+    match rng.gen_range(0, 14) {
+        0 | 1 | 2 | 3 => generate_near_rule(rng, puzzle),
+        4 => generate_open_rule(rng, puzzle),
+        5 | 6 => generate_under_rule(rng, puzzle),
+        7 | 8 | 9 | 10 => generate_direction_rule(rng, puzzle),
+        11 | 12 | 13 => generate_between_rule(rng, puzzle),
         _ => unreachable!()
     }
 }

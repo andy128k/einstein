@@ -1,3 +1,4 @@
+use rand::Rng;
 use rules::*;
 use error::*;
 use converge::converge_result;
@@ -28,11 +29,11 @@ fn remove_rules(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<Vec<Rule>> {
     })
 }
 
-fn generate_rules(puzzle: &SolvedPuzzle) -> Result<Vec<Rule>> {
+fn generate_rules(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Result<Vec<Rule>> {
     let mut rules: Vec<Rule> = Vec::new();
     while !can_solve(puzzle, &rules)? {
         loop {
-            let rule = generate_rule(puzzle);
+            let rule = generate_rule(rng, puzzle);
             if rules.iter().find(|r| **r == rule).is_none() {
                 rules.push(rule);
                 break;
@@ -42,10 +43,10 @@ fn generate_rules(puzzle: &SolvedPuzzle) -> Result<Vec<Rule>> {
     Ok(rules)
 }
 
-pub fn generate_puzzle() -> Result<(SolvedPuzzle, Vec<Rule>)> {
+pub fn generate_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>)> {
     loop {
-        let puzzle = SolvedPuzzle::random();
-        let rules = generate_rules(&puzzle)?;
+        let puzzle = SolvedPuzzle::random(rng);
+        let rules = generate_rules(rng, &puzzle)?;
         let reduced_rules = remove_rules(&puzzle, &rules)?;
 
         let mut horizontal = 0;
@@ -68,11 +69,13 @@ pub fn generate_puzzle() -> Result<(SolvedPuzzle, Vec<Rule>)> {
 
 #[cfg(test)]
 mod tests {
+    use rand::thread_rng;
     use super::*;
 
     #[test]
     fn test_eq_generate_puzzle() {
-        let (_puzzle, rules) = generate_puzzle().unwrap();
+        let mut rng = thread_rng();
+        let (_puzzle, rules) = generate_puzzle(&mut rng).unwrap();
         assert!(rules.len() > 0);
     }
 }
