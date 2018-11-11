@@ -7,7 +7,7 @@ fn can_solve(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<bool> {
         for rule in rules {
             pos = apply(&pos, rule);
             if !pos.is_valid(puzzle) {
-                return Err(format_err!("Invalid possibilities after rule {}", display_rule(rule)));
+                return Err(format_err!("Invalid possibilities after rule {}", rule));
             }
         }
         Ok(pos)

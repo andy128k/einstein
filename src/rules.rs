@@ -1,3 +1,4 @@
+use std::fmt;
 use itertools::all;
 use rand::{thread_rng, Rng};
 use converge::converge;
@@ -18,15 +19,15 @@ pub type Value = u8;
 #[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize)]
 pub struct Thing { pub row: u8, pub value: Value }
 
-impl Thing {
-    pub fn display_name(&self) -> String {
+impl fmt::Display for Thing {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.row {
-            0 => self.value.to_string(),
-            1 => ["A", "B", "C", "D", "E", "F"][self.value as usize].to_string(),
-            2 => ["I", "II", "III", "IV", "V", "VI"][self.value as usize].to_string(),
-            3 => ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value as usize].to_string(),
-            4 => ["α", "β", "γ", "δ", "ε", "ζ"][self.value as usize].to_string(),
-            5 => ["+", "-", "÷", "*", "=", "√"][self.value as usize].to_string(),
+            0 => write!(f, "{}", self.value),
+            1 => write!(f, "{}", ["A", "B", "C", "D", "E", "F"][self.value as usize]),
+            2 => write!(f, "{}", ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ"][self.value as usize]),
+            3 => write!(f, "{}", ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value as usize]),
+            4 => write!(f, "{}", ["α", "β", "γ", "δ", "ε", "ζ"][self.value as usize]),
+            5 => write!(f, "{}", ["+", "-", "÷", "*", "=", "√"][self.value as usize]),
             _ => unreachable!()
         }
     }
@@ -306,13 +307,15 @@ pub fn generate_rule(puzzle: &SolvedPuzzle) -> Rule {
     }
 }
 
-pub fn display_rule(rule: &Rule) -> String {
-    match *rule {
-        Rule::Near(thing1, thing2) => format!("{} is near to {}", thing1.display_name(), thing2.display_name()),
-        Rule::Direction(thing1, thing2) => format!("{} is from the left of {}", thing1.display_name(), thing2.display_name()),
-        Rule::Open(col, thing) => format!("{} is at column {}", thing.display_name(), col + 1),
-        Rule::Under(thing1, thing2) => format!("{} is the same column as {}", thing1.display_name(), thing2.display_name()),
-        Rule::Between(thing1, thing2, thing3) => format!("{} is between {} and {}", thing2.display_name(), thing1.display_name(), thing3.display_name())
+impl fmt::Display for Rule {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Rule::Near(thing1, thing2) => write!(f, "{} is near to {}", thing1, thing2),
+            Rule::Direction(thing1, thing2) => write!(f, "{} is from the left of {}", thing1, thing2),
+            Rule::Open(col, thing) => write!(f, "{} is at column {}", thing, col + 1),
+            Rule::Under(thing1, thing2) => write!(f, "{} is the same column as {}", thing1, thing2),
+            Rule::Between(thing1, thing2, thing3) => write!(f, "{} is between {} and {}", thing2, thing1, thing3)
+        }
     }
 }
 
