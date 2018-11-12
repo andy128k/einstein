@@ -231,7 +231,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                         *failure_trigger2.borrow_mut() = Some(());
                     }
                 }
-                Ok(EventReaction::empty())
+                Ok(EventReaction::update())
             }
         )
     });
@@ -414,7 +414,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 } else {
                     *show_scores_trigger2.borrow_mut() = Some(None);
                 }
-                Ok(EventReaction::empty())
+                Ok(EventReaction::update())
             }
         )
     });
