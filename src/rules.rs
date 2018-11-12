@@ -2,6 +2,7 @@ use std::fmt;
 use itertools::all;
 use rand::Rng;
 use converge::converge;
+use util::retry::retry;
 
 fn only<T>(values: &[T]) -> Option<&T> {
     if values.len() == 1 {
@@ -50,7 +51,7 @@ impl SolvedPuzzle {
     }
 
     pub fn get(&self, row: u8, col: u8) -> Thing {
-        Thing { row: row, value: self.0[row as usize][col as usize] }
+        Thing { row, value: self.0[row as usize][col as usize] }
     }
 }
 
@@ -267,16 +268,12 @@ fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
     let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row2 = retry(move || rng.gen_range(0, PUZZLE_SIZE as u8), |row2| row1 != *row2);
 
     let thing1 = puzzle.get(row1, col);
+    let thing2 = puzzle.get(row2, col);
 
-    loop {
-        let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-        if row1 != row2 {
-            let thing2 = puzzle.get(row2, col);
-            return Rule::Under(thing1, thing2);
-        }
-    }
+    Rule::Under(thing1, thing2)
 }
 
 fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
