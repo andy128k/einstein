@@ -136,7 +136,7 @@ impl Widget<String> for InputField {
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         let font_size = FontSize::TEXT;
 
-        let mut brick = Brick::new(self.get_rect())
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height())
             .border(Border::Sunken)
             .text(Text::new(&self.text.borrow()).font_size(font_size).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
 
@@ -147,9 +147,8 @@ impl Widget<String> for InputField {
             } else {
                 0
             };
-            let cursor_rect = Rect::new(pos as i32, 4, 2, self.get_rect().height() - 8);
-            let cursor = Brick::new(cursor_rect).background(Background::Color(Color::RGB(33, 33, 33)));
-            brick.push(cursor);
+            let cursor = Brick::new(2, self.get_rect().height() - 8).background(Background::Color(Color::RGB(33, 33, 33)));
+            brick.push(pos as u32, 4, cursor);
         }
 
         brick

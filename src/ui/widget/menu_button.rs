@@ -18,7 +18,7 @@ impl ButtonRenderer for MenuButton {
         } else {
             Color::RGB(30, 255, 255)
         };
-        Brick::new(self.rect)
+        Brick::new(self.rect.width(), self.rect.height())
             .text(Text::new(&self.text).font_size(FontSize(20)).color(color).shadow())
     }
 }

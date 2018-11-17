@@ -14,7 +14,7 @@ pub struct DialogButton {
 
 impl ButtonRenderer for DialogButton {
     fn draw(&self, _resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick {
-        Brick::new(self.rect)
+        Brick::new(self.rect.width(), self.rect.height())
             .background(if highlighted { self.background.highlighted() } else { self.background })
             .border(Border::Etched)
             .text(Text::new(&self.text).font_size(FontSize::BUTTON).color(Color::RGB(255, 255, 0)).shadow())

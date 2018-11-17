@@ -72,19 +72,21 @@ impl Widget<Nothing> for PageView {
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         self.state.borrow_mut().make_pages(self.get_client_rect().width(), self.get_client_rect().height(), resource_manager).unwrap();
 
-        let mut brick = Brick::new(self.get_rect());
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
         if let Some(items) = self.state.borrow().current_page() {
             for item in items {
                 match *item {
                     PageItem::Text(ref text, x, y, w, h) => {
                         brick.push(
-                            Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
+                            x as u32, y as u32,
+                            Brick::new(w as u32, h as u32)
                                 .text(Text::new(&text).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).shadow().halign(HorizontalAlign::Left))
                         );
                     },
                     PageItem::Image(ref image, x, y, w, h) => {
                         brick.push(
-                            Brick::new(Rect::new(x as i32, y as i32, w as u32, h as u32))
+                            x as u32, y as u32,
+                            Brick::new(w as u32, h as u32)
                                 .background(Background::Pattern(image, false))
                         );
                     }

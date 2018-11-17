@@ -21,9 +21,9 @@ pub struct VerticalRules {
     highlighted: Cell<Option<usize>>,
 }
 
-const TILE_GAP: i32 =      4;
-const TILE_WIDTH: i32 =   48;
-const TILE_HEIGHT: i32 =  48;
+const TILE_GAP: u32 =      4;
+const TILE_WIDTH: u32 =   48;
+const TILE_HEIGHT: u32 =  48;
 
 impl VerticalRules {
     pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
@@ -35,17 +35,14 @@ impl VerticalRules {
     }
 
     fn draw_cell(&self, index: usize) -> Brick {
-        let rect = self.rect(index);
-
         if let Some(vertical_rule) = self.state.borrow().vertical_rules.get(index) {
             if self.state.borrow().show_excluded == vertical_rule.is_excluded {
                 let rule = &self.state.borrow().rules[vertical_rule.original_index];
-                return Brick::new(rect)
-                    .add(draw_rule(&rule, self.highlighted.get() == Some(index)));
+                return draw_rule(&rule, self.highlighted.get() == Some(index));
             }
         }
 
-        Brick::new(rect)
+        Brick::new(self.rect.width(), self.rect.height())
             .background(Background::Pattern(&EMPTY_TILE, false))
     }
 
@@ -53,16 +50,12 @@ impl VerticalRules {
         if !self.get_client_rect().contains_point((x, y)) {
             return None;
         }
-        if x % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
-            let index = x / (TILE_WIDTH + TILE_GAP);
+        if (x as u32) % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
+            let index = (x as u32) / (TILE_WIDTH + TILE_GAP);
             Some(index as usize)
         } else {
             None
         }
-    }
-
-    fn rect(&self, index: usize) -> Rect {
-        Rect::new((index as i32) * (TILE_WIDTH + TILE_GAP), 0, TILE_WIDTH as u32, TILE_HEIGHT as u32 * 2)
     }
 }
 
@@ -99,11 +92,11 @@ impl Widget<Nothing> for VerticalRules {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect());
-        let num = ((self.get_client_rect().width() as i32 + TILE_GAP) / (TILE_WIDTH + TILE_GAP)) as usize;
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
+        let num = (self.get_client_rect().width() + TILE_GAP) / (TILE_WIDTH + TILE_GAP);
         for i in 0..num {
-            let b = self.draw_cell(i);
-            brick.push(b);
+            let b = self.draw_cell(i as usize);
+            brick.push(i * (TILE_WIDTH + TILE_GAP), 0, b);
         }
         brick
     }

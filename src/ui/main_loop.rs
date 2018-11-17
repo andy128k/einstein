@@ -20,7 +20,7 @@ pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Wi
     canvas.clear();
 
     let b = widget.draw(resource_manager);
-    b.draw(canvas, rect, resource_manager)?;
+    b.draw(canvas, 0, 0, resource_manager)?;
     canvas.present();
 
     let mut event_pump = sdl_context.event_pump().map_err(err_msg)?;
@@ -40,7 +40,7 @@ pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Wi
             };
             if reaction.update {
                 let b = widget.draw(resource_manager);
-                b.draw(canvas, rect, resource_manager)?;
+                b.draw(canvas, 0, 0, resource_manager)?;
                 canvas.present();
             }
             if reaction.action.is_some() {

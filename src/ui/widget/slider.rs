@@ -115,19 +115,18 @@ impl Widget<f32> for Slider {
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let rect = self.rect;
-        let scale_rect = Rect::new(0, rect.height() as i32 / 2 - 2, rect.width(), 4);
-        let x = self.value_to_x(self.value.get());
-        let slider_rect = Rect::new(x as i32, 0, rect.height(), rect.height());
 
-        let scale = Brick::new(scale_rect)
+        let x = self.value_to_x(self.value.get()) as u32;
+
+        let scale = Brick::new(rect.width(), 4)
             .border(Border::Sunken);
 
-        let slider = Brick::new(slider_rect)
+        let slider = Brick::new(rect.height(), rect.height())
             .background(if self.highlight.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);
 
-        Brick::new(rect)
-            .add(scale)
-            .add(slider)
+        Brick::new(rect.width(), rect.height())
+            .add(0, (rect.height() - 4) / 2, scale)
+            .add(x, 0, slider)
     }
 }

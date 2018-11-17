@@ -48,10 +48,10 @@ impl Widget<PuzzleAction> for Puzzle {
     }
 
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect());
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
         for child in &self.cells {
             let cb = child.draw(resource_manager);
-            brick.push(cb);
+            brick.push(child.get_rect().left() as u32, child.get_rect().top() as u32, cb);
         }
         brick
     }

@@ -23,10 +23,10 @@ pub struct HorizontalRules {
 
 const HINTS_COLS: usize =  3;
 const HINTS_ROWS: usize =  8;
-const TILE_GAP_X: i32 =    4;
-const TILE_GAP_Y: i32 =    4;
-const TILE_WIDTH: i32 =   48;
-const TILE_HEIGHT: i32 =  48;
+const TILE_GAP_X: u32 =    4;
+const TILE_GAP_Y: u32 =    4;
+const TILE_WIDTH: u32 =   48;
+const TILE_HEIGHT: u32 =  48;
 
 impl HorizontalRules {
     pub fn new(rect: Rect, state: Rc<RefCell<GamePrivate>>) -> Result<Self> {
@@ -38,17 +38,14 @@ impl HorizontalRules {
     }
 
     fn draw_cell(&self, index: usize) -> Brick {
-        let rect = self.rect(index);
-
         if let Some(horizontal_rule) = self.state.borrow().horizontal_rules.get(index) {
             if self.state.borrow().show_excluded == horizontal_rule.is_excluded {
                 let rule = &self.state.borrow().rules[horizontal_rule.original_index];
-                return Brick::new(rect)
-                    .add(draw_rule(&rule, self.highlighted.get() == Some(index)));
+                return draw_rule(&rule, self.highlighted.get() == Some(index));
             }
         }
 
-        Brick::new(rect)
+        Brick::new(self.rect.width(), self.rect.height())
             .background(Background::Pattern(&EMPTY_TILE, false))
     }
 
@@ -57,33 +54,22 @@ impl HorizontalRules {
             return None;
         }
 
-        let col: usize = (x / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
-        if (col as i32) * (TILE_WIDTH*3 + TILE_GAP_X) + TILE_WIDTH*3 < x {
+        let col = (x as u32) / (TILE_WIDTH*3 + TILE_GAP_X);
+        if col * (TILE_WIDTH*3 + TILE_GAP_X) + TILE_WIDTH*3 < (x as u32) {
             return None;
         }
 
-        let row: usize = (y / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
-        if (row as i32) * (TILE_HEIGHT + TILE_GAP_Y) + TILE_HEIGHT < y {
+        let row = (y as u32) / (TILE_HEIGHT + TILE_GAP_Y);
+        if row * (TILE_HEIGHT + TILE_GAP_Y) + TILE_HEIGHT < (y as u32) {
             return None;
         }
     
-        let no = row * HINTS_COLS + col;
+        let no = (row as usize) * HINTS_COLS + (col as usize);
         if no >= self.state.borrow().horizontal_rules.len() {
             return None;
         }
 
         Some(no)
-    }
-
-    fn rect(&self, index: usize) -> Rect {
-        let row = index / HINTS_COLS;
-        let col = index % HINTS_COLS;
-        Rect::new(
-            (col as i32) * (TILE_WIDTH*3 + TILE_GAP_X),
-            (row as i32) * (TILE_HEIGHT + TILE_GAP_Y),
-            TILE_WIDTH as u32 * 3,
-            TILE_HEIGHT as u32
-        )
     }
 }
 
@@ -120,12 +106,17 @@ impl Widget<Nothing> for HorizontalRules {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect());
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
         // let num_cols = ((self.get_client_rect().width() as i32 + TILE_GAP_X) / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
         // let num_rows = ((self.get_client_rect().height() as i32 + TILE_GAP_Y) / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
         for i in 0..(HINTS_ROWS * HINTS_COLS) {
-            let b = self.draw_cell(i);
-            brick.push(b);
+            let row = i / HINTS_COLS;
+            let col = i % HINTS_COLS;
+            brick.push(
+                (col as u32) * (TILE_WIDTH*3 + TILE_GAP_X),
+                (row as u32) * (TILE_HEIGHT + TILE_GAP_Y),
+                self.draw_cell(i)
+            );
         }
         brick
     }

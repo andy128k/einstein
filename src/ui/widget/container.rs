@@ -54,7 +54,7 @@ impl<A> Widget<A> for Container<A> where A: Clone {
     }
 
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect())
+        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height())
             .background(self.background);
 
         match self.background {
@@ -66,7 +66,7 @@ impl<A> Widget<A> for Container<A> where A: Clone {
 
         for child in &self.children {
             let cb = child.draw(resource_manager);
-            brick.push(cb);
+            brick.push(child.get_rect().left() as u32, child.get_rect().top() as u32, cb);
         }
 
         brick

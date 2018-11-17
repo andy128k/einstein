@@ -53,18 +53,26 @@ impl Text {
     }
 }
 
+struct Child {
+    left: u32,
+    top: u32,
+    brick: Brick,
+}
+
 pub struct Brick {
-    rect: Rect,
+    width: u32,
+    height: u32,
     background: Option<Background>,
     text: Option<Text>,
     border: Option<Border>,
-    children: Vec<Brick>,
+    children: Vec<Child>,
 }
 
 impl Brick {
-    pub fn new(rect: Rect) -> Self {
+    pub fn new(width: u32, height: u32) -> Self {
         Self {
-            rect,
+            width,
+            height,
             text: None,
             background: None,
             border: None,
@@ -87,16 +95,17 @@ impl Brick {
         self
     }
 
-    pub fn add(mut self, child: Self) -> Self {
-        self.children.push(child);
+    pub fn add(mut self, left: u32, top: u32, child: Self) -> Self {
+        self.children.push(Child { left, top, brick: child });
         self
     }
 
-    pub fn push(&mut self, child: Self) {
-        self.children.push(child);
+    pub fn push(&mut self, left: u32, top: u32, child: Self) {
+        self.children.push(Child { left, top, brick: child });
     }
 
-    pub fn draw(&self, canvas: &mut Canvas<Window>, rect: Rect, resource_manager: &dyn ResourceManager) -> Result<(), ::failure::Error> {
+    pub fn draw(&self, canvas: &mut Canvas<Window>, left: u32, top: u32, resource_manager: &dyn ResourceManager) -> Result<(), ::failure::Error> {
+        let rect = Rect::new(left as i32, top as i32, self.width, self.height);
         match self.background {
             Some(Background::Color(color)) => {
                 canvas.set_draw_color(color);
@@ -123,8 +132,9 @@ impl Brick {
             None => {},
         }
         for child in &self.children {
-            let child_rect = child.rect.offset(rect.left(), rect.top()).intersection(&rect).unwrap_or_default();
-            child.draw(canvas, child_rect, resource_manager)?;
+            let r = Rect::new((left + child.left) as i32, (top + child.top) as i32, child.brick.width, child.brick.height);
+            let child_rect = r.intersection(&rect).unwrap_or_default();
+            child.brick.draw(canvas, left + child.left, top + child.top, resource_manager)?;
         }
         Ok(())
     }

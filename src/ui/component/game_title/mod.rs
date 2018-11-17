@@ -13,6 +13,8 @@ use audio::Audio;
 use util::time::sec_to_str;
 
 const GAME_TITLE: Resource = resource!("./title.bmp");
+const PADDING: u32 = 7;
+const WATCH_WIDTH: u32 = 100;
 
 pub struct GameTitle {
     rect: Rect,
@@ -54,19 +56,15 @@ impl Widget<Nothing> for GameTitle {
         self.last_duration.set(Some(duration));
         let s = sec_to_str(duration.as_secs() as u32);
 
-        let watch_rect = Rect::new(
-            (self.get_rect().width() - 7 - 100) as i32,
-            7,
-            100,
-            self.get_rect().height() - (2 * 7)
-        );
-
-        Brick::new(self.get_rect())
+        Brick::new(self.get_rect().width(), self.get_rect().height())
             .background(Background::Pattern(&GAME_TITLE, false))
             .text(Text::new(&self.title).font_size(FontSize::TITLE).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
-            .add(Brick::new(watch_rect)
-                .background(Background::Color(Color::RGB(48, 0, 255)))
-                .text(Text::new(s).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right))
+            .add(
+                self.get_rect().width() - PADDING - WATCH_WIDTH,
+                PADDING,
+                Brick::new(WATCH_WIDTH, self.get_rect().height() - (2 * PADDING))
+                    .background(Background::Color(Color::RGB(48, 0, 255)))
+                    .text(Text::new(s).font_size(FontSize::TEXT).color(Color::RGB(255, 255, 255)).halign(HorizontalAlign::Right))
             )
     }
 }

@@ -67,7 +67,7 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         self.check().unwrap();
         match *self.wrapped.borrow() {
             Some(ref widget) => widget.draw(resource_manager),
-            None => Brick::new(self.get_rect())
+            None => Brick::new(0, 0)
         }
     }
 }

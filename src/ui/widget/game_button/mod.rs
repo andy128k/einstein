@@ -21,7 +21,7 @@ impl ButtonRenderer for GameButton {
         } else {
             Background::Pattern(&BUTTON_BG_BYTES, false)
         };
-        Brick::new(self.rect)
+        Brick::new(self.rect.width(), self.rect.height())
             .background(image)
             .text(Text::new(&self.text).font_size(FontSize::BUTTON).color(Color::RGB(255, 255, 0)).shadow())
     }

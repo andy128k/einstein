@@ -34,6 +34,6 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        Brick::new(self.get_rect())
+        Brick::new(0, 0)
     }
 }

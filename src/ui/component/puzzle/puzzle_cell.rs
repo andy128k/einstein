@@ -16,8 +16,8 @@ use error::*;
 
 const PUZZLE_SIZE: u8 = 6;
 
-const FIELD_TILE_WIDTH: u16 =  48;
-const FIELD_TILE_HEIGHT: u16 = 48;
+const FIELD_TILE_WIDTH: u32 =  48;
+const FIELD_TILE_HEIGHT: u32 = 48;
 
 fn local_choice_cell_rect(value: u8) -> Rect {
     let x: i32 = ((value % 3) as i32) * ((FIELD_TILE_WIDTH / 3) as i32);
@@ -157,7 +157,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         let row = self.row;
         let col = self.col;
 
-        let mut brick = Brick::new(self.get_rect());
+        let mut brick = Brick::new(FIELD_TILE_WIDTH, FIELD_TILE_HEIGHT);
 
         if let Some(value) = self.state.borrow().possibilities.get_defined(col, row) {
             let thing = Thing { row, value };
@@ -176,7 +176,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
 
                     let rect = get_small_thing_rect(thing);
                     brick.push(
-                        Brick::new(choice_rect)
+                        choice_rect.left() as u32,
+                        choice_rect.top() as u32,
+                        Brick::new(choice_rect.width(), choice_rect.height())
                             .background(Background::Sprite(&SMALL_THINGS_ATLAS, highlight, rect))
                     );
                 }
