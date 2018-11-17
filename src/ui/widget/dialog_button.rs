@@ -1,7 +1,7 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use ui::context::Rect;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::widget::button::*;
 use ui::widget::common::*;
 use resources::manager::ResourceManager;

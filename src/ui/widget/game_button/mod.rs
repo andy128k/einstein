@@ -3,7 +3,7 @@ use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::button::*;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use resources::manager::{ResourceManager, Resource};
 
 const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");

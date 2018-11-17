@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use resources::manager::ResourceManager;
 use audio::Audio;
 use resources::audio::CLICK;

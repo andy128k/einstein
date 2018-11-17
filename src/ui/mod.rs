@@ -1,4 +1,5 @@
 pub mod context;
+pub mod brick;
 pub mod rule;
 pub mod page_layout;
 pub mod widget;

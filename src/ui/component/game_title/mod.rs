@@ -5,7 +5,7 @@ use cell::RefCell;
 use sdl2::pixels::Color;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::widget::widget::*;
 use ui::component::game::GamePrivate;
 use resources::manager::{ResourceManager, Resource};

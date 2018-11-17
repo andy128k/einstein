@@ -6,7 +6,7 @@ use rules::{Thing};
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::component::game::GamePrivate;
 use resources::manager::ResourceManager;
 use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};

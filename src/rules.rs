@@ -1,6 +1,7 @@
 use std::fmt;
 use itertools::all;
 use rand::Rng;
+use rand::seq::SliceRandom;
 use converge::converge;
 use util::retry::retry;
 
@@ -45,7 +46,7 @@ impl SolvedPuzzle {
             for c in 0..PUZZLE_SIZE {
                 values[r][c] = c as u8;
             }
-            rng.shuffle(&mut values[r]);
+            values[r].shuffle(rng);
         }
         SolvedPuzzle(values)
     }

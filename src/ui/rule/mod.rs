@@ -3,7 +3,7 @@ use resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
 use resources::manager::Resource;
 use ui::context::Rect;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 
 const TILE_WIDTH: i32 = 48;
 const TILE_HEIGHT: i32 = 48;

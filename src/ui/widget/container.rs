@@ -1,7 +1,7 @@
 use ui::context::Rect;
 use ui::widget::widget::*;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use resources::manager::ResourceManager;
 use audio::Audio;
 

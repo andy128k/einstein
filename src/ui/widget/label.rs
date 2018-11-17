@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
 use ui::context::{Rect, HorizontalAlign, VerticalAlign};
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::widget::widget::*;
 use resources::manager::ResourceManager;
 

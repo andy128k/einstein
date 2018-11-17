@@ -4,7 +4,7 @@ use sdl2::pixels::Color;
 use ui::context::{Rect, HorizontalAlign};
 use ui::widget::widget::*;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::page_layout::*;
 use resources::manager::ResourceManager;
 use resources::rules::TextItem;

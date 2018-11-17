@@ -3,7 +3,7 @@ use std::rc::Rc;
 use cell::RefCell;
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use resources::manager::ResourceManager;
 use audio::Audio;
 use error::*;

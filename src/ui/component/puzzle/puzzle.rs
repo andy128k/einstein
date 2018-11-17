@@ -3,7 +3,7 @@ use cell::RefCell;
 use rules::{PUZZLE_SIZE};
 use ui::context::Rect;
 use ui::widget::widget::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::component::game::GamePrivate;
 use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
 use resources::manager::ResourceManager;

@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use ui::context::Rect;
 use ui::widget::common::*;
 use ui::widget::widget::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use resources::manager::ResourceManager;
 use resources::audio::CLICK;
 use audio::Audio;

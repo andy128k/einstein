@@ -2,7 +2,7 @@ use std::cell::Cell;
 use sdl2::mouse::MouseButton;
 use ui::context::Rect;
 use ui::widget::common::*;
-use ui::widget::brick::*;
+use ui::brick::*;
 use ui::widget::widget::*;
 use resources::manager::ResourceManager;
 use audio::Audio;

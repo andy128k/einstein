@@ -2,7 +2,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use error::*;
 use ui::context::Rect;
-use ui::widget::brick::Brick;
+use ui::brick::Brick;
 use resources::manager::ResourceManager;
 use audio::Audio;
 pub use algebra::*;
