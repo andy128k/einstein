@@ -4,8 +4,8 @@ use crate::resources::manager::Resource;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 
-const TILE_WIDTH: u32 = 48;
-const TILE_HEIGHT: u32 = 48;
+pub const TILE_WIDTH: u32 = 48;
+pub const TILE_HEIGHT: u32 = 48;
 
 const HINT_NEAR_ICON: Resource = resource!("./hint-near.bmp");
 const HINT_SIDE_ICON: Resource = resource!("./hint-side.bmp");

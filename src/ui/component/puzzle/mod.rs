@@ -1,4 +1,5 @@
 pub mod puzzle_cell;
 pub mod puzzle;
-pub mod horizontal_rules;
-pub mod vertical_rules;
+pub mod rule;
+pub mod grid;
+pub mod rules_grid;

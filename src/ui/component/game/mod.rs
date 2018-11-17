@@ -1,11 +1,12 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
+use std::collections::HashSet;
 use rand::thread_rng;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use crate::rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use crate::puzzle_gen::generate_puzzle;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::conditional::*;
@@ -14,8 +15,7 @@ use crate::ui::widget::container::Container;
 use crate::ui::component::dialog::DialogResult;
 use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
-use crate::ui::component::puzzle::horizontal_rules::HorizontalRules;
-use crate::ui::component::puzzle::vertical_rules::VerticalRules;
+use crate::ui::component::puzzle::rules_grid::{create_horizontal_rules, create_vertical_rules};
 use crate::ui::component::game_title::GameTitle;
 use crate::ui::component::rules_dialog::{new_help_dialog};
 use crate::ui::component::save_dialog::{new_save_game_dialog};
@@ -30,18 +30,6 @@ use crate::resources::messages::Messages;
 use crate::error::*;
 use crate::storage::*;
 
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub struct HorizontalRule {
-    pub is_excluded: bool,
-    pub original_index: usize,
-}
-
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub struct VerticalRule {
-    pub is_excluded: bool,
-    pub original_index: usize,
-}
-
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct GamePrivate {
     pub solved_puzzle: SolvedPuzzle,
@@ -50,8 +38,9 @@ pub struct GamePrivate {
     pub valid: bool,
     pub win: bool,
 
-    pub horizontal_rules: Vec<HorizontalRule>,
-    pub vertical_rules: Vec<VerticalRule>,
+    pub horizontal_rules: Vec<usize>,
+    pub vertical_rules: Vec<usize>,
+    pub excluded: HashSet<usize>,
     pub show_excluded: bool,
 
     pub elapsed: Duration,
@@ -79,16 +68,10 @@ impl GamePrivate {
         let mut horizontal_rules = Vec::new();
         for (index, rule) in rules.iter().enumerate() {
             match *rule {
-                Rule::Under(..) => vertical_rules.push(VerticalRule {
-                    is_excluded: false,
-                    original_index: index
-                }),
+                Rule::Under(..) => vertical_rules.push(index),
                 Rule::Near(..) |
                 Rule::Between(..) |
-                Rule::Direction(..) => horizontal_rules.push(HorizontalRule {
-                    is_excluded: false,
-                    original_index: index
-                }),
+                Rule::Direction(..) => horizontal_rules.push(index),
                 _ => {}
             }
         }
@@ -103,6 +86,7 @@ impl GamePrivate {
             started: None,
             vertical_rules,
             horizontal_rules,
+            excluded: HashSet::new(),
             show_excluded: false,
             hinted: false,
         })))
@@ -116,12 +100,7 @@ impl GamePrivate {
             }
         }
         self.possibilities = possibilities;
-        for mut rule in &mut self.horizontal_rules {
-            rule.is_excluded = false;
-        }
-        for mut rule in &mut self.vertical_rules {
-            rule.is_excluded = false;
-        }
+        self.excluded.clear();
         self.show_excluded = false;
         self.hinted = true;
         self.reset();
@@ -161,22 +140,18 @@ impl GamePrivate {
         self.show_excluded = !self.show_excluded;
     }
 
-    pub fn toggle_horizontal_rule(&mut self, index: usize) -> Option<bool> {
-        let rule = self.horizontal_rules.get_mut(index)?;
-        if self.show_excluded != rule.is_excluded {
+    pub fn toggle_rule(&mut self, index: usize) -> Option<bool> {
+        let excluded = self.excluded.contains(&index);
+        if self.show_excluded != excluded {
             return None;
         }
-        rule.is_excluded = !rule.is_excluded;
-        Some(rule.is_excluded)
-    }
-
-    pub fn toggle_vertical_rule(&mut self, index: usize) -> Option<bool> {
-        let rule = self.vertical_rules.get_mut(index)?;
-        if self.show_excluded != rule.is_excluded {
-            return None;
+        if excluded {
+            self.excluded.remove(&index);
+            Some(false)
+        } else {
+            self.excluded.insert(index);
+            Some(true)
         }
-        rule.is_excluded = !rule.is_excluded;
-        Some(rule.is_excluded)
     }
 }
 
@@ -234,16 +209,16 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     });
 
     container.push(348, 68, WidgetMapAction::no_action(
-        HorizontalRules::new(
-            Rect::new(348, 68, 800 - 348 - 12, 412),
+        create_horizontal_rules(
+            Size::new(800 - 348 - 12, 412),
             state.clone()
-        )?
+        )
     ));
     container.push(12, 495, WidgetMapAction::no_action(
-        VerticalRules::new(
-            Rect::new(12, 495, 800 - 12 * 2, 48 * 2),
+        create_vertical_rules(
+            Size::new(800 - 12 * 2, 48 * 2),
             state.clone()
-        )?
+        )
     ));
 
     container.push(12, 440, {
