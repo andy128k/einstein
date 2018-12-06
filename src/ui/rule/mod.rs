@@ -1,7 +1,6 @@
 use crate::rules::{Rule, Thing};
 use crate::resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
 use crate::resources::manager::Resource;
-use crate::ui::context::Rect;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 

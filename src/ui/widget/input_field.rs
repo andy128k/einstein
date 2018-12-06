@@ -4,7 +4,7 @@ use std::cell::{Cell};
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
@@ -13,7 +13,7 @@ use crate::audio::Audio;
 use crate::error::*;
 
 pub struct InputField {
-    rect: Rect,
+    size: Size,
     max_len: usize,
     text: Rc<RefCell<String>>,
     cursor_pos: Cell<usize>,
@@ -22,9 +22,9 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(rect: Rect, text: &str, max_len: usize) -> Result<Self> {
+    pub fn new(size: Size, text: &str, max_len: usize) -> Result<Self> {
         Ok(Self {
-            rect,
+            size,
             max_len,
             text: Rc::new(RefCell::new(text.to_string())),
             cursor_pos: Cell::new(text.len()),
@@ -118,11 +118,7 @@ impl InputField {
 }
 
 impl Widget<String> for InputField {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        self.rect
-    }
+    fn get_size(&self) -> Size { self.size }
 
     fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<String> {
         match *event {
@@ -136,7 +132,7 @@ impl Widget<String> for InputField {
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
         let font_size = FontSize::TEXT;
 
-        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height())
+        let mut brick = Brick::new(self.get_size().width, self.get_size().height)
             .border(Border::Sunken)
             .text(Text::new(&self.text.borrow()).font_size(font_size).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
 
@@ -147,7 +143,7 @@ impl Widget<String> for InputField {
             } else {
                 0
             };
-            let cursor = Brick::new(2, self.get_rect().height() - 8).background(Background::Color(Color::RGB(33, 33, 33)));
+            let cursor = Brick::new(2, self.get_size().height - 8).background(Background::Color(Color::RGB(33, 33, 33)));
             brick.push(pos as u32, 4, cursor);
         }
 

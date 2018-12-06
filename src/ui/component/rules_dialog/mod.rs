@@ -2,20 +2,21 @@ use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use crate::error::*;
-use crate::ui::context::Rect;
+use crate::ui::context::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::Background;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::label::Label;
 use crate::ui::widget::page_view::*;
 use crate::ui::widget::container::Container;
+use crate::ui::component::dialog::dialod_widget;
 use crate::resources::rules::{get_rules, TextItem};
 use crate::resources::messages::Messages;
 
-const WIDTH: u16 = 600;
-const HEIGHT: u16 = 500;
-const CLIENT_WIDTH: u16 = 570;
-const CLIENT_HEIGHT: u16 = 390;
+const WIDTH: u32 = 600;
+const HEIGHT: u32 = 500;
+const CLIENT_WIDTH: u32 = 570;
+const CLIENT_HEIGHT: u32 = 390;
 
 struct DescriptionPrivate {
     page_view_state: Rc<RefCell<PageViewState>>,
@@ -25,42 +26,41 @@ impl DescriptionPrivate {
     fn new(messages: &Messages, text: &'static [TextItem]) -> Result<Container<()>> {
         let page_view_state = PageViewState::new(text);
 
-        let rect = Rect::new(100, 50, WIDTH as u32, HEIGHT as u32);
         let bg = Background::BLUE_PATTERN;
 
         let state = Rc::new(RefCell::new(DescriptionPrivate {
             page_view_state: page_view_state.clone(),
         }));
 
-        let container = Container::<()>::modal(rect, bg)
-            .add(WidgetMapAction::no_action(
-                Label::title(Rect::new(150, 10, 300, 40), messages.rules)
+        let container = Container::<()>::container(Size::new(WIDTH, HEIGHT), bg)
+            .add(150, 10, WidgetMapAction::no_action(
+                Label::title(Size::new(300, 40), messages.rules)
             ))
-            .add(WidgetMapAction::no_action(
-                PageView::new(Rect::new(15, 50, CLIENT_WIDTH as u32, CLIENT_HEIGHT as u32), &page_view_state)
+            .add(15, 50, WidgetMapAction::no_action(
+                PageView::new(Size::new(CLIENT_WIDTH, CLIENT_HEIGHT), &page_view_state)
             ))
-            .add({
+            .add(10, 465, {
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    DialogButton::new(Rect::new(10, 465, 80, 25), bg, messages.prev, None, ()),
+                    DialogButton::new(Size::new(80, 25), bg, messages.prev, None, ()),
                     move |_| {
                         state2.borrow_mut().prev();
                         Ok(EventReaction::empty())
                     }
                 )
             })
-            .add({
+            .add(100, 465, {
                 let state2 = state.clone();
                 WidgetMapAction::new(
-                    DialogButton::new(Rect::new(100, 465, 80, 25), bg, messages.next, None, ()),
+                    DialogButton::new(Size::new(80, 25), bg, messages.next, None, ()),
                     move |_| {
                         state2.borrow_mut().next();
                         Ok(EventReaction::empty())
                     }
                 )
             })
-            .add(
-                DialogButton::new(Rect::new(510, 465, 80, 25), bg, messages.close, Some(Keycode::Escape), ())
+            .add(510, 465,
+                DialogButton::new(Size::new(80, 25), bg, messages.close, Some(Keycode::Escape), ())
             );
 
         Ok(container)
@@ -76,5 +76,6 @@ impl DescriptionPrivate {
 }
 
 pub fn new_help_dialog(messages: &Messages) -> Result<Container<()>> {
-    DescriptionPrivate::new(messages, get_rules())
+    let dlg = DescriptionPrivate::new(messages, get_rules())?;
+    Ok(dialod_widget(None, dlg))
 }

@@ -186,20 +186,17 @@ fn game_popup<W, A, F>(trigger: &Rc<RefCell<Option<()>>>, create_widget: F, mess
         W: Widget<A> + 'static,
         A: Clone + 'static,
 {
-    let screen_rect = Rect::new(0, 0, 800, 600);
     ConditionalWidget::new(
         trigger.clone(),
-        move |_| Ok(Container::container(screen_rect, Background::Pattern(&RAIN, false))
-            .add(WidgetMapAction::no_action(
-                GameTitle::new(Rect::new(8, 10, 783, 47), messages.einstein_puzzle, state.clone())
+        move |_| Ok(Container::screen_modal(Background::Pattern(&RAIN, false))
+            .add(8, 10, WidgetMapAction::no_action(
+                GameTitle::new(messages.einstein_puzzle, state.clone())
             ))
-            .add((create_widget)()?))
+            .add(0, 0, (create_widget)()?))
     )
 }
 
 pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Container<()>> {
-    let screen_rect = Rect::new(0, 0, 800, 600);
-
     let save_game_trigger = Rc::new(RefCell::new(None));
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_help_trigger = Rc::new(RefCell::new(None));
@@ -209,13 +206,13 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<()>::modal(screen_rect, Background::Pattern(&RAIN, false));
+    let mut container = Container::<()>::screen_modal(Background::Pattern(&RAIN, false));
 
-    container.push(WidgetMapAction::no_action(
-        GameTitle::new(Rect::new(8, 10, 783, 47), messages.einstein_puzzle, state.clone())
+    container.push(8, 10, WidgetMapAction::no_action(
+        GameTitle::new(messages.einstein_puzzle, state.clone())
     ));
 
-    container.push({
+    container.push(12, 68, {
         let state2 = state.clone();
         let victory_trigger2 = victory_trigger.clone();
         let failure_trigger2 = failure_trigger.clone();
@@ -236,24 +233,24 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push(WidgetMapAction::no_action(
+    container.push(348, 68, WidgetMapAction::no_action(
         HorizontalRules::new(
             Rect::new(348, 68, 800 - 348 - 12, 412),
             state.clone()
         )?
     ));
-    container.push(WidgetMapAction::no_action(
+    container.push(12, 495, WidgetMapAction::no_action(
         VerticalRules::new(
             Rect::new(12, 495, 800 - 12 * 2, 48 * 2),
             state.clone()
         )?
     ));
 
-    container.push({
+    container.push(12, 440, {
         let this_state = state.clone();
         let save_game_trigger2 = save_game_trigger.clone();
         WidgetMapAction::new(
-            new_game_button(Rect::new(12, 440, 94, 30), messages.save, None, ()),
+            new_game_button(messages.save, None, ()),
             move |_| {
                 this_state.borrow_mut().stop();
                 *save_game_trigger2.borrow_mut() = Some(());
@@ -262,10 +259,10 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(119, 400, {
         let this_state = state.clone();
         WidgetMapAction::new(
-            new_game_button(Rect::new(119, 400, 94, 30), messages.switch, None, ()),
+            new_game_button(messages.switch, None, ()),
             move |_| {
                 this_state.borrow_mut().toggle_show_excluded();
                 Ok(EventReaction::empty())
@@ -273,15 +270,15 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push(
-        new_game_button(Rect::new(226, 400, 94, 30), messages.exit, Some(Keycode::Escape), ())
+    container.push(226, 400,
+        new_game_button(messages.exit, Some(Keycode::Escape), ())
     );
 
-    container.push({
+    container.push(226, 440, {
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
-            new_game_button(Rect::new(226, 440, 94, 30), messages.help, None, ()),
+            new_game_button(messages.help, None, ()),
             move |_| {
                 this_state.borrow_mut().stop();
                 *show_help_trigger2.borrow_mut() = Some(());
@@ -290,11 +287,11 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(119, 440, {
         let this_state = state.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
         WidgetMapAction::new(
-            new_game_button(Rect::new(119, 440, 94, 30), messages.options, None, ()),
+            new_game_button(messages.options, None, ()),
             move |_| {
                 this_state.borrow_mut().stop();
                 *show_opts_trigger2.borrow_mut() = Some(());
@@ -303,11 +300,11 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(12, 400, {
         let this_state = state.clone();
         let pause_trigger2 = pause_trigger.clone();
         WidgetMapAction::new(
-            new_game_button(Rect::new(12, 400, 94, 30), messages.pause, None, ()),
+            new_game_button(messages.pause, None, ()),
             move |_| {
                 this_state.borrow_mut().stop();
                 *pause_trigger2.borrow_mut() = Some(());
@@ -316,7 +313,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let this_state = state.clone();
         let pause_trigger2 = pause_trigger.clone();
         WidgetMapAction::new(
@@ -329,7 +326,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
@@ -342,7 +339,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         let this_state = state.clone();
@@ -366,7 +363,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         let this_state = state.clone();
@@ -395,7 +392,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let victory_trigger2 = victory_trigger.clone();
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
@@ -419,7 +416,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         let storage1 = storage.clone();
@@ -446,7 +443,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage2 = storage.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         WidgetMapAction::new(
@@ -461,7 +458,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let failure_trigger2 = failure_trigger.clone();
         let state2 = state.clone();
         WidgetMapAction::new(
@@ -489,18 +486,3 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
 
     Ok(container)
 }
-
-/*
-void Game::pleaseWait()
-{
-    drawWallpaper(screen, L"rain.bmp");
-    Window window(screen, 230, 260, 340, 80, L"greenpattern.bmp", 6);
-    window.draw();
-    Font font(L"laudcn2.ttf", 16);
-    Label label(screen, &font, 280, 275, 240, 50, Label::ALIGN_CENTER,
-                Label::ALIGN_MIDDLE, 255,255,0, msg(L"loading"));
-    label.draw();
-    screen->addRegionToUpdate(0, 0, screen->getWidth(), screen->getHeight());
-    screen->flush();
-}
-*/

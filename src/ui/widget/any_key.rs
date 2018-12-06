@@ -1,5 +1,5 @@
 use failure::err_msg;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;
@@ -17,10 +17,8 @@ impl<A> AnyKey<A> {
 }
 
 impl<A> Widget<A> for AnyKey<A> where A: Clone {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        Rect::default()
+    fn get_size(&self) -> Size {
+        Size::EMPTY
     }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {

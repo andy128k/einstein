@@ -1,24 +1,24 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::error::*;
-use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::Background;
 use crate::ui::widget::label::*;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::container::Container;
+use crate::ui::component::dialog::dialod_widget;
 use crate::resources::messages::Messages;
 use crate::storage::{Scores};
 use crate::util::time::sec_to_str;
 
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
-    let rect = Rect::new(240, 125, 320, 350);
     let bg = Background::BLUE_PATTERN;
 
-    let mut container = Container::<()>::modal(rect, bg);
+    let mut container = Container::<()>::container(Size::new(320, 350), bg);
 
-    container.push(WidgetMapAction::no_action(
-        Label::title(Rect::new(10, 10, 300, 40), messages.top_scores)
+    container.push(10, 10, WidgetMapAction::no_action(
+        Label::title(Size::new(300, 40), messages.top_scores)
     ));
 
     let mut pos = 50;
@@ -29,22 +29,22 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
             Color::RGB(255, 255, 255)
         };
 
-        container.push(WidgetMapAction::no_action(
-            Label::new(Rect::new(10, pos, 30, 25), &format!("{}.", i + 1), color, HorizontalAlign::Right)
+        container.push(10, pos, WidgetMapAction::no_action(
+            Label::new(Size::new(30, 25), &format!("{}.", i + 1), color, HorizontalAlign::Right)
         ));
-        container.push(WidgetMapAction::no_action(
-            Label::new(Rect::new(50, pos, 160, 25), &score.name, color, HorizontalAlign::Left)
+        container.push(50, pos, WidgetMapAction::no_action(
+            Label::new(Size::new(160, 25), &score.name, color, HorizontalAlign::Left)
         ));
-        container.push(WidgetMapAction::no_action(
-            Label::new(Rect::new(220, pos, 80, 25), &sec_to_str(score.score), color, HorizontalAlign::Right)
+        container.push(220, pos, WidgetMapAction::no_action(
+            Label::new(Size::new(80, 25), &sec_to_str(score.score), color, HorizontalAlign::Right)
         ));
 
         pos += 25;
     }
 
-    container.push(
-        DialogButton::new(Rect::new(115, 310, 90, 25), bg, messages.ok, Some(Keycode::Escape), ())
+    container.push(115, 310,
+        DialogButton::new(Size::new(90, 25), bg, messages.ok, Some(Keycode::Escape), ())
     );
 
-    Ok(container)
+    Ok(dialod_widget(None, container))
 }

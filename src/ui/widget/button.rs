@@ -2,7 +2,7 @@ use std::cell::Cell;
 use failure::err_msg;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;
@@ -14,7 +14,7 @@ pub trait ButtonRenderer {
 }
 
 pub struct Button<R: ButtonRenderer, A> {
-    rect: Rect,
+    size: Size,
     highlighted: Cell<bool>,
     key: Option<Keycode>,
     action: A,
@@ -22,9 +22,9 @@ pub struct Button<R: ButtonRenderer, A> {
 }
 
 impl<R: ButtonRenderer, A> Button<R, A> {
-    pub fn new(rect: Rect, key: Option<Keycode>, action: A, renderer: R) -> Button<R, A> {
+    pub fn new(size: Size, key: Option<Keycode>, action: A, renderer: R) -> Button<R, A> {
         Button::<R, A> {
-            rect,
+            size,
             highlighted: Cell::new(false),
             key,
             action,
@@ -34,11 +34,7 @@ impl<R: ButtonRenderer, A> Button<R, A> {
 }
 
 impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        self.rect
-    }
+    fn get_size(&self) -> Size { self.size }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
         match *event {
@@ -46,12 +42,12 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
                 audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
-            Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_client_rect().contains_point((x, y)) => {
+            Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_size().to_rect().contains_point((x, y)) => {
                 audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseMove(x, y) => {
-                let to_highlight = self.get_client_rect().contains_point((x, y));
+                let to_highlight = self.get_size().to_rect().contains_point((x, y));
                 if self.highlighted.get() != to_highlight {
                     self.highlighted.set(to_highlight);
                     Ok(EventReaction::update())

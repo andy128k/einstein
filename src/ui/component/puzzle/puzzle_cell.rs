@@ -3,7 +3,7 @@ use std::cell::{Cell};
 use crate::cell::RefCell;
 use sdl2::mouse::MouseButton;
 use crate::rules::{Thing};
-use crate::ui::context::Rect;
+use crate::ui::context::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
@@ -41,8 +41,6 @@ pub enum PuzzleAction {
 }
 
 pub struct PuzzleCell {
-    x: i32,
-    y: i32,
     state: Rc<RefCell<GamePrivate>>,
     row: u8,
     col: u8,
@@ -50,10 +48,8 @@ pub struct PuzzleCell {
 }
 
 impl PuzzleCell {
-    pub fn new(x: i32, y: i32, state: Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Result<Self> {
+    pub fn new(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Result<Self> {
         Ok(Self {
-            x,
-            y,
             state,
             row,
             col,
@@ -66,7 +62,8 @@ impl PuzzleCell {
             return EventReaction::empty();
         }
 
-        if !self.get_client_rect().contains_point((x, y)) {
+        let Size { width, height } = self.get_size();
+        if x < 0 || x >= width as i32 || y < 0 || y >= height as i32 {
             return EventReaction::empty();
         }
 
@@ -106,12 +103,12 @@ impl PuzzleCell {
     }
 
     fn on_mouse_move(&self, x: i32, y: i32) -> bool {
-        if !self.get_client_rect().contains_point((x,y)) && self.highlighted.get().is_none() {
+        if !self.get_size().to_rect().contains_point((x,y)) && self.highlighted.get().is_none() {
             return false;
         }
 
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
-            if self.get_client_rect().contains_point((x,y)) {
+            if self.get_size().to_rect().contains_point((x,y)) {
                 self.highlighted.set(Some(None));
             } else {
                 self.highlighted.set(None);
@@ -128,15 +125,8 @@ impl PuzzleCell {
 }
 
 impl Widget<PuzzleAction> for PuzzleCell {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        Rect::new(
-            self.x,
-            self.y,
-            FIELD_TILE_WIDTH as u32,
-            FIELD_TILE_HEIGHT as u32
-        )
+    fn get_size(&self) -> Size {
+        Size { width: FIELD_TILE_WIDTH as u32, height: FIELD_TILE_HEIGHT as u32 }
     }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<PuzzleAction> {

@@ -5,7 +5,8 @@ use crate::ui::widget::common::Background;
 use crate::ui::widget::label::*;
 use crate::ui::widget::any_key::*;
 use crate::ui::widget::container::Container;
-use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::component::dialog::dialod_widget;
+use crate::ui::context::{Size, HorizontalAlign};
 
 pub enum MessageType {
     Neutral,
@@ -14,15 +15,7 @@ pub enum MessageType {
 }
 
 pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Container<()>> {
-    let width = 500;
-    let height = 400;
-
-    let rect = Rect::new(
-        ((800 - width) / 2) as i32,
-        ((600 - height) / 2) as i32,
-        width,
-        height
-    );
+    let size = Size::new(500, 400);
 
     let (bg, color) = match message_type {
         MessageType::Neutral => (Background::WHITE_PATTERN, Color::RGB(255, 0, 0)),
@@ -30,13 +23,13 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (Background::RED_PATTERN, Color::RGB(255, 255, 255))
     };
 
-    let container = Container::<()>::modal(rect, bg)
-        .add(WidgetMapAction::no_action(
-            Label::new(Rect::new0(width, height), message, color, HorizontalAlign::Center)
+    let container = Container::<()>::container(size, bg)
+        .add(0, 0, WidgetMapAction::no_action(
+            Label::new(size, message, color, HorizontalAlign::Center)
         ))
-        .add(
+        .add(0, 0,
             AnyKey::new(())
         );
 
-    Ok(container)
+    Ok(dialod_widget(None, container))
 }

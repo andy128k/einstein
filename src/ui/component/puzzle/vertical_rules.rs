@@ -3,7 +3,7 @@ use std::cell::{Cell};
 use crate::cell::RefCell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Rect;
+use crate::ui::context::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
@@ -47,7 +47,8 @@ impl VerticalRules {
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.get_client_rect().contains_point((x, y)) {
+        let Size { width, height } = self.get_size();
+        if x < 0 || x >= width as i32 || y < 0 || y >= height as i32 {
             return None;
         }
         if (x as u32) % (TILE_WIDTH + TILE_GAP) < TILE_WIDTH {
@@ -60,8 +61,9 @@ impl VerticalRules {
 }
 
 impl Widget<Nothing> for VerticalRules {
-    fn is_relative(&self) -> bool { true }
-    fn get_rect(&self) -> Rect { self.rect }
+    fn get_size(&self) -> Size {
+        Size { width: self.rect.width(), height: self.rect.height() }
+    }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<Nothing> {
         match *event {
@@ -92,8 +94,9 @@ impl Widget<Nothing> for VerticalRules {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
-        let num = (self.get_client_rect().width() + TILE_GAP) / (TILE_WIDTH + TILE_GAP);
+        let Size { width, height } = self.get_size();
+        let mut brick = Brick::new(width, height);
+        let num = (width + TILE_GAP) / (TILE_WIDTH + TILE_GAP);
         for i in 0..num {
             let b = self.draw_cell(i as usize);
             brick.push(i * (TILE_WIDTH + TILE_GAP), 0, b);

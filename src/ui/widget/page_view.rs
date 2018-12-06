@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::pixels::Color;
-use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
@@ -52,27 +52,23 @@ impl PageViewState {
 }
 
 pub struct PageView {
-    rect: Rect,
+    size: Size,
     state: Rc<RefCell<PageViewState>>,
 }
 
 impl PageView {
-    pub fn new(rect: Rect, state: &Rc<RefCell<PageViewState>>) -> Self {
-        Self { rect, state: state.clone() }
+    pub fn new(size: Size, state: &Rc<RefCell<PageViewState>>) -> Self {
+        Self { size, state: state.clone() }
     }
 }
 
 impl Widget<Nothing> for PageView {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        self.rect
-    }
+    fn get_size(&self) -> Size { self.size }
 
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
-        self.state.borrow_mut().make_pages(self.get_client_rect().width(), self.get_client_rect().height(), resource_manager).unwrap();
+        self.state.borrow_mut().make_pages(self.get_size().width, self.get_size().height, resource_manager).unwrap();
 
-        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
+        let mut brick = Brick::new(self.get_size().width, self.get_size().height);
         if let Some(items) = self.state.borrow().current_page() {
             for item in items {
                 match *item {

@@ -2,7 +2,7 @@ use std::cell::Cell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
@@ -11,16 +11,14 @@ use crate::resources::audio::CLICK;
 use crate::audio::Audio;
 
 pub struct Checkbox {
-    rect: Rect,
     background: Background,
     checked: Cell<bool>,
     mouse_inside: Cell<bool>,
 }
 
 impl Checkbox {
-    pub fn new(x: i32, y: i32, background: Background, checked: bool) -> Self {
+    pub fn new(background: Background, checked: bool) -> Self {
         Self{
-            rect: Rect::new(x, y, 20, 20),
             background,
             checked: Cell::new(checked),
             mouse_inside: Cell::new(false),
@@ -29,14 +27,12 @@ impl Checkbox {
 }
 
 impl Widget<bool> for Checkbox {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        self.rect
+    fn get_size(&self) -> Size {
+        Size { width: 20, height: 20 }
     }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<bool> {
-        let rect = self.get_client_rect();
+        let rect = self.get_size().to_rect();
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
                 audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
@@ -57,7 +53,7 @@ impl Widget<bool> for Checkbox {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height())
+        let mut brick = Brick::new(self.get_size().width, self.get_size().height)
             .background(if self.mouse_inside.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);
         if self.checked.get() {

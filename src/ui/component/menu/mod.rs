@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::error::*;
 use crate::storage::*;
-use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::menu_button::*;
@@ -25,8 +25,6 @@ use crate::resources::messages::Messages;
 const MENU_BG: Resource = resource!("./nova.bmp");
 
 pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<Container<MainLoopQuit>> {
-    let rect = Rect::new(0, 0, 800, 600);
-
     let new_game_trigger = Rc::new(RefCell::new(None));
     let load_game_trigger = Rc::new(RefCell::new(None));
     let show_scores_trigger = Rc::new(RefCell::new(None));
@@ -34,20 +32,20 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_about_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<MainLoopQuit>::modal(rect, Background::Pattern(&MENU_BG, false));
+    let mut container = Container::<MainLoopQuit>::modal(Size::new(800, 600), Background::Pattern(&MENU_BG, false));
 
-    container.push(WidgetMapAction::no_action(
-        Label::title(Rect::new(0, 30, 800, 30), messages.einstein_flowix)
+    container.push(0, 30, WidgetMapAction::no_action(
+        Label::title(Size::new(800, 30), messages.einstein_flowix)
     ));
 
-    container.push(WidgetMapAction::no_action(
-        Label::new(Rect::new(0, 60, 800, 30), "http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
+    container.push(0, 60, WidgetMapAction::no_action(
+        Label::new(Size::new(800, 30), "http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
     ));
 
-    container.push({
+    container.push(550, 340, {
         let new_game_trigger2 = new_game_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 340, 220, 30), messages.new_game, None, ()),
+            new_menu_button(Size::new(220, 30), messages.new_game, None, ()),
             move |_| {
                 let game = GamePrivate::new().unwrap();
                 *new_game_trigger2.borrow_mut() = Some(game);
@@ -55,61 +53,61 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
             }
         )
     });
-    container.push({
+    container.push(550, 370, {
         let load_game_trigger2 = load_game_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 370, 220, 30), messages.load_game, None, ()),
+            new_menu_button(Size::new(220, 30), messages.load_game, None, ()),
             move |_| {
                 *load_game_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
         )
     });
-    container.push({
+    container.push(550, 400, {
         let show_scores_trigger2 = show_scores_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 400, 220, 30), messages.top_scores, None, ()),
+            new_menu_button(Size::new(220, 30), messages.top_scores, None, ()),
             move |_| {
                 *show_scores_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
         )
     });
-    container.push({
+    container.push(550, 430, {
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 430, 220, 30), messages.rules, None, ()),
+            new_menu_button(Size::new(220, 30), messages.rules, None, ()),
             move |_| {
                 *show_help_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
         )
     });
-    container.push({
+    container.push(550, 460, {
         let show_opts_trigger2 = show_opts_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 460, 220, 30), messages.options, None, ()),
+            new_menu_button(Size::new(220, 30), messages.options, None, ()),
             move |_| {
                 *show_opts_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
         )
     });
-    container.push({
+    container.push(550, 490, {
         let show_about_trigger2 = show_about_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Rect::new(550, 490, 220, 30), messages.about, None, ()),
+            new_menu_button(Size::new(220, 30), messages.about, None, ()),
             move |_| {
                 *show_about_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
         )
     });
-    container.push(
-        new_menu_button(Rect::new(550, 520, 220, 30), messages.exit, Some(Keycode::Escape), MainLoopQuit)
+    container.push(550, 520,
+        new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainLoopQuit)
     );
 
-    container.push({
+    container.push(0, 0, {
         let storage2 = storage.clone();
         let new_game_trigger2 = new_game_trigger.clone();
         WidgetMapAction::new(
@@ -128,7 +126,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage2 = storage.clone();
         let load_game_trigger2 = load_game_trigger.clone();
         let new_game_trigger2 = new_game_trigger.clone();
@@ -155,7 +153,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage2 = storage.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         WidgetMapAction::new(
@@ -170,7 +168,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
             ConditionalWidget::new(
@@ -184,7 +182,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
@@ -209,7 +207,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         )
     });
 
-    container.push({
+    container.push(0, 0, {
         let show_about_trigger2 = show_about_trigger.clone();
         WidgetMapAction::new(
             ConditionalWidget::new(

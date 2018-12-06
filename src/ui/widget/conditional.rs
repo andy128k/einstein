@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
 use crate::cell::RefCell;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;
@@ -45,13 +45,11 @@ impl<A, W, I> ConditionalWidget<A, W, I> where W: Widget<A> {
 }
 
 impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
+    fn get_size(&self) -> Size {
         self.check().unwrap();
         match *self.wrapped.borrow() {
-            Some(ref widget) => widget.get_rect(),
-            None => Rect::default()
+            Some(ref widget) => widget.get_size(),
+            None => Size::EMPTY,
         }
     }
 

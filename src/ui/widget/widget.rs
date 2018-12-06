@@ -1,7 +1,7 @@
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use crate::error::*;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::brick::Brick;
 use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
@@ -17,12 +17,12 @@ pub enum Event {
 }
 
 impl Event {
-    pub fn relative(&self, rect: Rect) -> Self {
+    pub fn relative(&self, left: i32, top: i32) -> Self {
         match *self {
             Event::Tick => Event::Tick,
-            Event::MouseButtonDown(mouse, x, y) => Event::MouseButtonDown(mouse, x - rect.left(), y - rect.top()),
-            Event::MouseButtonUp(mouse, x, y) => Event::MouseButtonUp(mouse, x - rect.left(), y - rect.top()),
-            Event::MouseMove(x, y) => Event::MouseMove(x - rect.left(), y - rect.top()),
+            Event::MouseButtonDown(mouse, x, y) => Event::MouseButtonDown(mouse, x - left, y - top),
+            Event::MouseButtonUp(mouse, x, y) => Event::MouseButtonUp(mouse, x - left, y - top),
+            Event::MouseMove(x, y) => Event::MouseMove(x - left, y - top),
             Event::KeyDown(key) => Event::KeyDown(key),
             Event::TextInput(ref text) => Event::TextInput(text.clone()),
         }
@@ -86,13 +86,7 @@ impl<A> EventReaction<A> where A: Clone {
 pub type EventResult<A> = Result<EventReaction<A>>;
 
 pub trait Widget<A> {
-    fn is_relative(&self) -> bool;
-    fn get_rect(&self) -> Rect;
-
-    fn get_client_rect(&self) -> Rect {
-        let rect = self.get_rect();
-        Rect::new(0, 0, rect.width(), rect.height())
-    }
+    fn get_size(&self) -> Size;
 
     fn on_event(&mut self, _event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<A> {
         Ok(EventReaction::empty())
@@ -103,12 +97,8 @@ pub trait Widget<A> {
 pub type WidgetPtr<A> = Box<Widget<A>>;
 
 impl<A> Widget<A> for WidgetPtr<A> {
-    fn is_relative(&self) -> bool {
-        (**self).is_relative()
-    }
-
-    fn get_rect(&self) -> Rect {
-        (**self).get_rect()
+    fn get_size(&self) -> Size {
+        (**self).get_size()
     }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
@@ -140,12 +130,8 @@ impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
 }
 
 impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
-    fn is_relative(&self) -> bool {
-        self.wrapped.is_relative()
-    }
-
-    fn get_rect(&self) -> Rect {
-        self.wrapped.get_rect()
+    fn get_size(&self) -> Size {
+        self.wrapped.get_size()
     }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<AT> {

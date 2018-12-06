@@ -3,7 +3,7 @@ use std::cell::Cell;
 use crate::cell::RefCell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Rect;
+use crate::ui::context::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
@@ -50,7 +50,8 @@ impl HorizontalRules {
     }
 
     fn get_rule_index(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.get_client_rect().contains_point((x, y)) {
+        let Size { width, height } = self.get_size();
+        if x < 0 || x >= width as i32 || y < 0 || y >= height as i32 {
             return None;
         }
 
@@ -74,8 +75,9 @@ impl HorizontalRules {
 }
 
 impl Widget<Nothing> for HorizontalRules {
-    fn is_relative(&self) -> bool { true }
-    fn get_rect(&self) -> Rect { self.rect }
+    fn get_size(&self) -> Size {
+        Size { width: self.rect.width(), height: self.rect.height() }
+    }
 
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<Nothing> {
         match *event {
@@ -106,9 +108,10 @@ impl Widget<Nothing> for HorizontalRules {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_rect().width(), self.get_rect().height());
-        // let num_cols = ((self.get_client_rect().width() as i32 + TILE_GAP_X) / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
-        // let num_rows = ((self.get_client_rect().height() as i32 + TILE_GAP_Y) / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
+        let Size { width, height } = self.get_size();
+        let mut brick = Brick::new(width, height);
+        // let num_cols = ((self.get_size().width as i32 + TILE_GAP_X) / (TILE_WIDTH*3 + TILE_GAP_X)) as usize;
+        // let num_rows = ((self.get_size().height as i32 + TILE_GAP_Y) / (TILE_HEIGHT + TILE_GAP_Y)) as usize;
         for i in 0..(HINTS_ROWS * HINTS_COLS) {
             let row = i / HINTS_COLS;
             let col = i % HINTS_COLS;

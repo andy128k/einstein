@@ -1,6 +1,6 @@
 use std::cell::Cell;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Rect;
+use crate::ui::context::{Rect, Size};
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::ui::widget::widget::*;
@@ -8,7 +8,7 @@ use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
 
 pub struct Slider {
-    rect: Rect,
+    size: Size,
     background: Background,
     value: Cell<f32>,
     highlight: Cell<bool>,
@@ -16,9 +16,9 @@ pub struct Slider {
 }
 
 impl Slider {
-    pub fn new(rect: Rect, background: Background, value: f32) -> Self {
+    pub fn new(size: Size, background: Background, value: f32) -> Self {
         Self {
-            rect,
+            size,
             background,
             value: Cell::new(value),
             highlight: Cell::new(false),
@@ -27,21 +27,21 @@ impl Slider {
     }
 
     fn value_to_x(&self, value: f32) -> i32 {
-        let width = self.rect.width();
-        let slider_width = self.rect.height();
+        let width = self.size.width;
+        let slider_width = self.size.height;
         let x_range = width - slider_width;
         (value.max(0f32).min(1f32) * (x_range as f32)) as i32
     }
 
     fn x_to_value(&self, pos: i32) -> f32 {
-        let width = self.rect.width();
-        let slider_width = self.rect.height();
+        let width = self.size.width;
+        let slider_width = self.size.height;
         let x_range = width - slider_width;
         (pos.max(0).min(x_range as i32) as f32) / (x_range as f32)
     }
 
     fn get_slider_rect(&self) -> Rect {
-        let rect = self.get_client_rect();
+        let rect = self.get_size().to_rect();
         let slider_x = self.value_to_x(self.value.get());
         Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height())
     }
@@ -66,10 +66,10 @@ impl Slider {
             }
         } else {
             let p = (x, y);
-            let inside = self.get_client_rect().contains_point(p);
+            let inside = self.get_size().to_rect().contains_point(p);
             if inside {
                 let slider_x = self.value_to_x(self.value.get());
-                let slider_height = self.get_client_rect().height();
+                let slider_height = self.get_size().height;
                 let slider_rect = Rect::new(slider_x as i32, 0, slider_height, slider_height);
                 let highlight = slider_rect.contains_point(p);
                 if highlight != self.highlight.get() {
@@ -89,8 +89,9 @@ impl Slider {
 }
 
 impl Widget<f32> for Slider {
-    fn is_relative(&self) -> bool { true }
-    fn get_rect(&self) -> Rect { self.rect }
+    fn get_size(&self) -> Size {
+        self.size
+    }
 
     fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<f32> {
         match *event {
@@ -114,19 +115,17 @@ impl Widget<f32> for Slider {
     }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let rect = self.rect;
-
         let x = self.value_to_x(self.value.get()) as u32;
 
-        let scale = Brick::new(rect.width(), 4)
+        let scale = Brick::new(self.size.width, 4)
             .border(Border::Sunken);
 
-        let slider = Brick::new(rect.height(), rect.height())
+        let slider = Brick::new(self.size.height, self.size.height)
             .background(if self.highlight.get() { self.background.highlighted() } else { self.background })
             .border(Border::Etched);
 
-        Brick::new(rect.width(), rect.height())
-            .add(0, (rect.height() - 4) / 2, scale)
+        Brick::new(self.size.width, self.size.height)
+            .add(0, (self.size.height - 4) / 2, scale)
             .add(x, 0, slider)
     }
 }

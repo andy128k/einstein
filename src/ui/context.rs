@@ -46,6 +46,29 @@ pub fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
 }
 
 #[derive(Clone, Copy)]
+pub struct Size {
+    pub width: u32,
+    pub height: u32,
+}
+
+impl Size {
+    pub const EMPTY: Size = Size { width: 0, height: 0 };
+
+    pub const fn new(width: u32, height: u32) -> Self {
+        Self { width, height }
+    }
+
+    pub fn to_rect(&self) -> Rect {
+        Rect::new0(self.width, self.height)
+    }
+
+    pub fn contains(&self, x: i32, y: i32) -> bool {
+        x >= 0 && (x as u32) < self.width &&
+        y >= 0 && (y as u32) < self.height
+    }
+}
+
+#[derive(Clone, Copy)]
 pub enum HorizontalAlign {
     Left,
     Center,

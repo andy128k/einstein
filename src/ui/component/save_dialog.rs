@@ -2,7 +2,7 @@ use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use crate::error::*;
-use crate::ui::context::Rect;
+use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::Background;
 use crate::ui::widget::dialog_button::*;
@@ -10,18 +10,17 @@ use crate::ui::widget::conditional::*;
 use crate::ui::widget::container::Container;
 use crate::ui::widget::label::Label;
 use crate::ui::component::game_name_dialog::*;
-use crate::ui::component::dialog::DialogResult;
+use crate::ui::component::dialog::{DialogResult, dialod_widget};
 use crate::resources::messages::Messages;
 use crate::storage::SavedGame;
 
 pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<Container<DialogResult<(usize, String)>>> {
-    let rect = Rect::new(250, 90, 300, 420);
     let bg = Background::BLUE_PATTERN;
 
-    let mut container = Container::<DialogResult<(usize, String)>>::modal(rect, bg);
+    let mut container = Container::<DialogResult<(usize, String)>>::container(Size::new(300, 420), bg);
 
-    container.push(WidgetMapAction::no_action(
-        Label::title(Rect::new(0, 5, 300, 40), messages.save_game)
+    container.push(0, 5, WidgetMapAction::no_action(
+        Label::title(Size::new(300, 40), messages.save_game)
     ));
 
     let ask_name: Rc<RefCell<Option<(usize, String)>>> = Rc::new(RefCell::new(None));
@@ -35,10 +34,10 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
             )
         };
 
-        container.push({
+        container.push(10, 60 + (i as u32) * 30, {
             let ask_name2 = ask_name.clone();
             WidgetMapAction::new(
-                DialogButton::new(Rect::new(10, 60 + (i as i32) * 30, 280, 25), bg, &label, None, ()),
+                DialogButton::new(Size::new(280, 25), bg, &label, None, ()),
                 move |_| {
                     *ask_name2.borrow_mut() = Some((i, default_name.clone()));
                     Ok(EventReaction::empty())
@@ -47,11 +46,11 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
         });
     }
 
-    container.push(
-        DialogButton::new(Rect::new(110, 380, 80, 25), bg, messages.close, Some(Keycode::Escape), DialogResult::Cancel)
+    container.push(110, 380,
+        DialogButton::new(Size::new(80, 25), bg, messages.close, Some(Keycode::Escape), DialogResult::Cancel)
     );
 
-    container.push({
+    container.push(0, 0, {
         let ask_name2 = ask_name.clone();
         WidgetMapAction::new(
             ConditionalWidget::new(
@@ -69,5 +68,5 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
         )
     });
 
-    Ok(container)
+    Ok(dialod_widget(None, container))
 }

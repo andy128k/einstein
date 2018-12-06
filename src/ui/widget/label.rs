@@ -1,13 +1,13 @@
 use sdl2::pixels::Color;
-use crate::ui::context::{Rect, HorizontalAlign, VerticalAlign};
+use crate::ui::context::{Size, HorizontalAlign, VerticalAlign};
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::ui::widget::widget::*;
 use crate::resources::manager::ResourceManager;
 
 pub struct Label {
+    size: Size,
     text: String,
-    rect: Rect,
     font_size: FontSize,
     color: Color,
     horizontal_align: HorizontalAlign,
@@ -15,10 +15,10 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn new(rect: Rect, text: &str, color: Color, horizontal_align: HorizontalAlign) -> Self {
+    pub fn new(size: Size, text: &str, color: Color, horizontal_align: HorizontalAlign) -> Self {
         Self {
+            size,
             text: text.to_string(),
-            rect,
             font_size: FontSize::TEXT,
             color,
             horizontal_align,
@@ -26,10 +26,10 @@ impl Label {
         }
     }
 
-    pub fn title(rect: Rect, text: &str) -> Self {
+    pub fn title(size: Size, text: &str) -> Self {
         Self {
+            size,
             text: text.to_string(),
-            rect,
             font_size: FontSize::TITLE,
             color: Color::RGB(255, 255, 0),
             horizontal_align: HorizontalAlign::Center,
@@ -39,14 +39,10 @@ impl Label {
 }
 
 impl Widget<Nothing> for Label {
-    fn is_relative(&self) -> bool { true }
-
-    fn get_rect(&self) -> Rect {
-        self.rect
-    }
+    fn get_size(&self) -> Size { self.size }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        Brick::new(self.get_rect().width(), self.get_rect().height())
+        Brick::new(self.get_size().width, self.get_size().height)
             .text(Text::new(&self.text)
                 .font_size(self.font_size)
                 .color(self.color)
