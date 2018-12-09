@@ -1,19 +1,19 @@
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::label::*;
-use ui::widget::dialog_button::*;
-use ui::widget::container::Container;
-use ui::widget::checkbox::*;
-use ui::widget::slider::*;
-use ui::component::dialog::*;
-use resources::messages::Messages;
-use storage::Storage;
+use crate::error::*;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::label::*;
+use crate::ui::widget::dialog_button::*;
+use crate::ui::widget::container::Container;
+use crate::ui::widget::checkbox::*;
+use crate::ui::widget::slider::*;
+use crate::ui::component::dialog::*;
+use crate::resources::messages::Messages;
+use crate::storage::Storage;
 
 #[derive(Clone)]
 pub struct Options {

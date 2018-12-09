@@ -28,14 +28,14 @@ pub mod audio;
 
 use std::process::exit;
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use dirs::home_dir;
 use std::fs::create_dir_all;
 use failure::err_msg;
-use error::*;
-use resources::messages::get_messages;
-use ui::component::menu::make_menu;
-use ui::main_loop::main_loop;
+use crate::error::*;
+use crate::resources::messages::get_messages;
+use crate::ui::component::menu::make_menu;
+use crate::ui::main_loop::main_loop;
 
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;

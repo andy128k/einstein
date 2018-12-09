@@ -2,9 +2,9 @@ use itertools::join;
 use regex::Regex;
 use sdl2::render::TextureQuery;
 use sdl2::ttf::Font;
-use util::group_by_weight::group_by_weight;
-use resources::manager::{ResourceManager, Resource};
-use error::*;
+use crate::util::group_by_weight::group_by_weight;
+use crate::resources::manager::{ResourceManager, Resource};
+use crate::error::*;
 
 pub type Page = Vec<PageItem>;
 

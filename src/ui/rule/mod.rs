@@ -1,9 +1,9 @@
-use rules::{Rule, Thing};
-use resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
-use resources::manager::Resource;
-use ui::context::Rect;
-use ui::widget::common::*;
-use ui::brick::*;
+use crate::rules::{Rule, Thing};
+use crate::resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
+use crate::resources::manager::Resource;
+use crate::ui::context::Rect;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
 
 const TILE_WIDTH: u32 = 48;
 const TILE_HEIGHT: u32 = 48;

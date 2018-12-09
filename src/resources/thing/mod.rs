@@ -1,6 +1,6 @@
-use rules::Thing;
-use ui::context::Rect;
-use resources::manager::Resource;
+use crate::rules::Thing;
+use crate::ui::context::Rect;
+use crate::resources::manager::Resource;
 
 pub const LARGE_THINGS_ATLAS: Resource = resource!("./large.bmp");
 pub const SMALL_THINGS_ATLAS: Resource = resource!("./small.bmp");

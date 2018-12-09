@@ -1,12 +1,12 @@
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::label::*;
-use ui::widget::container::Container;
-use ui::widget::any_key::*;
-use resources::messages::Messages;
+use crate::error::*;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::label::*;
+use crate::ui::widget::container::Container;
+use crate::ui::widget::any_key::*;
+use crate::resources::messages::Messages;
 
 pub fn new_pause_dialog(messages: &Messages) -> Result<Container<()>> {
     let rect = Rect::new(280, 275, 240, 50);

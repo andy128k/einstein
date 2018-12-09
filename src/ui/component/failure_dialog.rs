@@ -1,12 +1,12 @@
 use sdl2::keyboard::Keycode;
-use error::*;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::container::Container;
-use ui::widget::label::Label;
-use ui::widget::dialog_button::*;
-use resources::messages::Messages;
+use crate::error::*;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::container::Container;
+use crate::ui::widget::label::Label;
+use crate::ui::widget::dialog_button::*;
+use crate::resources::messages::Messages;
 
 #[derive(Clone, Copy)]
 pub enum FailureChoice {

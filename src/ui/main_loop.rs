@@ -5,11 +5,11 @@ use sdl2::event::{Event};
 use sdl2::render::{Canvas};
 use sdl2::video::Window;
 use failure::err_msg;
-use error::*;
-use ui::context::{Rect};
-use ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
-use resources::manager::ResourceManager;
-use audio::Audio;
+use crate::error::*;
+use crate::ui::context::{Rect};
+use crate::ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
 
 #[derive(Clone)]
 pub struct MainLoopQuit;

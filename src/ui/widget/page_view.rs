@@ -1,13 +1,13 @@
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::pixels::Color;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::page_layout::*;
-use resources::manager::ResourceManager;
-use resources::rules::TextItem;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::page_layout::*;
+use crate::resources::manager::ResourceManager;
+use crate::resources::rules::TextItem;
 
 pub struct PageViewState {
     text: &'static [TextItem<'static>],

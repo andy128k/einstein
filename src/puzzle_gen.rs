@@ -1,8 +1,8 @@
 use rand::Rng;
-use rules::*;
-use error::*;
-use converge::converge_result;
-use util::retry::{retry, retry_result};
+use crate::rules::*;
+use crate::error::*;
+use crate::converge::converge_result;
+use crate::util::retry::{retry, retry_result};
 
 fn can_solve(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<bool> {
     let pos = converge_result(Possibilities::new(), |mut pos| {

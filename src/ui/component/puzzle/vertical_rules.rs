@@ -1,19 +1,19 @@
 use std::rc::Rc;
 use std::cell::{Cell};
-use cell::RefCell;
+use crate::cell::RefCell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::rule::{draw_rule};
-use ui::component::game::{GamePrivate};
-use resources::manager::ResourceManager;
-use resources::thing::EMPTY_TILE;
-use resources::audio::WHIZZ;
-use audio::Audio;
-use error::*;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::rule::{draw_rule};
+use crate::ui::component::game::{GamePrivate};
+use crate::resources::manager::ResourceManager;
+use crate::resources::thing::EMPTY_TILE;
+use crate::resources::audio::WHIZZ;
+use crate::audio::Audio;
+use crate::error::*;
 
 pub struct VerticalRules {
     rect: Rect,

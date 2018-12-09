@@ -2,12 +2,12 @@ use std::cell::Cell;
 use failure::err_msg;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::brick::*;
-use resources::manager::ResourceManager;
-use audio::Audio;
-use resources::audio::CLICK;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::brick::*;
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
+use crate::resources::audio::CLICK;
 
 pub trait ButtonRenderer {
     fn draw(&self, resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick;

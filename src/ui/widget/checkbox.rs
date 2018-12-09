@@ -2,13 +2,13 @@ use std::cell::Cell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
-use ui::context::Rect;
-use ui::widget::common::*;
-use ui::widget::widget::*;
-use ui::brick::*;
-use resources::manager::ResourceManager;
-use resources::audio::CLICK;
-use audio::Audio;
+use crate::ui::context::Rect;
+use crate::ui::widget::common::*;
+use crate::ui::widget::widget::*;
+use crate::ui::brick::*;
+use crate::resources::manager::ResourceManager;
+use crate::resources::audio::CLICK;
+use crate::audio::Audio;
 
 pub struct Checkbox {
     rect: Rect,

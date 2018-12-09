@@ -2,6 +2,7 @@
 name = "einstein"
 version = "3.0.0"
 authors = ["Andrey Kutejko <andy128k@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 libc = "*"

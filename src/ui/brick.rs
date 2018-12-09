@@ -2,9 +2,9 @@ use sdl2::pixels::Color;
 use sdl2::render::{Canvas, Texture, TextureQuery};
 use sdl2::video::Window;
 use sdl2::ttf::Font;
-use ui::widget::common::*;
-use ui::context::{rect_to_rect2, Rect, HorizontalAlign, VerticalAlign};
-use resources::manager::ResourceManager;
+use crate::ui::widget::common::*;
+use crate::ui::context::{rect_to_rect2, Rect, HorizontalAlign, VerticalAlign};
+use crate::resources::manager::ResourceManager;
 
 pub struct Text {
     text: String,

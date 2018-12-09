@@ -1,14 +1,14 @@
 use std::rc::Rc;
-use cell::RefCell;
-use rules::{PUZZLE_SIZE};
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::brick::*;
-use ui::component::game::GamePrivate;
-use ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
-use resources::manager::ResourceManager;
-use audio::Audio;
-use error::*;
+use crate::cell::RefCell;
+use crate::rules::{PUZZLE_SIZE};
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::brick::*;
+use crate::ui::component::game::GamePrivate;
+use crate::ui::component::puzzle::puzzle_cell::{PuzzleCell, PuzzleAction};
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
+use crate::error::*;
 
 const FIELD_OFFSET_X: u16 =    12;
 const FIELD_OFFSET_Y: u16 =    68;

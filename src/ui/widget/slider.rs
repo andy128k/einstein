@@ -1,11 +1,11 @@
 use std::cell::Cell;
 use sdl2::mouse::MouseButton;
-use ui::context::Rect;
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::widget::widget::*;
-use resources::manager::ResourceManager;
-use audio::Audio;
+use crate::ui::context::Rect;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::widget::widget::*;
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
 
 pub struct Slider {
     rect: Rect,

@@ -1,17 +1,17 @@
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::label::*;
-use ui::widget::dialog_button::*;
-use ui::widget::input_field::*;
-use ui::widget::container::Container;
-use ui::component::dialog::DialogResult;
-use resources::messages::Messages;
+use crate::error::*;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::label::*;
+use crate::ui::widget::dialog_button::*;
+use crate::ui::widget::input_field::*;
+use crate::ui::widget::container::Container;
+use crate::ui::component::dialog::DialogResult;
+use crate::resources::messages::Messages;
 
 pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<DialogResult<String>>> {
     let rect = Rect::new(170, 280, 460, 100);

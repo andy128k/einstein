@@ -1,11 +1,11 @@
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
-use error::*;
-use ui::context::Rect;
-use ui::brick::Brick;
-use resources::manager::ResourceManager;
-use audio::Audio;
-pub use algebra::*;
+use crate::error::*;
+use crate::ui::context::Rect;
+use crate::ui::brick::Brick;
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
+pub use crate::algebra::*;
 
 pub enum Event {
     Tick,

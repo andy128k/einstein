@@ -1,4 +1,4 @@
-use error::*;
+use crate::error::*;
 
 pub fn converge<T: Clone + PartialEq, F: Fn(T) -> T>(initial: T, step: F) -> T {
     let mut previous = initial;

@@ -1,16 +1,16 @@
 use std::time::{Instant, Duration};
 use std::rc::Rc;
 use std::cell::{Cell};
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use resources::manager::ResourceManager;
-use audio::Audio;
-use error::*;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
+use crate::error::*;
 
 pub struct InputField {
     rect: Rect,

@@ -1,15 +1,15 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use error::*;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::label::*;
-use ui::widget::dialog_button::*;
-use ui::widget::container::Container;
-use resources::messages::Messages;
-use storage::{Scores};
-use util::time::sec_to_str;
+use crate::error::*;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::label::*;
+use crate::ui::widget::dialog_button::*;
+use crate::ui::widget::container::Container;
+use crate::resources::messages::Messages;
+use crate::storage::{Scores};
+use crate::util::time::sec_to_str;
 
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
     let rect = Rect::new(240, 125, 320, 350);

@@ -2,8 +2,8 @@ use std::fmt;
 use itertools::all;
 use rand::Rng;
 use rand::seq::SliceRandom;
-use converge::converge;
-use util::retry::retry;
+use crate::converge::converge;
+use crate::util::retry::retry;
 
 fn only<T>(values: &[T]) -> Option<&T> {
     if values.len() == 1 {

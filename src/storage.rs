@@ -4,8 +4,8 @@ use std::fs::{File, create_dir_all};
 use dirs::home_dir;
 use failure::err_msg;
 use serde_json;
-use error::*;
-use ui::component::game::GamePrivate;
+use crate::error::*;
+use crate::ui::component::game::GamePrivate;
 
 fn read_file(filename: &Path) -> Result<Vec<u8>> {
     let mut file = File::open(filename)?;

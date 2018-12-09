@@ -1,18 +1,18 @@
 use std::rc::Rc;
 use std::cell::{Cell};
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::mouse::MouseButton;
-use rules::{Thing};
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::component::game::GamePrivate;
-use resources::manager::ResourceManager;
-use resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
-use resources::audio::{LASER, APPLAUSE, GLASS};
-use audio::Audio;
-use error::*;
+use crate::rules::{Thing};
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::component::game::GamePrivate;
+use crate::resources::manager::ResourceManager;
+use crate::resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
+use crate::resources::audio::{LASER, APPLAUSE, GLASS};
+use crate::audio::Audio;
+use crate::error::*;
 
 const PUZZLE_SIZE: u8 = 6;
 

@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
-use ui::context::Rect;
-use resources::manager::Resource;
-use resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
+use crate::ui::context::Rect;
+use crate::resources::manager::Resource;
+use crate::resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 
 #[derive(Clone, Copy)]
 pub enum Border {

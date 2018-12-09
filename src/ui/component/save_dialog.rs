@@ -1,18 +1,18 @@
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
-use error::*;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::dialog_button::*;
-use ui::widget::conditional::*;
-use ui::widget::container::Container;
-use ui::widget::label::Label;
-use ui::component::game_name_dialog::*;
-use ui::component::dialog::DialogResult;
-use resources::messages::Messages;
-use storage::SavedGame;
+use crate::error::*;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::dialog_button::*;
+use crate::ui::widget::conditional::*;
+use crate::ui::widget::container::Container;
+use crate::ui::widget::label::Label;
+use crate::ui::component::game_name_dialog::*;
+use crate::ui::component::dialog::DialogResult;
+use crate::resources::messages::Messages;
+use crate::storage::SavedGame;
 
 pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<Container<DialogResult<(usize, String)>>> {
     let rect = Rect::new(250, 90, 300, 420);

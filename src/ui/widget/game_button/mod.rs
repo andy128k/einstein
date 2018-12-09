@@ -1,10 +1,10 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use ui::context::Rect;
-use ui::widget::button::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use resources::manager::{ResourceManager, Resource};
+use crate::ui::context::Rect;
+use crate::ui::widget::button::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::resources::manager::{ResourceManager, Resource};
 
 const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");
 const BUTTON_BG_HIGHLIGHTED_BYTES: Resource = resource!("./btn-highlighted.bmp");

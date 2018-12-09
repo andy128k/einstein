@@ -1,11 +1,11 @@
 use sdl2::pixels::Color;
-use error::*;
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::label::*;
-use ui::widget::any_key::*;
-use ui::widget::container::Container;
-use ui::context::{Rect, HorizontalAlign};
+use crate::error::*;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::label::*;
+use crate::ui::widget::any_key::*;
+use crate::ui::widget::container::Container;
+use crate::ui::context::{Rect, HorizontalAlign};
 
 pub enum MessageType {
     Neutral,

@@ -1,10 +1,10 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use ui::context::Rect;
-use ui::widget::button::*;
-use ui::widget::common::*;
-use ui::brick::*;
-use resources::manager::ResourceManager;
+use crate::ui::context::Rect;
+use crate::ui::widget::button::*;
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::resources::manager::ResourceManager;
 
 pub struct MenuButton {
     rect: Rect,

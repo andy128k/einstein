@@ -1,12 +1,12 @@
 use std::marker::PhantomData;
 use std::rc::Rc;
-use cell::RefCell;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::brick::*;
-use resources::manager::ResourceManager;
-use audio::Audio;
-use error::*;
+use crate::cell::RefCell;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::brick::*;
+use crate::resources::manager::ResourceManager;
+use crate::audio::Audio;
+use crate::error::*;
 
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
     wrapped: RefCell<Option<W>>,

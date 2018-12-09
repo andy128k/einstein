@@ -1,16 +1,16 @@
 use std::rc::Rc;
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
-use error::*;
-use ui::context::Rect;
-use ui::widget::widget::*;
-use ui::widget::common::Background;
-use ui::widget::dialog_button::*;
-use ui::widget::label::Label;
-use ui::widget::page_view::*;
-use ui::widget::container::Container;
-use resources::rules::{get_rules, TextItem};
-use resources::messages::Messages;
+use crate::error::*;
+use crate::ui::context::Rect;
+use crate::ui::widget::widget::*;
+use crate::ui::widget::common::Background;
+use crate::ui::widget::dialog_button::*;
+use crate::ui::widget::label::Label;
+use crate::ui::widget::page_view::*;
+use crate::ui::widget::container::Container;
+use crate::resources::rules::{get_rules, TextItem};
+use crate::resources::messages::Messages;
 
 const WIDTH: u16 = 600;
 const HEIGHT: u16 = 500;

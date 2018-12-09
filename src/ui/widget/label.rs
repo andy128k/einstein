@@ -1,9 +1,9 @@
 use sdl2::pixels::Color;
-use ui::context::{Rect, HorizontalAlign, VerticalAlign};
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::widget::widget::*;
-use resources::manager::ResourceManager;
+use crate::ui::context::{Rect, HorizontalAlign, VerticalAlign};
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::widget::widget::*;
+use crate::resources::manager::ResourceManager;
 
 pub struct Label {
     text: String,

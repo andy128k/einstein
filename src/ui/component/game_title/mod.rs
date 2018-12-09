@@ -1,16 +1,16 @@
 use std::time::{Duration};
 use std::rc::Rc;
 use std::cell::{Cell};
-use cell::RefCell;
+use crate::cell::RefCell;
 use sdl2::pixels::Color;
-use ui::context::{Rect, HorizontalAlign};
-use ui::widget::common::*;
-use ui::brick::*;
-use ui::widget::widget::*;
-use ui::component::game::GamePrivate;
-use resources::manager::{ResourceManager, Resource};
-use audio::Audio;
-use util::time::sec_to_str;
+use crate::ui::context::{Rect, HorizontalAlign};
+use crate::ui::widget::common::*;
+use crate::ui::brick::*;
+use crate::ui::widget::widget::*;
+use crate::ui::component::game::GamePrivate;
+use crate::resources::manager::{ResourceManager, Resource};
+use crate::audio::Audio;
+use crate::util::time::sec_to_str;
 
 const GAME_TITLE: Resource = resource!("./title.bmp");
 const PADDING: u32 = 7;

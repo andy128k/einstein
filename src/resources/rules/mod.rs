@@ -4,7 +4,7 @@ mod rules_de;
 mod rules_ru;
 
 pub use self::base::TextItem;
-use locale::get_language;
+use crate::locale::get_language;
 
 pub fn get_rules() -> &'static [TextItem<'static>] {
     match get_language().as_ref().map(String::as_str) {
