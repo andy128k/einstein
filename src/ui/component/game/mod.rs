@@ -17,7 +17,7 @@ use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
 use crate::ui::component::puzzle::rules_grid::{create_horizontal_rules, create_vertical_rules};
 use crate::ui::component::game_title::GameTitle;
-use crate::ui::component::rules_dialog::{new_help_dialog};
+use crate::ui::component::help_dialog::new_help_dialog;
 use crate::ui::component::save_dialog::{new_save_game_dialog};
 use crate::ui::component::options_dialog::{new_options_dialog};
 use crate::ui::component::pause_dialog::new_pause_dialog;
@@ -305,7 +305,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
-            game_popup(&show_help_trigger, move || new_help_dialog(messages), messages, state.clone()),
+            game_popup(&show_help_trigger, move || Ok(new_help_dialog(messages)), messages, state.clone()),
             move |_| {
                 *show_help_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();

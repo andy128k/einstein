@@ -16,7 +16,7 @@ use crate::ui::component::dialog::*;
 use crate::ui::component::game::{new_game_widget, GamePrivate};
 use crate::ui::component::load_dialog::{new_load_game_dialog};
 use crate::ui::component::topscores_dialog::{create_topscores_dialog};
-use crate::ui::component::rules_dialog::{new_help_dialog};
+use crate::ui::component::help_dialog::new_help_dialog;
 use crate::ui::component::options_dialog::{new_options_dialog};
 use crate::ui::component::about_dialog::{create_about_dialog};
 use crate::resources::manager::Resource;
@@ -173,7 +173,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         WidgetMapAction::new(
             ConditionalWidget::new(
                 show_help_trigger.clone(),
-                move |_| new_help_dialog(messages)
+                move |_| Ok(new_help_dialog(messages))
             ),
             move |_| {
                 *show_help_trigger2.borrow_mut() = None;
