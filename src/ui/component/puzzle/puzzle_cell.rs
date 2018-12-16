@@ -12,7 +12,6 @@ use crate::resources::manager::ResourceManager;
 use crate::resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
 use crate::resources::audio::{LASER, APPLAUSE, GLASS};
 use crate::audio::Audio;
-use crate::error::*;
 
 const PUZZLE_SIZE: u8 = 6;
 
@@ -48,13 +47,13 @@ pub struct PuzzleCell {
 }
 
 impl PuzzleCell {
-    pub fn new(state: Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Result<Self> {
-        Ok(Self {
-            state,
+    pub fn new(state: &Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Self {
+        Self {
+            state: state.clone(),
             row,
             col,
             highlighted: Cell::new(None),
-        })
+        }
     }
 
     fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventReaction<PuzzleAction> {

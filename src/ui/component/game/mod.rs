@@ -192,7 +192,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let victory_trigger2 = victory_trigger.clone();
         let failure_trigger2 = failure_trigger.clone();
         WidgetMapAction::new(
-            new_puzzle_widget(state.clone())?,
+            new_puzzle_widget(&state),
             move |puzzle_action| {
                 state2.borrow_mut().stop();
                 match *puzzle_action {

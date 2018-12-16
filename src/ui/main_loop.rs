@@ -6,7 +6,6 @@ use sdl2::render::{Canvas};
 use sdl2::video::Window;
 use failure::err_msg;
 use crate::error::*;
-use crate::ui::context::{Rect};
 use crate::ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
 use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
@@ -15,8 +14,6 @@ use crate::audio::Audio;
 pub struct MainLoopQuit;
 
 pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Widget<MainLoopQuit>, resource_manager: &dyn ResourceManager, audio: &Audio) -> Result<()> {
-    let rect = Rect::new(0, 0, 800, 600);
-
     canvas.clear();
 
     let b = widget.draw(resource_manager);

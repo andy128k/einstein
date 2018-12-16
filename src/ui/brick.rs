@@ -134,7 +134,9 @@ impl Brick {
         for child in &self.children {
             let r = Rect::new((left + child.left) as i32, (top + child.top) as i32, child.brick.width, child.brick.height);
             let child_rect = r.intersection(&rect).unwrap_or_default();
+            canvas.set_clip_rect(Some(rect_to_rect2(child_rect)));
             child.brick.draw(canvas, left + child.left, top + child.top, resource_manager)?;
+            canvas.set_clip_rect(None);
         }
         Ok(())
     }
