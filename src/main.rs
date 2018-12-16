@@ -44,11 +44,11 @@ fn real_main() -> Result<()> {
     let state = Rc::new(RefCell::new(storage::Storage::load().unwrap_or_default()));
 
     let sdl_context = sdl2::init().map_err(err_msg)?;
-    let video = sdl_context.video().map_err(err_msg)?;
-    let audio = sdl_context.audio().map_err(err_msg)?;
+    let video_subsystem = sdl_context.video().map_err(err_msg)?;
+    let _audio_subsystem = sdl_context.audio().map_err(err_msg)?;
 
     let window = {
-        let mut builder = video.window("Einstein 3.0", 800, 600);
+        let mut builder = video_subsystem.window("Einstein 3.0", 800, 600);
         if state.borrow().fullscreen {
             builder.fullscreen();
         }
