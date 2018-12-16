@@ -45,7 +45,7 @@ impl HorizontalRules {
             }
         }
 
-        Brick::new(self.rect.width(), self.rect.height())
+        Brick::new(TILE_WIDTH * 3, TILE_HEIGHT)
             .background(Background::Pattern(&EMPTY_TILE, false))
     }
 

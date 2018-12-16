@@ -42,7 +42,7 @@ impl VerticalRules {
             }
         }
 
-        Brick::new(self.rect.width(), self.rect.height())
+        Brick::new(TILE_WIDTH, TILE_HEIGHT * 2)
             .background(Background::Pattern(&EMPTY_TILE, false))
     }
 
