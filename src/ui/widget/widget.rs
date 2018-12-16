@@ -114,18 +114,18 @@ impl<A> Widget<A> for WidgetPtr<A> {
 
 pub struct WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     wrapped: WF,
-    convert: Box<Fn(&AF) -> Result<EventReaction<AT>>>,
+    convert: Box<Fn(&AF, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>>>,
 }
 
 impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     pub fn new<F>(wrapped: WF, convert: F) -> Self
-        where F: Fn(&AF) -> Result<EventReaction<AT>> + 'static
+        where F: Fn(&AF, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static
     {
         Self { wrapped, convert: Box::new(convert) }
     }
 
     pub fn no_action(wrapped: WF) -> Self {
-        Self { wrapped, convert: Box::new(|_| Ok(EventReaction::empty())) }
+        Self { wrapped, convert: Box::new(|_, _, _| Ok(EventReaction::empty())) }
     }
 }
 
@@ -137,7 +137,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
     fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<AT> {
         let reaction = self.wrapped.on_event(event, resource_manager, audio)?;
         if let Some(ref action) = reaction.action {
-            let mut reaction2 = (self.convert)(action)?;
+            let mut reaction2 = (self.convert)(action, resource_manager, audio)?;
             reaction2.update |= reaction.update;
             reaction2.terminated |= reaction.terminated;
             Ok(reaction2)

@@ -40,7 +40,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
         let state2 = state.clone();
         WidgetMapAction::new(
             Checkbox::new(bg, state.borrow().fullscreen),
-            move |value| {
+            move |value, _, _| {
                 state2.borrow_mut().fullscreen = *value;
                 Ok(EventReaction::empty())
             }
@@ -56,7 +56,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
         let state2 = state.clone();
         WidgetMapAction::new(
             Slider::new(Size::new(160, 16), bg, state.borrow().volume_float),
-            move |value| {
+            move |value, _, _| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;
                 Ok(EventReaction::empty())
@@ -67,7 +67,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
         let state2 = state.clone();
         WidgetMapAction::new(
             DialogButton::new(Size::new(85, 25), bg, messages.ok, Some(Keycode::Return), ()),
-            move |_| {
+            move |_, _, _| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
             }

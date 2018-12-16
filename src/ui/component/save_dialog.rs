@@ -38,7 +38,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
             let ask_name2 = ask_name.clone();
             WidgetMapAction::new(
                 DialogButton::new(Size::new(280, 25), bg, &label, None, ()),
-                move |_| {
+                move |_, _, _| {
                     *ask_name2.borrow_mut() = Some((i, default_name.clone()));
                     Ok(EventReaction::empty())
                 }
@@ -57,7 +57,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
                 ask_name.clone(),
                 move |&(_index, ref name)| new_game_name(name, messages)
             ),
-            move |result| {
+            move |result, _, _| {
                 let index = ask_name2.borrow().as_ref().map(|p| p.0).unwrap();
                 *ask_name2.borrow_mut() = None;
                 match *result {

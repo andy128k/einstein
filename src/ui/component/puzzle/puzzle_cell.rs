@@ -10,7 +10,7 @@ use crate::ui::brick::*;
 use crate::ui::component::game::GamePrivate;
 use crate::resources::manager::ResourceManager;
 use crate::resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
-use crate::resources::audio::{LASER, APPLAUSE, GLASS};
+use crate::resources::audio::LASER;
 use crate::audio::Audio;
 
 const PUZZLE_SIZE: u8 = 6;
@@ -91,10 +91,8 @@ impl PuzzleCell {
         }
 
         if !self.state.borrow().is_valid() {
-            audio.play(&*resource_manager.chunk(&GLASS)).unwrap();
             EventReaction::action(PuzzleAction::Failure)
         } else if self.state.borrow().possibilities.is_solved() {
-            audio.play(&*resource_manager.chunk(&APPLAUSE)).unwrap();
             EventReaction::action(PuzzleAction::Victory)
         } else {
             EventReaction::update()

@@ -59,7 +59,7 @@ fn real_main() -> Result<()> {
     let ttf = sdl2::ttf::init()?;
     let audio = audio::Audio::new().map_err(err_msg)?;
 
-    audio.set_volume(state.borrow().volume as f32 / 100.0);
+    audio.set_volume(state.borrow().volume);
 
     {
         let texture_creator = canvas.texture_creator();

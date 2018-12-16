@@ -46,7 +46,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let new_game_trigger2 = new_game_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.new_game, None, ()),
-            move |_| {
+            move |_, _, _| {
                 let game = GamePrivate::new().unwrap();
                 *new_game_trigger2.borrow_mut() = Some(game);
                 Ok(EventReaction::empty())
@@ -57,7 +57,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let load_game_trigger2 = load_game_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.load_game, None, ()),
-            move |_| {
+            move |_, _, _| {
                 *load_game_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
@@ -67,7 +67,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_scores_trigger2 = show_scores_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.top_scores, None, ()),
-            move |_| {
+            move |_, _, _| {
                 *show_scores_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
@@ -77,7 +77,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.rules, None, ()),
-            move |_| {
+            move |_, _, _| {
                 *show_help_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
@@ -87,7 +87,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_opts_trigger2 = show_opts_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.options, None, ()),
-            move |_| {
+            move |_, _, _| {
                 *show_opts_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
@@ -97,7 +97,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_about_trigger2 = show_about_trigger.clone();
         WidgetMapAction::new(
             new_menu_button(Size::new(220, 30), messages.about, None, ()),
-            move |_| {
+            move |_, _, _| {
                 *show_about_trigger2.borrow_mut() = Some(());
                 Ok(EventReaction::empty())
             }
@@ -119,7 +119,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     Ok(game_widget)
                 }
             ),
-            move |_| {
+            move |_, _, _| {
                 *new_game_trigger2.borrow_mut() = None;
                 Ok(EventReaction::empty())
             }
@@ -138,7 +138,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     Ok(load_dialog)
                 }
             ),
-            move |result| {
+            move |result, _, _| {
                 *load_game_trigger2.borrow_mut() = None;
                 match *result {
                     DialogResult::Ok(ref game_data) => {
@@ -161,7 +161,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                 show_scores_trigger.clone(),
                 move |_| create_topscores_dialog(&storage2.borrow().scores, messages, None)
             ),
-            move |_| {
+            move |_, _, _| {
                 *show_scores_trigger2.borrow_mut() = None;
                 Ok(EventReaction::empty())
             }
@@ -175,7 +175,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                 show_help_trigger.clone(),
                 move |_| Ok(new_help_dialog(messages))
             ),
-            move |_| {
+            move |_, _, _| {
                 *show_help_trigger2.borrow_mut() = None;
                 Ok(EventReaction::empty())
             }
@@ -191,14 +191,14 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                 show_opts_trigger.clone(),
                 move |_| new_options_dialog(&storage1.borrow(), messages)
             ),
-            move |result| {
+            move |result, _, audio| {
                 *show_opts_trigger2.borrow_mut() = None;
                 match *result {
                     DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
                         storage2.borrow_mut().volume = options.volume;
                         // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
-                        // sound->setVolume(options.volume);
+                        audio.set_volume(options.volume);
                     },
                     DialogResult::Cancel => {},
                 }
@@ -214,7 +214,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                 show_about_trigger.clone(),
                 move |_| create_about_dialog(messages)
             ),
-            move |_| {
+            move |_, _, _| {
                 *show_about_trigger2.borrow_mut() = None;
                 Ok(EventReaction::empty())
             }
