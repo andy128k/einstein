@@ -2,9 +2,9 @@ use std::rc::Rc;
 use crate::cell::RefCell;
 use crate::ui::context::Size;
 use crate::ui::widget::container::Container;
+use crate::ui::widget::grid::new_grid;
 use crate::ui::component::game::{GamePrivate};
-use crate::ui::component::puzzle::grid::new_grid;
-use crate::ui::component::puzzle::rule::RuleWidget;
+use crate::ui::component::rule::RuleWidget;
 use crate::ui::rule::{TILE_WIDTH, TILE_HEIGHT};
 
 pub fn create_horizontal_rules(size: Size, state: Rc<RefCell<GamePrivate>>) -> Container<usize> {

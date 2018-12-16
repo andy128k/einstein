@@ -11,6 +11,8 @@ pub mod save_dialog;
 pub mod load_dialog;
 pub mod game_title;
 pub mod puzzle;
+pub mod rule;
+pub mod rules_grid;
 pub mod game;
 pub mod menu;
 pub mod about_dialog;

@@ -15,7 +15,7 @@ use crate::ui::widget::container::Container;
 use crate::ui::component::dialog::DialogResult;
 use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
-use crate::ui::component::puzzle::rules_grid::{create_horizontal_rules, create_vertical_rules};
+use crate::ui::component::rules_grid::{create_horizontal_rules, create_vertical_rules};
 use crate::ui::component::game_title::GameTitle;
 use crate::ui::component::help_dialog::new_help_dialog;
 use crate::ui::component::save_dialog::{new_save_game_dialog};

@@ -2,6 +2,7 @@ pub mod common;
 pub mod widget;
 pub mod conditional;
 pub mod container;
+pub mod grid;
 pub mod label;
 pub mod button;
 pub mod dialog_button;
