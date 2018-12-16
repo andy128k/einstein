@@ -57,7 +57,6 @@ impl<A> Widget<A> for Container<A> where A: Clone {
         for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.left as i32, child.top as i32);
             let child_reaction = child.widget.on_event(&event2, resource_manager, audio)?;
-            // TODO -relative
             reaction.add(&child_reaction);
             if reaction.terminated {
                 break;

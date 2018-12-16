@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 use std::rc::Rc;
 use std::collections::HashSet;
+use serde_derive::{Serialize, Deserialize};
 use rand::thread_rng;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;

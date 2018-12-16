@@ -1,4 +1,5 @@
 use rand::Rng;
+use failure::format_err;
 use crate::rules::*;
 use crate::error::*;
 use crate::converge::converge_result;

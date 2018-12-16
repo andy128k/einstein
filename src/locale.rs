@@ -1,6 +1,7 @@
 use std::ffi::{CStr, CString};
 use libc::{setlocale, LC_ALL};
 use regex::Regex;
+use lazy_static::lazy_static;
 
 lazy_static! {
     static ref LANGUAGE: Option<String> = detect_language();

@@ -1,30 +1,16 @@
-extern crate libc;
-#[macro_use] extern crate failure;
-extern crate itertools;
-extern crate rand;
-extern crate sdl2;
-extern crate serde;
-#[macro_use] extern crate serde_derive;
-extern crate serde_json;
-extern crate regex;
-#[macro_use] extern crate lazy_static;
-#[cfg(windows)]
-extern crate winapi;
-extern crate dirs;
-
-pub mod cell;
-pub mod error;
-pub mod algebra;
-pub mod util;
-pub mod locale;
-pub mod converge;
-pub mod rules;
-pub mod puzzle_gen;
+mod cell;
+mod error;
+mod algebra;
+mod util;
+mod locale;
+mod converge;
+mod rules;
+mod puzzle_gen;
 #[macro_use]
-pub mod resources;
-pub mod ui;
-pub mod storage;
-pub mod audio;
+mod resources;
+mod ui;
+mod storage;
+mod audio;
 
 use std::process::exit;
 use std::rc::Rc;

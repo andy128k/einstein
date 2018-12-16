@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use std::fs::{File, create_dir_all};
 use dirs::home_dir;
 use failure::err_msg;
+use serde_derive::{Serialize, Deserialize};
 use serde_json;
 use crate::error::*;
 use crate::ui::component::game::GamePrivate;

@@ -2,6 +2,7 @@ use std::fmt;
 use itertools::all;
 use rand::Rng;
 use rand::seq::SliceRandom;
+use serde_derive::{Serialize, Deserialize};
 use crate::converge::converge;
 use crate::util::retry::retry;
 

@@ -1,5 +1,6 @@
 use itertools::join;
 use regex::Regex;
+use lazy_static::lazy_static;
 use sdl2::render::TextureQuery;
 use sdl2::ttf::Font;
 use crate::util::group_by_weight::group_by_weight;
