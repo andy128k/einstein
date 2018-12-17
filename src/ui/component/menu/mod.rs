@@ -9,6 +9,7 @@ use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::menu_button::*;
 use crate::ui::widget::conditional::*;
+use crate::ui::widget::grid::new_grid;
 use crate::ui::widget::container::Container;
 use crate::ui::widget::label::*;
 use crate::ui::main_loop::MainLoopQuit;
@@ -23,6 +24,17 @@ use crate::resources::manager::Resource;
 use crate::resources::messages::Messages;
 
 const MENU_BG: Resource = resource!("./nova.bmp");
+
+#[derive(Clone)]
+enum MainMenuAction {
+    NewGame,
+    LoadGame,
+    ShowScores,
+    Help,
+    Options,
+    About,
+    Exit,
+}
 
 pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> Result<Container<MainLoopQuit>> {
     let new_game_trigger = Rc::new(RefCell::new(None));
@@ -44,68 +56,55 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
 
     container.push(550, 340, {
         let new_game_trigger2 = new_game_trigger.clone();
-        WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.new_game, None, ()),
-            move |_, _, _| {
-                let game = GamePrivate::new().unwrap();
-                *new_game_trigger2.borrow_mut() = Some(game);
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-    container.push(550, 370, {
         let load_game_trigger2 = load_game_trigger.clone();
-        WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.load_game, None, ()),
-            move |_, _, _| {
-                *load_game_trigger2.borrow_mut() = Some(());
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-    container.push(550, 400, {
         let show_scores_trigger2 = show_scores_trigger.clone();
-        WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.top_scores, None, ()),
-            move |_, _, _| {
-                *show_scores_trigger2.borrow_mut() = Some(());
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-    container.push(550, 430, {
         let show_help_trigger2 = show_help_trigger.clone();
-        WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.rules, None, ()),
-            move |_, _, _| {
-                *show_help_trigger2.borrow_mut() = Some(());
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-    container.push(550, 460, {
         let show_opts_trigger2 = show_opts_trigger.clone();
-        WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.options, None, ()),
-            move |_, _, _| {
-                *show_opts_trigger2.borrow_mut() = Some(());
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-    container.push(550, 490, {
         let show_about_trigger2 = show_about_trigger.clone();
         WidgetMapAction::new(
-            new_menu_button(Size::new(220, 30), messages.about, None, ()),
-            move |_, _, _| {
-                *show_about_trigger2.borrow_mut() = Some(());
-                Ok(EventReaction::empty())
+            new_grid(Size::new(220, 210), Size::new(220, 30), 1, 7, vec![
+                new_menu_button(Size::new(220, 30), messages.new_game, None, MainMenuAction::NewGame),
+                new_menu_button(Size::new(220, 30), messages.load_game, None, MainMenuAction::LoadGame),
+                new_menu_button(Size::new(220, 30), messages.top_scores, None, MainMenuAction::ShowScores),
+                new_menu_button(Size::new(220, 30), messages.rules, None, MainMenuAction::Help),
+                new_menu_button(Size::new(220, 30), messages.options, None, MainMenuAction::Options),
+                new_menu_button(Size::new(220, 30), messages.about, None, MainMenuAction::About),
+                new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainMenuAction::Exit),
+            ]),
+            move |menu_action, _, _| {
+                match menu_action {
+                    MainMenuAction::NewGame => {
+                        let game = GamePrivate::new().unwrap();
+                        *new_game_trigger2.borrow_mut() = Some(game);
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::LoadGame => {
+                        *load_game_trigger2.borrow_mut() = Some(());
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::ShowScores => {
+                        *show_scores_trigger2.borrow_mut() = Some(());
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::Help => {
+                        *show_help_trigger2.borrow_mut() = Some(());
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::Options => {
+                        *show_opts_trigger2.borrow_mut() = Some(());
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::About => {
+                        *show_about_trigger2.borrow_mut() = Some(());
+                        Ok(EventReaction::empty())
+                    },
+                    MainMenuAction::Exit => {
+                        Ok(EventReaction::action(MainLoopQuit))
+                    },
+                }
             }
         )
     });
-    container.push(550, 520,
-        new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainLoopQuit)
-    );
 
     container.push(0, 0, {
         let storage2 = storage.clone();
