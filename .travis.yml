@@ -4,8 +4,6 @@ sudo: required
 dist: xenial
 
 rust:
-  # - nightly
-  # - beta
   - stable
 
 os:
@@ -28,7 +26,7 @@ before_install:
   - |
     if [[ "$TRAVIS_RUST_VERSION" == "stable" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       export CARGO_TARGET_DIR="$(pwd)/target"
-      RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install --force --git https://github.com/xd009642/tarpaulin --tag 0.6.6 cargo-tarpaulin
+      RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install --force --git https://github.com/AnderEnder/tarpaulin --branch stable-master cargo-tarpaulin
     fi
 
 env:
