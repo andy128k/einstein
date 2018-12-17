@@ -16,7 +16,7 @@ fn child_pos(size: Size, child_size: Size, cols: usize, rows: usize, index: usiz
 }
 
 pub fn new_grid<A, Ch: Widget<A> + 'static>(size: Size, child_size: Size, cols: usize, rows: usize, children: Vec<Ch>) -> Container<A> {
-    let mut container = Container::container(size, None);
+    let mut container = Container::container(size, None, None);
     for (index, child) in children.into_iter().enumerate() {
         let (x, y) = child_pos(size, child_size, cols, rows, index);
         container.push(x, y, child);

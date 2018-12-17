@@ -3,7 +3,7 @@ use sdl2::pixels::Color;
 use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::container::Container;
@@ -15,7 +15,7 @@ use crate::util::time::sec_to_str;
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
     let bg = Background::BLUE_PATTERN;
 
-    let mut container = Container::<()>::container(Size::new(320, 350), bg);
+    let mut container = Container::<()>::container(Size::new(320, 350), bg, Border::Raised);
 
     container.push(10, 10, WidgetMapAction::no_action(
         Label::title(Size::new(300, 40), messages.top_scores)

@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
 use crate::error::*;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::any_key::*;
 use crate::ui::widget::container::Container;
@@ -23,7 +23,7 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
         MessageType::Failure => (Background::RED_PATTERN, Color::RGB(255, 255, 255))
     };
 
-    let container = Container::<()>::container(size, bg)
+    let container = Container::<()>::container(size, bg, Border::Raised)
         .add(0, 0, WidgetMapAction::no_action(
             Label::new(size, message, color, HorizontalAlign::Center)
         ))

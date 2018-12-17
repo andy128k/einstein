@@ -2,7 +2,7 @@ use sdl2::keyboard::Keycode;
 use crate::error::*;
 use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::container::Container;
 use crate::ui::widget::label::Label;
 use crate::ui::widget::dialog_button::*;
@@ -19,7 +19,7 @@ pub enum FailureChoice {
 pub fn new_failure_dialog(messages: &Messages) -> Result<Container<FailureChoice>> {
     let bg = Background::RED_PATTERN;
 
-    let container = Container::<FailureChoice>::container(Size::new(360, 140), bg)
+    let container = Container::<FailureChoice>::container(Size::new(360, 140), bg, Border::Raised)
         .add(30, 10, WidgetMapAction::no_action(
             Label::title(Size::new(300, 100), messages.loose)
         ))

@@ -14,21 +14,22 @@ struct Child<A> {
 pub struct Container<A> {
     size: Size,
     background: Option<Background>,
+    border: Option<Border>,
     children: Vec<Child<A>>,
     modal: bool,
 }
 
 impl<A> Container<A> {
-    pub fn container(size: Size, background: impl Into<Option<Background>>) -> Self {
-        Container { size, background: background.into(), children: Vec::new(), modal: false }
+    pub fn container(size: Size, background: impl Into<Option<Background>>, border: impl Into<Option<Border>>) -> Self {
+        Container { size, background: background.into(), border: border.into(), children: Vec::new(), modal: false }
     }
 
     pub fn modal(size: Size, background: impl Into<Option<Background>>) -> Self {
-        Container { size, background: background.into(), children: Vec::new(), modal: true }
+        Container { size, background: background.into(), border: None, children: Vec::new(), modal: true }
     }
 
     pub fn screen_modal(background: impl Into<Option<Background>>) -> Self {
-        Container { size: Size::new(800, 600), background: background.into(), children: Vec::new(), modal: true }
+        Container { size: Size::new(800, 600), background: background.into(), border: None, children: Vec::new(), modal: true }
     }
 
     pub fn add<W: Widget<A> + 'static>(mut self, left: u32, top: u32, child: W) -> Self {
@@ -70,12 +71,9 @@ impl<A> Widget<A> for Container<A> where A: Clone {
         let mut brick = Brick::new(self.get_size().width, self.get_size().height);
         if let Some(bg) = self.background {
             brick = brick.background(bg);
-            match bg {
-                Background::Pattern(..) => {},
-                _ => {
-                    brick = brick.border(Border::Raised);
-                },
-            }
+        }
+        if let Some(border) = self.border {
+            brick = brick.border(border);
         }
 
         for child in &self.children {

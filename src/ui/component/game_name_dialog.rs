@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::input_field::*;
@@ -21,7 +21,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<Dialog
         name.to_string()
     ));
 
-    let container = Container::<DialogResult<String>>::container(Size::new(460, 100), bg)
+    let container = Container::<DialogResult<String>>::container(Size::new(460, 100), bg, Border::Raised)
         .add(10, 20, WidgetMapAction::no_action(
             Label::new(Size::new(150, 26), messages.enter_game, yellow, HorizontalAlign::Left)
         ))

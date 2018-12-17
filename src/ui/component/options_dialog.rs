@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::container::Container;
@@ -31,7 +31,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
         volume_float: storage.volume as f32 / 100_f32,
     }));
 
-    let mut container = Container::<DialogResult<Options>>::container(Size::new(300, 260), bg);
+    let mut container = Container::<DialogResult<Options>>::container(Size::new(300, 260), bg, Border::Raised);
 
     container.push(0, 5, WidgetMapAction::no_action(
         Label::title(Size::new(300, 40), messages.options)

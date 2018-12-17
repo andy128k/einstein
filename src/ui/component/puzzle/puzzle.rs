@@ -15,7 +15,7 @@ const WIDTH: u32 = (6 * FIELD_TILE_WIDTH + 5 * FIELD_GAP_X) as u32;
 const HEIGHT: u32 = (6 * FIELD_TILE_HEIGHT + 5 * FIELD_GAP_Y) as u32;
 
 pub fn new_puzzle_widget(state: &Rc<RefCell<GamePrivate>>) -> Container<PuzzleAction> {
-    let mut container = Container::container(Size::new(WIDTH, HEIGHT), None);
+    let mut container = Container::container(Size::new(WIDTH, HEIGHT), None, None);
 
     for row in 0..PUZZLE_SIZE {
         for col in 0..PUZZLE_SIZE {

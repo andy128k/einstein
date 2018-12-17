@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use crate::error::*;
 use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::conditional::*;
 use crate::ui::widget::container::Container;
@@ -17,7 +17,7 @@ use crate::storage::SavedGame;
 pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'static Messages) -> Result<Container<DialogResult<(usize, String)>>> {
     let bg = Background::BLUE_PATTERN;
 
-    let mut container = Container::<DialogResult<(usize, String)>>::container(Size::new(300, 420), bg);
+    let mut container = Container::<DialogResult<(usize, String)>>::container(Size::new(300, 420), bg, Border::Raised);
 
     container.push(0, 5, WidgetMapAction::no_action(
         Label::title(Size::new(300, 40), messages.save_game)

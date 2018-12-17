@@ -1,7 +1,7 @@
 use sdl2::keyboard::Keycode;
 use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::label::Label;
 use crate::ui::widget::page_view::*;
@@ -20,7 +20,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
 
     let bg = Background::BLUE_PATTERN;
 
-    let container = Container::<()>::container(Size::new(WIDTH, HEIGHT), bg)
+    let container = Container::<()>::container(Size::new(WIDTH, HEIGHT), bg, Border::Raised)
         .add(150, 10, WidgetMapAction::no_action(
             Label::title(Size::new(300, 40), messages.rules)
         ))

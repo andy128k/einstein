@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::input_field::*;
@@ -19,7 +19,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Result<Contain
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container = Container::<String>::container(Size::new(460, 100), bg)
+    let container = Container::<String>::container(Size::new(460, 100), bg, Border::Raised)
         .add(10, 20, WidgetMapAction::no_action(
             Label::new(Size::new(150, 26), messages.enter_name, yellow, HorizontalAlign::Left)
         ))
