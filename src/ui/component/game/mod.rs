@@ -10,11 +10,10 @@ use crate::puzzle_gen::generate_puzzle;
 use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
-use crate::ui::widget::conditional::*;
 use crate::ui::widget::grid::new_grid;
 use crate::ui::widget::game_button::{new_game_button, GAME_BUTTON_SIZE};
 use crate::ui::widget::container::Container;
-use crate::ui::component::dialog::DialogResult;
+use crate::ui::component::dialog::{DialogResult, cond_dialog};
 use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
 use crate::ui::component::rules_grid::{create_horizontal_rules, create_vertical_rules};
@@ -158,20 +157,11 @@ impl GamePrivate {
     }
 }
 
-fn game_popup<W, A, F>(trigger: &Rc<RefCell<Option<()>>>, create_widget: F, messages: &'static Messages, state: Rc<RefCell<GamePrivate>>) -> impl Widget<A>
-    where
-        F: Fn() -> W + 'static,
-        W: Widget<A> + 'static,
-        A: Clone + 'static,
-{
-    ConditionalWidget::new(
-        trigger.clone(),
-        move |_| Container::screen_modal(Background::Pattern(&RAIN, false))
-            .add(8, 10, WidgetMapAction::no_action(
-                GameTitle::new(messages.einstein_puzzle, state.clone())
-            ))
-            .add(0, 0, (create_widget)())
-    )
+fn game_popup_background<A: 'static>(messages: &'static Messages, state: &Rc<RefCell<GamePrivate>>) -> Container<A> {
+    Container::screen_modal(Background::Pattern(&RAIN, false))
+        .add(8, 10, WidgetMapAction::no_action(
+            GameTitle::new(messages.einstein_puzzle, state.clone())
+        ))
 }
 
 #[derive(Clone)]
@@ -290,41 +280,45 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     });
 
     container.push(0, 0, {
-        let this_state = state.clone();
-        let pause_trigger2 = pause_trigger.clone();
-        WidgetMapAction::new(
-            game_popup(&pause_trigger, move || new_pause_dialog(messages), messages, state.clone()),
-            move |_, _, _| {
-                *pause_trigger2.borrow_mut() = None;
-                this_state.borrow_mut().start();
+        let this_state1 = state.clone();
+        let this_state2 = state.clone();
+        cond_dialog(&pause_trigger,
+            move |_| {
+                game_popup_background(messages, &this_state1)
+                    .add(0, 0, new_pause_dialog(messages))
+            })
+            .flat_map_action(move |_, _, _| {
+                this_state2.borrow_mut().start();
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
-        let this_state = state.clone();
-        let show_help_trigger2 = show_help_trigger.clone();
-        WidgetMapAction::new(
-            game_popup(&show_help_trigger, move || new_help_dialog(messages), messages, state.clone()),
-            move |_, _, _| {
-                *show_help_trigger2.borrow_mut() = None;
-                this_state.borrow_mut().start();
+        let this_state1 = state.clone();
+        let this_state2 = state.clone();
+        cond_dialog(&show_help_trigger,
+            move |_| {
+                game_popup_background(messages, &this_state1)
+                    .add(0, 0, new_help_dialog(messages))
+            })
+            .flat_map_action(move |_, _, _| {
+                this_state2.borrow_mut().start();
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
-        let this_state = state.clone();
-        let show_opts_trigger2 = show_opts_trigger.clone();
-        WidgetMapAction::new(
-            game_popup(&show_opts_trigger, move || new_options_dialog(&storage1.borrow(), messages), messages, state.clone()),
-            move |result, _, audio| {
-                *show_opts_trigger2.borrow_mut() = None;
-                this_state.borrow_mut().start();
+        let this_state1 = state.clone();
+        let this_state2 = state.clone();
+        cond_dialog(&show_opts_trigger,
+            move |_| {
+                game_popup_background(messages, &this_state1)
+                    .add(0, 0, new_options_dialog(&storage1.borrow(), messages))
+            })
+            .flat_map_action(move |result, _, audio| {
+                this_state2.borrow_mut().start();
                 match *result {
                     DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
@@ -335,24 +329,20 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     DialogResult::Cancel => {},
                 }
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
+        let state1 = state.clone();
         let this_state = state.clone();
-        let save_game_trigger2 = save_game_trigger.clone();
-        WidgetMapAction::new(
-            game_popup(
-                &save_game_trigger,
-                move || new_save_game_dialog(&storage1.borrow().saved_games, messages),
-                messages,
-                state.clone()
-            ),
-            move |result, _, _| {
-                *save_game_trigger2.borrow_mut() = None;
+        cond_dialog(&save_game_trigger,
+            move |_|
+                game_popup_background(messages, &state1)
+                    .add(0, 0, new_save_game_dialog(&storage1.borrow().saved_games, messages))
+            )
+            .flat_map_action(move |result, _, _| {
                 match *result {
                     DialogResult::Ok((index, ref name)) => {
                         storage2.borrow_mut().saved_games[index] = Some(SavedGame {
@@ -364,23 +354,16 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 }
                 this_state.borrow_mut().start();
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
-        let victory_trigger2 = victory_trigger.clone();
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         let state2 = state.clone();
         let storage2 = storage.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                victory_trigger.clone(),
-                move |_| create_message_dialog(MessageType::Neutral, messages.won)
-            ),
-            move |_, _, _| {
-                *victory_trigger2.borrow_mut() = None;
+        cond_dialog(&victory_trigger, move |_| create_message_dialog(MessageType::Neutral, messages.won))
+            .flat_map_action(move |_, _, _| {
                 let score = state2.borrow().elapsed.as_secs() as u32;
                 if !state2.borrow().hinted && storage2.borrow().scores.is_deserving(score) {
                     *save_score_trigger2.borrow_mut() = Some(score);
@@ -388,62 +371,41 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     *show_scores_trigger2.borrow_mut() = Some(None);
                 }
                 Ok(EventReaction::update())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
-        let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
         let storage1 = storage.clone();
         let storage2 = storage.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                save_score_trigger.clone(),
-                move |_| {
-                    let last_name = match storage1.borrow().last_name {
-                        Some(ref n) => n.clone(),
-                        None => "anonymous".to_string()
-                    };
-                    new_player_name_dialog(&last_name, messages)
-                }
-            ),
-            move |name, _, _| {
-                let score = save_score_trigger2.borrow().unwrap_or(0);
-                *save_score_trigger2.borrow_mut() = None;
-                storage2.borrow_mut().last_name = Some(name.to_string());
-                let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score });
+        cond_dialog(&save_score_trigger,
+            move |score| {
+                let score = *score;
+                let last_name = match storage1.borrow().last_name {
+                    Some(ref n) => n.clone(),
+                    None => "anonymous".to_string()
+                };
+                new_player_name_dialog(&last_name, messages)
+                    .map_action(move |name| Score { name: name.to_string(), score })
+            })
+            .flat_map_action(move |score, _, _| {
+                storage2.borrow_mut().last_name = Some(score.name.clone());
+                let pos = storage2.borrow_mut().scores.add_score_entry(score.clone());
                 *show_scores_trigger2.borrow_mut() = Some(pos);
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
         let storage2 = storage.clone();
-        let show_scores_trigger2 = show_scores_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_scores_trigger.clone(),
-                move |index| create_topscores_dialog(&storage2.borrow().scores, messages, *index)
-            ),
-            move |_, _, _| {
-                *show_scores_trigger2.borrow_mut() = None;
-                Ok(EventReaction::action(()))
-            }
-        )
+        cond_dialog(&show_scores_trigger, move |index| create_topscores_dialog(&storage2.borrow().scores, messages, *index))
+            .no_action()
     });
 
     container.push(0, 0, {
-        let failure_trigger2 = failure_trigger.clone();
         let state2 = state.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                failure_trigger.clone(),
-                move |_| new_failure_dialog(messages)
-            ),
-            move |result, _, _| {
-                *failure_trigger2.borrow_mut() = None;
+        cond_dialog(&failure_trigger, move |_| new_failure_dialog(messages))
+            .flat_map_action(move |result, _, _| {
                 match *result {
                     FailureChoice::StartNew => {
                         let g = GamePrivate::new().unwrap();
@@ -456,8 +418,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     },
                     FailureChoice::Cancel => Ok(EventReaction::action(())),
                 }
-            }
-        )
+            })
     });
 
     container

@@ -153,3 +153,52 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         self.wrapped.draw(resource_manager)
     }
 }
+
+pub trait WidgetMapActionExt<A, WT, AT, F>
+where
+    WT: Widget<AT>,
+    F: Fn(&A) -> AT + 'static,
+{
+    fn map_action(self, convert: F) -> WT;
+}
+
+impl<A, AnyWidget, AT, F> WidgetMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F> for AnyWidget
+    where
+        AnyWidget: Widget<A>,
+        F: Fn(&A) -> AT + 'static,
+{
+    fn map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
+        WidgetMapAction::new(self, move |a, _, _| Ok(EventReaction::action(convert(a))))
+    }
+}
+
+pub trait WidgetFlatMapActionExt<A, WT, AT, F>
+where
+    WT: Widget<AT>,
+    F: Fn(&A, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static,
+{
+    fn flat_map_action(self, convert: F) -> WT;
+}
+
+impl<A, AnyWidget, AT, F> WidgetFlatMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F> for AnyWidget
+    where
+        AnyWidget: Widget<A>,
+        F: Fn(&A, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static,
+{
+    fn flat_map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
+        WidgetMapAction::new(self, convert)
+    }
+}
+
+pub trait WidgetNoActionExt<W, A> where W: Widget<A> {
+    fn no_action(self) -> W;
+}
+
+impl<A, AnyWidget, AT> WidgetNoActionExt<WidgetMapAction<A, Self, AT>, AT> for AnyWidget
+    where
+        AnyWidget: Widget<A>,
+{
+    fn no_action(self) -> WidgetMapAction<A, Self, AT> {
+        WidgetMapAction::no_action(self)
+    }
+}

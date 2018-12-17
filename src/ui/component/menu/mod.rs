@@ -8,7 +8,6 @@ use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::menu_button::*;
-use crate::ui::widget::conditional::*;
 use crate::ui::widget::grid::new_grid;
 use crate::ui::widget::container::Container;
 use crate::ui::widget::label::*;
@@ -61,80 +60,61 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_help_trigger2 = show_help_trigger.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
         let show_about_trigger2 = show_about_trigger.clone();
-        WidgetMapAction::new(
-            new_grid(Size::new(220, 210), Size::new(220, 30), 1, 7, vec![
-                new_menu_button(Size::new(220, 30), messages.new_game, None, MainMenuAction::NewGame),
-                new_menu_button(Size::new(220, 30), messages.load_game, None, MainMenuAction::LoadGame),
-                new_menu_button(Size::new(220, 30), messages.top_scores, None, MainMenuAction::ShowScores),
-                new_menu_button(Size::new(220, 30), messages.rules, None, MainMenuAction::Help),
-                new_menu_button(Size::new(220, 30), messages.options, None, MainMenuAction::Options),
-                new_menu_button(Size::new(220, 30), messages.about, None, MainMenuAction::About),
-                new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainMenuAction::Exit),
-            ]),
-            move |menu_action, _, _| {
-                match menu_action {
-                    MainMenuAction::NewGame => {
-                        let game = GamePrivate::new().unwrap();
-                        *new_game_trigger2.borrow_mut() = Some(game);
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::LoadGame => {
-                        *load_game_trigger2.borrow_mut() = Some(());
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::ShowScores => {
-                        *show_scores_trigger2.borrow_mut() = Some(());
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::Help => {
-                        *show_help_trigger2.borrow_mut() = Some(());
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::Options => {
-                        *show_opts_trigger2.borrow_mut() = Some(());
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::About => {
-                        *show_about_trigger2.borrow_mut() = Some(());
-                        Ok(EventReaction::empty())
-                    },
-                    MainMenuAction::Exit => {
-                        Ok(EventReaction::action(MainLoopQuit))
-                    },
-                }
+        new_grid(Size::new(220, 210), Size::new(220, 30), 1, 7, vec![
+            new_menu_button(Size::new(220, 30), messages.new_game, None, MainMenuAction::NewGame),
+            new_menu_button(Size::new(220, 30), messages.load_game, None, MainMenuAction::LoadGame),
+            new_menu_button(Size::new(220, 30), messages.top_scores, None, MainMenuAction::ShowScores),
+            new_menu_button(Size::new(220, 30), messages.rules, None, MainMenuAction::Help),
+            new_menu_button(Size::new(220, 30), messages.options, None, MainMenuAction::Options),
+            new_menu_button(Size::new(220, 30), messages.about, None, MainMenuAction::About),
+            new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainMenuAction::Exit),
+        ]).flat_map_action(move |menu_action, _, _| {
+            match menu_action {
+                MainMenuAction::NewGame => {
+                    let game = GamePrivate::new().unwrap();
+                    *new_game_trigger2.borrow_mut() = Some(game);
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::LoadGame => {
+                    *load_game_trigger2.borrow_mut() = Some(());
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::ShowScores => {
+                    *show_scores_trigger2.borrow_mut() = Some(());
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::Help => {
+                    *show_help_trigger2.borrow_mut() = Some(());
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::Options => {
+                    *show_opts_trigger2.borrow_mut() = Some(());
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::About => {
+                    *show_about_trigger2.borrow_mut() = Some(());
+                    Ok(EventReaction::empty())
+                },
+                MainMenuAction::Exit => {
+                    Ok(EventReaction::action(MainLoopQuit))
+                },
             }
-        )
+        })
+    });
+
+    container.push(0, 0, {
+        let storage2 = storage.clone();
+        cond_dialog(&new_game_trigger, move |game| {
+            game.borrow_mut().start();
+            new_game_widget(storage2.clone(), game.clone(), messages)
+        }).no_action()
     });
 
     container.push(0, 0, {
         let storage2 = storage.clone();
         let new_game_trigger2 = new_game_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                new_game_trigger.clone(),
-                move |game| {
-                    game.borrow_mut().start();
-                    new_game_widget(storage2.clone(), game.clone(), messages)
-                }
-            ),
-            move |_, _, _| {
-                *new_game_trigger2.borrow_mut() = None;
-                Ok(EventReaction::empty())
-            }
-        )
-    });
-
-    container.push(0, 0, {
-        let storage2 = storage.clone();
-        let load_game_trigger2 = load_game_trigger.clone();
-        let new_game_trigger2 = new_game_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                load_game_trigger.clone(),
-                move |_| new_load_game_dialog(&storage2.borrow().saved_games, messages)
-            ),
-            move |result, _, _| {
-                *load_game_trigger2.borrow_mut() = None;
+        cond_dialog(&load_game_trigger, move |_| new_load_game_dialog(&storage2.borrow().saved_games, messages))
+            .flat_map_action(move |result, _, _| {
                 match *result {
                     DialogResult::Ok(ref game_data) => {
                         let game = Rc::new(RefCell::new(game_data.clone()));
@@ -144,50 +124,23 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     DialogResult::Cancel => {},
                 }
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
         let storage2 = storage.clone();
-        let show_scores_trigger2 = show_scores_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_scores_trigger.clone(),
-                move |_| create_topscores_dialog(&storage2.borrow().scores, messages, None)
-            ),
-            move |_, _, _| {
-                *show_scores_trigger2.borrow_mut() = None;
-                Ok(EventReaction::empty())
-            }
-        )
+        cond_dialog(&show_scores_trigger, move |_| create_topscores_dialog(&storage2.borrow().scores, messages, None)).no_action()
     });
 
-    container.push(0, 0, {
-        let show_help_trigger2 = show_help_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_help_trigger.clone(),
-                move |_| new_help_dialog(messages)
-            ),
-            move |_, _, _| {
-                *show_help_trigger2.borrow_mut() = None;
-                Ok(EventReaction::empty())
-            }
-        )
-    });
+    container.push(0, 0,
+        cond_dialog(&show_help_trigger, move |_| new_help_dialog(messages)).no_action()
+    );
 
     container.push(0, 0, {
         let storage1 = storage.clone();
         let storage2 = storage.clone();
-        let show_opts_trigger2 = show_opts_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_opts_trigger.clone(),
-                move |_| new_options_dialog(&storage1.borrow(), messages)
-            ),
-            move |result, _, audio| {
-                *show_opts_trigger2.borrow_mut() = None;
+        cond_dialog(&show_opts_trigger, move |_| new_options_dialog(&storage1.borrow(), messages))
+            .flat_map_action(move |result, _, audio| {
                 match *result {
                     DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
@@ -198,23 +151,12 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                     DialogResult::Cancel => {},
                 }
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
 
-    container.push(0, 0, {
-        let show_about_trigger2 = show_about_trigger.clone();
-        WidgetMapAction::new(
-            ConditionalWidget::new(
-                show_about_trigger.clone(),
-                move |_| create_about_dialog(messages)
-            ),
-            move |_, _, _| {
-                *show_about_trigger2.borrow_mut() = None;
-                Ok(EventReaction::empty())
-            }
-        )
-    });
+    container.push(0, 0,
+        cond_dialog(&show_about_trigger, move |_| create_about_dialog(messages)).no_action()
+    );
 
     Ok(container)
 }
