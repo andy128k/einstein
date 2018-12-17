@@ -9,7 +9,7 @@ use crate::audio::Audio;
 
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
     wrapped: RefCell<Option<W>>,
-    factory: Box<Fn(&I) -> W>,
+    factory: Box<dyn Fn(&I) -> W>,
     condition: Rc<RefCell<Option<I>>>,
     phantom: PhantomData<A>,
 }
@@ -51,7 +51,7 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
         self.check();
         match *self.wrapped.borrow_mut() {
             Some(ref mut widget) => widget.on_event(event, resource_manager, audio),

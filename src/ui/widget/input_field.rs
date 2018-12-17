@@ -122,7 +122,7 @@ impl InputField {
 impl Widget<String> for InputField {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<String> {
+    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &dyn Audio) -> EventResult<String> {
         match *event {
             Event::KeyDown(key) => Ok(self.on_key_down(key)),
             Event::TextInput(ref text) => Ok(self.on_text_input(text)),
@@ -174,7 +174,6 @@ mod test {
     use sdl2::ttf::Font;
     use sdl2::mixer::Chunk;
     use crate::resources::manager::*;
-    use crate::audio;
 
     struct ResourceManagerMock;
 
@@ -182,6 +181,13 @@ mod test {
         fn image(&self, _resource: &'static Resource, _highlighted: bool) -> Ref<Texture> { unreachable!() }
         fn font(&self, _point_size: u16) -> Ref<Font> { unreachable!() }
         fn chunk(&self, _resource: &'static Resource) -> Ref<Chunk> { unreachable!() }
+    }
+
+    struct AudioMock;
+
+    impl Audio for AudioMock {
+        fn set_volume(&self, _volume: u32) { unreachable!() }
+        fn play(&self, _chunk: &Chunk) -> Result<(), String> { unreachable!() }
     }
 
     #[test]
@@ -199,74 +205,72 @@ mod test {
 
     #[test]
     fn test_input() {
-        let audio = audio::Audio::new().unwrap();
-
         let mut field = InputField::new(Size::new(300, 40), "", 5);
 
-        field.on_event(&Event::TextInput("A".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("A".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "A");
 
-        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "");
 
-        field.on_event(&Event::TextInput("B".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("B".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "B");
 
-        field.on_event(&Event::TextInput("o".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("o".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "Bo");
 
-        field.on_event(&Event::TextInput("ы".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("ы".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "Boы");
 
-        field.on_event(&Event::TextInput("y".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("y".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "Boыy");
 
-        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "Boыy");
 
-        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "Boy");
 
-        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "By");
 
-        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "y");
 
-        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "y");
 
-        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "y");
 
-        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "y");
 
-        field.on_event(&Event::TextInput("e".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("e".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "ye");
 
-        field.on_event(&Event::TextInput("s".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("s".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "yes");
 
-        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "yes");
 
-        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "yes");
 
-        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "yes");
 
-        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "es");
 
-        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "s");
 
-        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "");
 
-        field.on_event(&Event::TextInput("4".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        field.on_event(&Event::TextInput("4".to_owned()), &ResourceManagerMock, &AudioMock).unwrap();
         assert_eq!(&*field.text.borrow(), "4");
     }
 }

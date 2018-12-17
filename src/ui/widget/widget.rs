@@ -88,21 +88,21 @@ pub type EventResult<A> = Result<EventReaction<A>>;
 pub trait Widget<A> {
     fn get_size(&self) -> Size;
 
-    fn on_event(&mut self, _event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, _event: &Event, _resource_manager: &dyn ResourceManager, _audio: &dyn Audio) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
 
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick;
 }
 
-pub type WidgetPtr<A> = Box<Widget<A>>;
+pub type WidgetPtr<A> = Box<dyn Widget<A>>;
 
 impl<A> Widget<A> for WidgetPtr<A> {
     fn get_size(&self) -> Size {
         (**self).get_size()
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
         (**self).on_event(event, resource_manager, audio)
     }
 
@@ -113,12 +113,12 @@ impl<A> Widget<A> for WidgetPtr<A> {
 
 pub struct WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     wrapped: WF,
-    convert: Box<Fn(&AF, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>>>,
+    convert: Box<dyn Fn(&AF, &dyn ResourceManager, &dyn Audio) -> Result<EventReaction<AT>>>,
 }
 
 impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     pub fn new<F>(wrapped: WF, convert: F) -> Self
-        where F: Fn(&AF, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static
+        where F: Fn(&AF, &dyn ResourceManager, &dyn Audio) -> Result<EventReaction<AT>> + 'static
     {
         Self { wrapped, convert: Box::new(convert) }
     }
@@ -133,7 +133,7 @@ impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF>
         self.wrapped.get_size()
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<AT> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<AT> {
         let reaction = self.wrapped.on_event(event, resource_manager, audio)?;
         if let Some(ref action) = reaction.action {
             let mut reaction2 = (self.convert)(action, resource_manager, audio)?;
@@ -175,7 +175,7 @@ impl<A, AnyWidget, AT, F> WidgetMapActionExt<A, WidgetMapAction<A, Self, AT>, AT
 pub trait WidgetFlatMapActionExt<A, WT, AT, F>
 where
     WT: Widget<AT>,
-    F: Fn(&A, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static,
+    F: Fn(&A, &dyn ResourceManager, &dyn Audio) -> Result<EventReaction<AT>> + 'static,
 {
     fn flat_map_action(self, convert: F) -> WT;
 }
@@ -183,7 +183,7 @@ where
 impl<A, AnyWidget, AT, F> WidgetFlatMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F> for AnyWidget
     where
         AnyWidget: Widget<A>,
-        F: Fn(&A, &dyn ResourceManager, &Audio) -> Result<EventReaction<AT>> + 'static,
+        F: Fn(&A, &dyn ResourceManager, &dyn Audio) -> Result<EventReaction<AT>> + 'static,
 {
     fn flat_map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
         WidgetMapAction::new(self, convert)

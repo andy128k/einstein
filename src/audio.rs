@@ -1,29 +1,36 @@
 use std::ops::Drop;
 use sdl2::mixer;
 
-pub struct Audio {
+pub trait Audio {
+    fn set_volume(&self, volume: u32);
+    fn play(&self, chunk: &mixer::Chunk) -> Result<(), String>;
+}
+
+pub struct SdlAudio {
     channel: mixer::Channel,
 }
 
-impl Audio {
+impl SdlAudio {
     pub fn new() -> Result<Self, String> {
         mixer::open_audio(22050, mixer::AUDIO_S16, 2, 1024)?;
-        Ok(Audio {
+        Ok(SdlAudio {
             channel: mixer::Channel::all(),
         })
     }
+}
 
-    pub fn set_volume(&self, volume: u32) {
+impl Audio for SdlAudio {
+    fn set_volume(&self, volume: u32) {
         self.channel.set_volume((volume as i32) * mixer::MAX_VOLUME / 100);
     }
 
-    pub fn play(&self, chunk: &mixer::Chunk) -> Result<(), String> {
+    fn play(&self, chunk: &mixer::Chunk) -> Result<(), String> {
         self.channel.play(chunk, 0)?;
         Ok(())
     }
 }
 
-impl Drop for Audio {
+impl Drop for SdlAudio {
     fn drop(&mut self) {
         mixer::close_audio();
     }

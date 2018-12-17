@@ -45,7 +45,7 @@ impl RuleWidget {
 impl Widget<usize> for RuleWidget {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<usize> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<usize> {
         match *event {
             Event::MouseButtonDown(MouseButton::Right, x, y) => {
                 if self.get_size().to_rect().contains_point((x, y)) {

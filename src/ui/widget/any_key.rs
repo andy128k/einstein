@@ -21,7 +21,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         Size::EMPTY
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
                 audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;

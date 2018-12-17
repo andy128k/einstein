@@ -37,7 +37,7 @@ impl Widget<Nothing> for GameTitle {
         Size { width: 783, height: 47 }
     }
 
-    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &dyn Audio) -> EventResult<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {

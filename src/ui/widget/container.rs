@@ -53,7 +53,7 @@ impl<A> Container<A> {
 impl<A> Widget<A> for Container<A> where A: Clone {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
         let mut reaction = EventReaction::empty();
         for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.left as i32, child.top as i32);

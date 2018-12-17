@@ -56,7 +56,7 @@ impl PuzzleCell {
         }
     }
 
-    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventReaction<PuzzleAction> {
+    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             return EventReaction::empty();
         }
@@ -126,7 +126,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
         Size { width: FIELD_TILE_WIDTH as u32, height: FIELD_TILE_HEIGHT as u32 }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<PuzzleAction> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<PuzzleAction> {
         match *event {
             Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y, resource_manager, audio)),
             Event::MouseMove(x, y) => {

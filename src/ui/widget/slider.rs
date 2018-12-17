@@ -93,7 +93,7 @@ impl Widget<f32> for Slider {
         self.size
     }
 
-    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<f32> {
+    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &dyn Audio) -> EventResult<f32> {
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
                 self.drag_start(x, y);

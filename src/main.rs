@@ -22,6 +22,7 @@ use crate::error::*;
 use crate::resources::messages::get_messages;
 use crate::ui::component::menu::make_menu;
 use crate::ui::main_loop::main_loop;
+use crate::audio::*;
 
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
@@ -43,7 +44,7 @@ fn real_main() -> Result<()> {
     let mut canvas = window.into_canvas().build()?;
 
     let ttf = sdl2::ttf::init()?;
-    let audio = audio::Audio::new().map_err(err_msg)?;
+    let audio = SdlAudio::new().map_err(err_msg)?;
 
     audio.set_volume(state.borrow().volume);
 

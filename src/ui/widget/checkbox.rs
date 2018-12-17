@@ -31,7 +31,7 @@ impl Widget<bool> for Checkbox {
         Size { width: 20, height: 20 }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<bool> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<bool> {
         let rect = self.get_size().to_rect();
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {

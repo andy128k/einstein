@@ -13,7 +13,7 @@ use crate::audio::Audio;
 #[derive(Clone)]
 pub struct MainLoopQuit;
 
-pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut Widget<MainLoopQuit>, resource_manager: &dyn ResourceManager, audio: &Audio) -> Result<()> {
+pub fn main_loop(sdl_context: &Sdl, canvas: &mut Canvas<Window>, widget: &mut dyn Widget<MainLoopQuit>, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> Result<()> {
     canvas.clear();
 
     let b = widget.draw(resource_manager);

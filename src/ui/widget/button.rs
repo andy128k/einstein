@@ -36,7 +36,7 @@ impl<R: ButtonRenderer, A> Button<R, A> {
 impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
         match *event {
             Event::KeyDown(key) if Some(key) == self.key => {
                 audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
