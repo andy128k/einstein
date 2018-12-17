@@ -118,11 +118,17 @@ impl GamePrivate {
         }
     }
 
-    pub fn stop(&mut self) {
+    pub fn stop(&mut self) -> Option<u32> {
+        let hinted = self.hinted;
         if let Some(started_at) = self.started {
             self.elapsed += Instant::now() - started_at;
             self.started = None;
             self.hinted = true;
+        }
+        if !hinted {
+            Some(self.elapsed.as_secs() as u32)
+        } else {
+            None
         }
     }
 
@@ -209,11 +215,11 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         WidgetMapAction::new(
             new_puzzle_widget(&state),
             move |puzzle_action, resource_manager, audio| {
-                state2.borrow_mut().stop();
+                let score = state2.borrow_mut().stop();
                 match *puzzle_action {
                     PuzzleAction::Victory => {
                         audio.play(&*resource_manager.chunk(&APPLAUSE)).unwrap();
-                        *victory_trigger2.borrow_mut() = Some(());
+                        *victory_trigger2.borrow_mut() = Some(score);
                     },
                     PuzzleAction::Failure => {
                         audio.play(&*resource_manager.chunk(&GLASS)).unwrap();
@@ -361,12 +367,14 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     container.push(0, 0, {
         let save_score_trigger2 = save_score_trigger.clone();
         let show_scores_trigger2 = show_scores_trigger.clone();
-        let state2 = state.clone();
         let storage2 = storage.clone();
-        cond_dialog(&victory_trigger, move |_| create_message_dialog(MessageType::Neutral, messages.won))
-            .flat_map_action(move |_, _, _| {
-                let score = state2.borrow().elapsed.as_secs() as u32;
-                if !state2.borrow().hinted && storage2.borrow().scores.is_deserving(score) {
+        cond_dialog(&victory_trigger,
+            move |score| {
+                let score = *score;
+                create_message_dialog(MessageType::Neutral, messages.won).map_action(move |_| score)
+            })
+            .flat_map_action(move |score, _, _| {
+                if let Some(score) = score.filter(|score| storage2.borrow().scores.is_deserving(*score)) {
                     *save_score_trigger2.borrow_mut() = Some(score);
                 } else {
                     *show_scores_trigger2.borrow_mut() = Some(None);
@@ -387,11 +395,11 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     None => "anonymous".to_string()
                 };
                 new_player_name_dialog(&last_name, messages)
-                    .map_action(move |name| Score { name: name.to_string(), score })
+                    .map_action(move |name| (name.to_string(), score))
             })
-            .flat_map_action(move |score, _, _| {
-                storage2.borrow_mut().last_name = Some(score.name.clone());
-                let pos = storage2.borrow_mut().scores.add_score_entry(score.clone());
+            .flat_map_action(move |(name, score), _, _| {
+                storage2.borrow_mut().last_name = Some(name.to_string());
+                let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score: *score });
                 *show_scores_trigger2.borrow_mut() = Some(pos);
                 Ok(EventReaction::empty())
             })
