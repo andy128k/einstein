@@ -6,10 +6,6 @@ impl Rect {
         Rect(x, y, w, h)
     }
 
-    pub fn new0(w: u32, h: u32) -> Self {
-        Rect(0, 0, w, h)
-    }
-
     pub fn left(&self) -> i32 { self.0 }
     pub fn top(&self) -> i32 { self.1 }
     pub fn width(&self) -> u32 { self.2 }
@@ -18,14 +14,6 @@ impl Rect {
     pub fn contains_point(&self, p: (i32, i32)) -> bool {
         p.0 >= self.0 && p.0 < self.0 + self.2 as i32 &&
         p.1 >= self.1 && p.1 < self.1 + self.3 as i32
-    }
-
-    pub fn offset(&self, dx: i32, dy: i32) -> Self {
-        Rect(self.0 + dx, self.1 + dy, self.2, self.3)
-    }
-
-    pub fn relative(&self) -> Self {
-        Rect(0, 0, self.2, self.3)
     }
 
     pub fn intersection(&self, other: &Self) -> Option<Rect> {
@@ -59,7 +47,7 @@ impl Size {
     }
 
     pub fn to_rect(&self) -> Rect {
-        Rect::new0(self.width, self.height)
+        Rect::new(0, 0, self.width, self.height)
     }
 
     pub fn contains(&self, x: i32, y: i32) -> bool {
