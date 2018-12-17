@@ -1,6 +1,5 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
@@ -12,7 +11,7 @@ use crate::resources::messages::Messages;
 use crate::storage::{Scores};
 use crate::util::time::sec_to_str;
 
-pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Result<Container<()>> {
+pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Container<()> {
     let bg = Background::BLUE_PATTERN;
 
     let mut container = Container::<()>::container(Size::new(320, 350), bg, Border::Raised);
@@ -46,5 +45,5 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
         DialogButton::new(Size::new(90, 25), bg, messages.ok, Some(Keycode::Escape), ())
     );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

@@ -2,7 +2,6 @@ use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
@@ -22,7 +21,7 @@ pub struct Options {
     volume_float: f32
 }
 
-pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Container<DialogResult<Options>>> {
+pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<DialogResult<Options>> {
     let bg = Background::BLUE_PATTERN;
 
     let state = Rc::new(RefCell::new(Options {
@@ -80,5 +79,5 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Result<Cont
         )
     );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

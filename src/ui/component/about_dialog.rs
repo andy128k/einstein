@@ -1,6 +1,5 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
@@ -12,7 +11,7 @@ use crate::resources::messages::Messages;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn create_about_dialog(messages: &Messages) -> Result<Container<()>> {
+pub fn create_about_dialog(messages: &Messages) -> Container<()> {
     let bg = Background::BLUE_PATTERN;
     let container = Container::<()>::container(Size::new(360, 280), bg, Border::Raised)
         .add(30, 5, WidgetMapAction::no_action(
@@ -37,5 +36,5 @@ pub fn create_about_dialog(messages: &Messages) -> Result<Container<()>> {
             )
         );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

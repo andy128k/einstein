@@ -1,5 +1,4 @@
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
@@ -9,7 +8,7 @@ use crate::ui::widget::any_key::*;
 use crate::ui::component::dialog::dialod_widget;
 use crate::resources::messages::Messages;
 
-pub fn new_pause_dialog(messages: &Messages) -> Result<Container<()>> {
+pub fn new_pause_dialog(messages: &Messages) -> Container<()> {
     let size = Size::new(240, 50);
 
     let container = Container::<()>::container(size, Background::GREEN_PATTERN, Border::Raised)
@@ -20,5 +19,5 @@ pub fn new_pause_dialog(messages: &Messages) -> Result<Container<()>> {
             AnyKey::new(())
         );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

@@ -160,17 +160,17 @@ impl GamePrivate {
 
 fn game_popup<W, A, F>(trigger: &Rc<RefCell<Option<()>>>, create_widget: F, messages: &'static Messages, state: Rc<RefCell<GamePrivate>>) -> impl Widget<A>
     where
-        F: Fn() -> Result<W> + 'static,
+        F: Fn() -> W + 'static,
         W: Widget<A> + 'static,
         A: Clone + 'static,
 {
     ConditionalWidget::new(
         trigger.clone(),
-        move |_| Ok(Container::screen_modal(Background::Pattern(&RAIN, false))
+        move |_| Container::screen_modal(Background::Pattern(&RAIN, false))
             .add(8, 10, WidgetMapAction::no_action(
                 GameTitle::new(messages.einstein_puzzle, state.clone())
             ))
-            .add(0, 0, (create_widget)()?))
+            .add(0, 0, (create_widget)())
     )
 }
 
@@ -195,7 +195,7 @@ fn make_game_menu(messages: &'static Messages) -> Container<MenuAction> {
     ])
 }
 
-pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Result<Container<()>> {
+pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Container<()> {
     let save_game_trigger = Rc::new(RefCell::new(None));
     let show_opts_trigger = Rc::new(RefCell::new(None));
     let show_help_trigger = Rc::new(RefCell::new(None));
@@ -306,7 +306,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let this_state = state.clone();
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
-            game_popup(&show_help_trigger, move || Ok(new_help_dialog(messages)), messages, state.clone()),
+            game_popup(&show_help_trigger, move || new_help_dialog(messages), messages, state.clone()),
             move |_, _, _| {
                 *show_help_trigger2.borrow_mut() = None;
                 this_state.borrow_mut().start();
@@ -460,5 +460,5 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    Ok(container)
+    container
 }

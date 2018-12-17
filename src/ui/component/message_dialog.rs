@@ -1,5 +1,4 @@
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
@@ -14,7 +13,7 @@ pub enum MessageType {
     Failure
 }
 
-pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result<Container<()>> {
+pub fn create_message_dialog(message_type: MessageType, message: &str) -> Container<()> {
     let size = Size::new(500, 400);
 
     let (bg, color) = match message_type {
@@ -31,5 +30,5 @@ pub fn create_message_dialog(message_type: MessageType, message: &str) -> Result
             AnyKey::new(())
         );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

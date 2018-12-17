@@ -2,7 +2,6 @@ use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::error::*;
 use crate::ui::context::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::{Background, Border};
@@ -13,7 +12,7 @@ use crate::ui::widget::container::Container;
 use crate::ui::component::dialog::{DialogResult, dialod_widget};
 use crate::resources::messages::Messages;
 
-pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<DialogResult<String>>> {
+pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<String>> {
     let bg = Background::BLUE_PATTERN;
     let yellow = Color::RGB(255, 255, 0);
 
@@ -28,7 +27,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<Dialog
         .add(170, 20, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                InputField::new(Size::new(280, 26), name, 20)?,
+                InputField::new(Size::new(280, 26), name, 20),
                 move |name, _, _| {
                     *state2.borrow_mut() = name.to_string();
                     Ok(EventReaction::empty())
@@ -49,5 +48,5 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Result<Container<Dialog
             DialogButton::new(Size::new(80, 25), bg, messages.cancel, Some(Keycode::Escape), DialogResult::Cancel)
         );
 
-    Ok(dialod_widget(None, container))
+    dialod_widget(None, container)
 }

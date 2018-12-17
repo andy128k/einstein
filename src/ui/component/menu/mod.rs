@@ -115,8 +115,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
                 new_game_trigger.clone(),
                 move |game| {
                     game.borrow_mut().start();
-                    let game_widget = new_game_widget(storage2.clone(), game.clone(), messages)?;
-                    Ok(game_widget)
+                    new_game_widget(storage2.clone(), game.clone(), messages)
                 }
             ),
             move |_, _, _| {
@@ -133,10 +132,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         WidgetMapAction::new(
             ConditionalWidget::new(
                 load_game_trigger.clone(),
-                move |_| {
-                    let load_dialog = new_load_game_dialog(&storage2.borrow().saved_games, messages)?;
-                    Ok(load_dialog)
-                }
+                move |_| new_load_game_dialog(&storage2.borrow().saved_games, messages)
             ),
             move |result, _, _| {
                 *load_game_trigger2.borrow_mut() = None;
@@ -173,7 +169,7 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         WidgetMapAction::new(
             ConditionalWidget::new(
                 show_help_trigger.clone(),
-                move |_| Ok(new_help_dialog(messages))
+                move |_| new_help_dialog(messages)
             ),
             move |_, _, _| {
                 *show_help_trigger2.borrow_mut() = None;

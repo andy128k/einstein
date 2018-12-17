@@ -10,7 +10,6 @@ use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
-use crate::error::*;
 
 pub struct InputField {
     size: Size,
@@ -22,15 +21,15 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(size: Size, text: &str, max_len: usize) -> Result<Self> {
-        Ok(Self {
+    pub fn new(size: Size, text: &str, max_len: usize) -> Self {
+        Self {
             size,
             max_len,
             text: Rc::new(RefCell::new(text.to_string())),
             cursor_pos: Cell::new(text.len()),
             last_cursor: Cell::new(Instant::now()),
             cursor_visible: Cell::new(true),
-        })
+        }
     }
 
     fn move_cursor(&self, pos: usize) {
