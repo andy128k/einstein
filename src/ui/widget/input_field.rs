@@ -26,7 +26,7 @@ impl InputField {
             size,
             max_len,
             text: Rc::new(RefCell::new(text.to_string())),
-            cursor_pos: Cell::new(text.len()),
+            cursor_pos: Cell::new(text.chars().count()),
             last_cursor: Cell::new(Instant::now()),
             cursor_visible: Cell::new(true),
         }
@@ -40,12 +40,13 @@ impl InputField {
 
     fn on_key_down(&self, key: Keycode) -> EventReaction<String> {
         let cursor_pos = self.cursor_pos.get();
-        let text_len = self.text.borrow().len();
+        let text_len = self.text.borrow().chars().count();
         match key {
             Keycode::Backspace => {
                 if cursor_pos > 0 {
-                    self.text.borrow_mut().remove(cursor_pos - 1);
-                    self.move_cursor(cursor_pos - 1); // TODO. char indicies
+                    let t = delete_char(&*self.text.borrow(), cursor_pos - 1);
+                    *self.text.borrow_mut() = t;
+                    self.move_cursor(cursor_pos - 1);
                 } else {
                     self.move_cursor(cursor_pos);
                 }
@@ -77,7 +78,8 @@ impl InputField {
             },
             Keycode::Delete => {
                 if cursor_pos < text_len {
-                    self.text.borrow_mut().remove(cursor_pos);
+                    let t = delete_char(&*self.text.borrow(), cursor_pos);
+                    *self.text.borrow_mut() = t;
                 }
                 self.move_cursor(cursor_pos);
                 EventReaction::update_and_action(self.text.borrow().clone())
@@ -87,11 +89,12 @@ impl InputField {
     }
 
     fn on_text_input(&self, text: &str) -> EventReaction<String> {
-        let cursor_pos = self.cursor_pos.get();
-        let text_len = self.text.borrow().len();
         for ch in text.chars() {
+            let cursor_pos = self.cursor_pos.get();
+            let text_len = self.text.borrow().chars().count();
             if text_len < self.max_len {
-                self.text.borrow_mut().insert(cursor_pos, ::std::char::from_u32(ch as u32).unwrap());
+                let t = insert_char(&*self.text.borrow(), cursor_pos, ch);
+                *self.text.borrow_mut() = t;
                 self.move_cursor(cursor_pos + 1);
             } else {
                 self.move_cursor(cursor_pos);
@@ -138,7 +141,7 @@ impl Widget<String> for InputField {
         if self.cursor_visible.get() {
             let cursor_pos = self.cursor_pos.get();
             let pos = if cursor_pos > 0 {
-                resource_manager.font(font_size.0).size_of(&self.text.borrow()[0..cursor_pos]).unwrap().0
+                resource_manager.font(font_size.0).size_of(&self.text.borrow().chars().take(cursor_pos).collect::<String>()).unwrap().0
             } else {
                 0
             };
@@ -147,5 +150,123 @@ impl Widget<String> for InputField {
         }
 
         brick
+    }
+}
+
+fn insert_char(text: &str, index: usize, ich: char) -> String {
+    let mut result: String = text.chars().take(index).collect();
+    result.push(ich);
+    result.extend(text.chars().skip(index));
+    result
+}
+
+fn delete_char(text: &str, index: usize) -> String {
+    let mut result: String = text.chars().take(index).collect();
+    result.extend(text.chars().skip(index + 1));
+    result
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::cell::Ref;
+    use sdl2::render::Texture;
+    use sdl2::ttf::Font;
+    use sdl2::mixer::Chunk;
+    use crate::resources::manager::*;
+    use crate::audio;
+
+    struct ResourceManagerMock;
+
+    impl ResourceManager for ResourceManagerMock {
+        fn image(&self, _resource: &'static Resource, _highlighted: bool) -> Ref<Texture> { unreachable!() }
+        fn font(&self, _point_size: u16) -> Ref<Font> { unreachable!() }
+        fn chunk(&self, _resource: &'static Resource) -> Ref<Chunk> { unreachable!() }
+    }
+
+    #[test]
+    fn test_insert() {
+        assert_eq!(insert_char("", 0, 'A'), "A");
+        assert_eq!(insert_char("Bb", 1, 'o'), "Bob");
+    }
+
+    #[test]
+    fn test_delete() {
+        assert_eq!(delete_char("", 0), "");
+        assert_eq!(delete_char("A", 0), "");
+        assert_eq!(delete_char("Latte", 2), "Late");
+    }
+
+    #[test]
+    fn test_input() {
+        let audio = audio::Audio::new().unwrap();
+
+        let mut field = InputField::new(Size::new(300, 40), "", 5);
+
+        field.on_event(&Event::TextInput("A".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "A");
+
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "");
+
+        field.on_event(&Event::TextInput("B".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "B");
+
+        field.on_event(&Event::TextInput("o".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "Bo");
+
+        field.on_event(&Event::TextInput("ы".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "Boы");
+
+        field.on_event(&Event::TextInput("y".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "Boыy");
+
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "Boыy");
+
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "Boy");
+
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "By");
+
+        field.on_event(&Event::KeyDown(Keycode::Backspace), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "y");
+
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "y");
+
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "y");
+
+        field.on_event(&Event::KeyDown(Keycode::Right), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "y");
+
+        field.on_event(&Event::TextInput("e".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "ye");
+
+        field.on_event(&Event::TextInput("s".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "yes");
+
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "yes");
+
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "yes");
+
+        field.on_event(&Event::KeyDown(Keycode::Left), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "yes");
+
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "es");
+
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "s");
+
+        field.on_event(&Event::KeyDown(Keycode::Delete), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "");
+
+        field.on_event(&Event::TextInput("4".to_owned()), &ResourceManagerMock, &audio).unwrap();
+        assert_eq!(&*field.text.borrow(), "4");
     }
 }
