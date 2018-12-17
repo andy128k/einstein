@@ -10,9 +10,9 @@ use crate::puzzle_gen::generate_puzzle;
 use crate::ui::context::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
-use crate::ui::widget::grid::new_grid;
-use crate::ui::widget::game_button::{new_game_button, GAME_BUTTON_SIZE};
+use crate::ui::widget::game_button::{new_game_button};
 use crate::ui::widget::container::Container;
+use crate::ui::layout::grid::GridBuilder;
 use crate::ui::component::dialog::{DialogResult, cond_dialog};
 use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
@@ -175,14 +175,15 @@ enum MenuAction {
 }
 
 fn make_game_menu(messages: &'static Messages) -> Container<MenuAction> {
-    new_grid(Size::new(308, 70), GAME_BUTTON_SIZE, 3, 2, vec![
-        new_game_button(messages.pause, None, MenuAction::Pause),
-        new_game_button(messages.switch, None, MenuAction::ToggleExcluded),
-        new_game_button(messages.exit, Some(Keycode::Escape), MenuAction::Exit),
-        new_game_button(messages.save, None, MenuAction::Save),
-        new_game_button(messages.options, None, MenuAction::Options),
-        new_game_button(messages.help, None, MenuAction::Help),
-    ])
+    let container = Container::container(Size::new(308, 70), None, None);
+    GridBuilder::new(container, 3, 2)
+        .add(0, 0, new_game_button(messages.pause, None, MenuAction::Pause))
+        .add(1, 0, new_game_button(messages.switch, None, MenuAction::ToggleExcluded))
+        .add(2, 0, new_game_button(messages.exit, Some(Keycode::Escape), MenuAction::Exit))
+        .add(0, 1, new_game_button(messages.save, None, MenuAction::Save))
+        .add(1, 1, new_game_button(messages.options, None, MenuAction::Options))
+        .add(2, 1, new_game_button(messages.help, None, MenuAction::Help))
+        .build()
 }
 
 pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePrivate>>, messages: &'static Messages) -> Container<()> {

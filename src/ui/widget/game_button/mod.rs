@@ -8,7 +8,7 @@ use crate::resources::manager::{ResourceManager, Resource};
 
 const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");
 const BUTTON_BG_HIGHLIGHTED_BYTES: Resource = resource!("./btn-highlighted.bmp");
-pub const GAME_BUTTON_SIZE: Size = Size::new(94, 30);
+const GAME_BUTTON_SIZE: Size = Size::new(94, 30);
 
 pub struct GameButton {
     text: String,
