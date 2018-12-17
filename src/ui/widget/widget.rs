@@ -91,6 +91,7 @@ pub trait Widget<A> {
     fn on_event(&mut self, _event: &Event, _resource_manager: &dyn ResourceManager, _audio: &Audio) -> EventResult<A> {
         Ok(EventReaction::empty())
     }
+
     fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick;
 }
 
@@ -109,8 +110,6 @@ impl<A> Widget<A> for WidgetPtr<A> {
         (**self).draw(resource_manager)
     }
 }
-
-
 
 pub struct WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     wrapped: WF,

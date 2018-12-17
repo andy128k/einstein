@@ -8,7 +8,7 @@ use crate::resources::manager::{ResourceManager, Resource};
 
 const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");
 const BUTTON_BG_HIGHLIGHTED_BYTES: Resource = resource!("./btn-highlighted.bmp");
-const SIZE: Size = Size::new(94, 30);
+pub const GAME_BUTTON_SIZE: Size = Size::new(94, 30);
 
 pub struct GameButton {
     text: String,
@@ -21,7 +21,7 @@ impl ButtonRenderer for GameButton {
         } else {
             Background::Pattern(&BUTTON_BG_BYTES, false)
         };
-        Brick::new(SIZE.width, SIZE.height)
+        Brick::new(GAME_BUTTON_SIZE.width, GAME_BUTTON_SIZE.height)
             .background(image)
             .text(Text::new(&self.text).font_size(FontSize::BUTTON).color(Color::RGB(255, 255, 0)).shadow())
     }
@@ -29,7 +29,7 @@ impl ButtonRenderer for GameButton {
 
 pub fn new_game_button<A>(text: &str, key: Option<Keycode>, action: A) -> Button<GameButton, A> {
     Button::<GameButton, A>::new(
-        SIZE,
+        GAME_BUTTON_SIZE,
         key,
         action,
         GameButton {
