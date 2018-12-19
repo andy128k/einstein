@@ -36,7 +36,7 @@ pub fn dialog_container<T>(size: Size, theme: DialogTheme) -> Container<T> {
     Container::container(size, theme.background(false), border)
 }
 
-pub fn dialod_widget<B: Into<Option<Background>>, A, W: Widget<A> + 'static>(background: B, widget: W) -> Container<A> {
+pub fn dialog_widget<B: Into<Option<Background>>, A, W: Widget<A> + 'static>(background: B, widget: W) -> Container<A> {
     let screen = Size::new(800, 600);
     let widget_size = widget.get_size();
     let x = screen.width.wrapping_sub(widget_size.width) / 2;

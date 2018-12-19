@@ -75,5 +75,5 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
         )
     );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

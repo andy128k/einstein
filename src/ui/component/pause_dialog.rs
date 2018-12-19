@@ -18,5 +18,5 @@ pub fn new_pause_dialog(messages: &Messages) -> Container<()> {
             AnyKey::new(())
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

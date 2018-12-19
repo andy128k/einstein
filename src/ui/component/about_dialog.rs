@@ -35,5 +35,5 @@ pub fn create_about_dialog(messages: &Messages) -> Container<()> {
             )
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

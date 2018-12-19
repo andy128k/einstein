@@ -43,5 +43,5 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
             DialogButton::new(Size::new(90, 25), theme, messages.ok, &[Keycode::Escape, Keycode::Return], ())
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

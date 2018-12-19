@@ -30,5 +30,5 @@ pub fn new_failure_dialog(messages: &Messages) -> Container<FailureChoice> {
             DialogButton::new(Size::new(90, 25), theme, messages.exit, &[Keycode::Escape], FailureChoice::Cancel)
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

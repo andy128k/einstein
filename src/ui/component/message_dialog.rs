@@ -16,5 +16,5 @@ pub fn create_message_dialog(theme: DialogTheme, message: &str) -> Container<()>
             AnyKey::new(())
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

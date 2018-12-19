@@ -49,5 +49,5 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
             DialogButton::new(Size::new(80, 25), theme, messages.close, &[Keycode::Escape], ())
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

@@ -56,5 +56,5 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
             })
     );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

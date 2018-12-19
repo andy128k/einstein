@@ -42,5 +42,5 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
         DialogButton::new(Size::new(80, 25), theme, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)
     );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

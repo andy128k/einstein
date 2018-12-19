@@ -41,5 +41,5 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Container<Stri
             )
         });
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }

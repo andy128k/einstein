@@ -46,5 +46,5 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
             DialogButton::new(Size::new(80, 25), theme, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)
         );
 
-    dialod_widget(None, container)
+    dialog_widget(None, container)
 }
