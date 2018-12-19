@@ -5,7 +5,7 @@ use crate::ui::widget::label::*;
 use crate::ui::widget::any_key::*;
 use crate::ui::widget::container::Container;
 use crate::ui::component::dialog::dialod_widget;
-use crate::ui::context::{Size, HorizontalAlign};
+use crate::ui::common::{Size, HorizontalAlign};
 
 pub enum MessageType {
     Neutral,

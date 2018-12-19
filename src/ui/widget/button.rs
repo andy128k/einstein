@@ -2,7 +2,7 @@ use std::cell::Cell;
 use failure::err_msg;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;

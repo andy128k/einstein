@@ -3,7 +3,7 @@ use sdl2::render::{Canvas, Texture, TextureQuery};
 use sdl2::video::Window;
 use sdl2::ttf::Font;
 use crate::ui::widget::common::*;
-use crate::ui::context::{rect_to_rect2, Rect, HorizontalAlign, VerticalAlign};
+use crate::ui::common::{Rect, HorizontalAlign, VerticalAlign};
 use crate::resources::manager::ResourceManager;
 
 pub struct Text {
@@ -140,6 +140,10 @@ impl Brick {
         }
         Ok(())
     }
+}
+
+fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
+    ::sdl2::rect::Rect::new(rect.0, rect.1, rect.2, rect.3)
 }
 
 fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect: Rect) -> Result<(), ::failure::Error> {

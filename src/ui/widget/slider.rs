@@ -1,6 +1,6 @@
 use std::cell::Cell;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::{Rect, Size};
+use crate::ui::common::{Rect, Size};
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::ui::widget::widget::*;

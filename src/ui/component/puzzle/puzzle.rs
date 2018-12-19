@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use crate::cell::RefCell;
 use crate::rules::{PUZZLE_SIZE};
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::container::Container;
 use crate::ui::layout::grid::GridBuilder;
 use crate::ui::component::game::GamePrivate;

@@ -4,7 +4,7 @@ use std::cell::{Cell};
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::ui::context::{Size, HorizontalAlign};
+use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;

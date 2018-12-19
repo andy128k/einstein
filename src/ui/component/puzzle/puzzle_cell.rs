@@ -3,7 +3,7 @@ use std::cell::{Cell};
 use crate::cell::RefCell;
 use sdl2::mouse::MouseButton;
 use crate::rules::{Thing};
-use crate::ui::context::{Rect, Size};
+use crate::ui::common::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;

@@ -7,7 +7,7 @@ use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use crate::rules::{Rule, SolvedPuzzle, Possibilities, apply};
 use crate::puzzle_gen::generate_puzzle;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::game_button::{new_game_button};

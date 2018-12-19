@@ -29,10 +29,6 @@ impl Rect {
     }
 }
 
-pub fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
-    ::sdl2::rect::Rect::new(rect.0, rect.1, rect.2, rect.3)
-}
-
 #[derive(Clone, Copy)]
 pub struct Size {
     pub width: u32,

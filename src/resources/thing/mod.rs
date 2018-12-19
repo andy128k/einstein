@@ -1,5 +1,5 @@
 use crate::rules::Thing;
-use crate::ui::context::Rect;
+use crate::ui::common::Rect;
 use crate::resources::manager::Resource;
 
 pub const LARGE_THINGS_ATLAS: Resource = resource!("./large.bmp");

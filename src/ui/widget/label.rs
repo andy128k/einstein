@@ -1,5 +1,5 @@
 use sdl2::pixels::Color;
-use crate::ui::context::{Size, HorizontalAlign, VerticalAlign};
+use crate::ui::common::{Size, HorizontalAlign, VerticalAlign};
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::ui::widget::widget::*;

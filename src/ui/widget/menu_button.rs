@@ -1,6 +1,6 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::button::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;

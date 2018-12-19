@@ -1,5 +1,5 @@
 use sdl2::pixels::Color;
-use crate::ui::context::Rect;
+use crate::ui::common::Rect;
 use crate::resources::manager::Resource;
 use crate::resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 

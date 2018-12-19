@@ -1,4 +1,4 @@
-pub mod context;
+pub mod common;
 pub mod brick;
 pub mod rule;
 pub mod page_layout;

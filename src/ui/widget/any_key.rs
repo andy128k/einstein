@@ -1,5 +1,5 @@
 use failure::err_msg;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::resources::manager::ResourceManager;

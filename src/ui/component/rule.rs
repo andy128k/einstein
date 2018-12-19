@@ -3,7 +3,7 @@ use std::cell::Cell;
 use crate::cell::RefCell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;

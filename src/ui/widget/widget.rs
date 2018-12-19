@@ -1,7 +1,7 @@
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
 use crate::error::*;
-use crate::ui::context::Size;
+use crate::ui::common::Size;
 use crate::ui::brick::Brick;
 use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
