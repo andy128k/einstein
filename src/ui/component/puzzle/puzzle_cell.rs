@@ -151,9 +151,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
             let highlight = self.highlighted.get() == Some(None);
 
             let rect = get_thing_rect(thing);
-            brick = brick.background(Background::Sprite(&LARGE_THINGS_ATLAS, highlight, rect));
+            brick = brick.background(Background::Image(&LARGE_THINGS_ATLAS, highlight, Some(rect)));
         } else {
-            brick = brick.background(Background::Pattern(&EMPTY_TILE, false));
+            brick = brick.background(Background::Image(&EMPTY_TILE, false, None));
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);
@@ -166,7 +166,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
                         choice_rect.left() as u32,
                         choice_rect.top() as u32,
                         Brick::new(choice_rect.width(), choice_rect.height())
-                            .background(Background::Sprite(&SMALL_THINGS_ATLAS, highlight, rect))
+                            .background(Background::Image(&SMALL_THINGS_ATLAS, highlight, Some(rect)))
                     );
                 }
             }

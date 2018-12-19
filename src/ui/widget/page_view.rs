@@ -83,7 +83,7 @@ impl Widget<Nothing> for PageView {
                         brick.push(
                             x as u32, y as u32,
                             Brick::new(w as u32, h as u32)
-                                .background(Background::Pattern(image, false))
+                                .background(Background::Image(image, false, None))
                         );
                     }
                 }

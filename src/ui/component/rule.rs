@@ -81,7 +81,7 @@ impl Widget<usize> for RuleWidget {
             draw_rule(&rule, self.highlighted.get())
         } else {
             Brick::new(self.size.width, self.size.height)
-                .background(Background::Pattern(&EMPTY_TILE, self.highlighted.get()))
+                .background(Background::Image(&EMPTY_TILE, self.highlighted.get(), None))
         }
     }
 }

@@ -164,7 +164,7 @@ impl GamePrivate {
 }
 
 fn game_popup_background<A: 'static>(messages: &'static Messages, state: &Rc<RefCell<GamePrivate>>) -> Container<A> {
-    Container::screen_modal(Background::Pattern(&RAIN, false))
+    Container::screen_modal(Background::Image(&RAIN, false, None))
         .add(8, 10, WidgetMapAction::no_action(
             GameTitle::new(messages.einstein_puzzle, state.clone())
         ))
@@ -202,7 +202,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     let show_scores_trigger = Rc::new(RefCell::new(None));
     let failure_trigger = Rc::new(RefCell::new(None));
 
-    let mut container = Container::<()>::screen_modal(Background::Pattern(&RAIN, false));
+    let mut container = Container::<()>::screen_modal(Background::Image(&RAIN, false, None));
 
     container.push(8, 10, WidgetMapAction::no_action(
         GameTitle::new(messages.einstein_puzzle, state.clone())

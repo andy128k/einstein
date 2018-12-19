@@ -56,7 +56,7 @@ impl Widget<Nothing> for GameTitle {
         let s = sec_to_str(duration.as_secs() as u32);
 
         Brick::new(self.get_size().width, self.get_size().height)
-            .background(Background::Pattern(&GAME_TITLE, false))
+            .background(Background::Image(&GAME_TITLE, false, None))
             .text(Text::new(&self.title).font_size(FontSize::TITLE).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Center))
             .add(
                 self.get_size().width - PADDING - WATCH_WIDTH,

@@ -2,7 +2,7 @@
 pub struct Rect(pub i32, pub i32, pub u32, pub u32);
 
 impl Rect {
-    pub fn new(x: i32, y: i32, w: u32, h: u32) -> Self {
+    pub const fn new(x: i32, y: i32, w: u32, h: u32) -> Self {
         Rect(x, y, w, h)
     }
 

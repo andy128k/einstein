@@ -111,13 +111,13 @@ impl Brick {
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(::failure::err_msg)?;
             },
-            Some(Background::Pattern(resource, highlight)) => {
+            Some(Background::Image(resource, highlight, s_rect)) => {
                 let image = resource_manager.image(&resource, highlight);
-                tiles(canvas, rect, &*image)?;
-            },
-            Some(Background::Sprite(resource, highlight, s_rect)) => {
-                let image = resource_manager.image(&resource, highlight);
-                sprite(canvas, rect, &*image, s_rect)?;
+                let src_rect = s_rect.unwrap_or_else(|| {
+                    let q = image.query();
+                    Rect::new(0, 0, q.width, q.height)
+                });
+                sprite(canvas, rect, &*image, src_rect)?;
             },
             None => {},
         }
@@ -147,27 +147,8 @@ fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
 }
 
 fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect: Rect) -> Result<(), ::failure::Error> {
-    let clip = Rect::new(
-            rect.left(),
-            rect.top(),
-            src_rect.width(),
-            src_rect.height()
-        )
-        .intersection(&rect)
-        .unwrap();
-
-    canvas.set_clip_rect(Some(rect_to_rect2(clip)));
-    canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(clip))).map_err(::failure::err_msg)?;
-    canvas.set_clip_rect(None);
-    Ok(())
-}
-
-fn tiles(canvas: &mut Canvas<Window>, rect: Rect, tile: &Texture) -> Result<(), ::failure::Error> {
-    canvas.set_clip_rect(Some(rect_to_rect2(rect)));
-
-    let q = tile.query();
-    let tile_width = q.width;
-    let tile_height = q.height;
+    let tile_width = src_rect.width();
+    let tile_height = src_rect.height();
 
     let cw = (rect.width() + tile_width - 1) / tile_width;
     let ch = (rect.height() + tile_height - 1) / tile_height;
@@ -175,11 +156,23 @@ fn tiles(canvas: &mut Canvas<Window>, rect: Rect, tile: &Texture) -> Result<(), 
     for j in 0..ch {
         for i in 0..cw {
             let r = Rect::new(rect.left() + ((i * tile_width) as i32), rect.top() + ((j * tile_height) as i32), tile_width, tile_height);
-            canvas.copy(&tile, None, rect_to_rect2(r)).map_err(::failure::err_msg)?;
+
+            let clip = Rect::new(
+                    r.left(),
+                    r.top(),
+                    src_rect.width(),
+                    src_rect.height()
+                )
+                .intersection(&r)
+                .unwrap()
+                .intersection(&rect)
+                .unwrap();
+
+            canvas.set_clip_rect(Some(rect_to_rect2(clip)));
+            canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(clip))).map_err(::failure::err_msg)?;
+            canvas.set_clip_rect(None);
         }
     }
-
-    canvas.set_clip_rect(None);
 
     Ok(())
 }

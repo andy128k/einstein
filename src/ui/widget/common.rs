@@ -13,15 +13,14 @@ pub enum Border {
 #[derive(Clone, Copy)]
 pub enum Background {
     Color(Color),
-    Pattern(&'static Resource, bool),
-    Sprite(&'static Resource, bool, Rect),
+    Image(&'static Resource, bool, Option<Rect>),
 }
 
 impl Background {
-    pub const BLUE_PATTERN: Self = Background::Pattern(&BLUE_PATTERN, false);
-    pub const GREEN_PATTERN: Self = Background::Pattern(&GREEN_PATTERN, false);
-    pub const WHITE_PATTERN: Self = Background::Pattern(&MARBLE_PATTERN, false);
-    pub const RED_PATTERN: Self = Background::Pattern(&RED_PATTERN, false);
+    pub const BLUE_PATTERN: Self = Background::Image(&BLUE_PATTERN, false, None);
+    pub const GREEN_PATTERN: Self = Background::Image(&GREEN_PATTERN, false, None);
+    pub const WHITE_PATTERN: Self = Background::Image(&MARBLE_PATTERN, false, None);
+    pub const RED_PATTERN: Self = Background::Image(&RED_PATTERN, false, None);
 }
 
 fn gamma(v: u8, k: f64) -> u8 {
@@ -39,8 +38,7 @@ impl Background {
                 b: gamma(b, GAMMA_K),
                 a: a,
             }),
-            Background::Pattern(resource, _) => Background::Pattern(resource, true),
-            Background::Sprite(resource, _, rect) => Background::Sprite(resource, true, rect),
+            Background::Image(resource, _, rect) => Background::Image(resource, true, rect),
         }
     }
 }
