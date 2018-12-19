@@ -52,8 +52,15 @@ fn real_main() -> Result<()> {
         let texture_creator = canvas.texture_creator();
         let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
+        let mut context = crate::ui::context::Context {
+            sdl_context: &sdl_context,
+            canvas: &mut canvas,
+            resource_manager: &mut resource_manager,
+            audio: &audio,
+        };
+
         let mut menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&sdl_context, &mut canvas, &mut menu, &mut resource_manager, &audio)?;
+        main_loop(&mut context, &mut menu)?;
     }
 
     state.borrow_mut().save()?;
