@@ -4,8 +4,7 @@ use crate::ui::common::Size;
 use crate::ui::widget::container::Container;
 use crate::ui::layout::grid::GridBuilder;
 use crate::ui::component::game::{GamePrivate};
-use crate::ui::component::rule::RuleWidget;
-use crate::ui::rule::{TILE_WIDTH, TILE_HEIGHT};
+use crate::ui::component::rule::{RuleWidget, TILE_WIDTH, TILE_HEIGHT};
 
 pub fn create_horizontal_rules(size: Size, state: Rc<RefCell<GamePrivate>>) -> Container<usize> {
     let container = Container::container(size, None, None);
