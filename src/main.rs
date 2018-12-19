@@ -21,7 +21,7 @@ use failure::err_msg;
 use crate::error::*;
 use crate::resources::messages::get_messages;
 use crate::ui::component::menu::make_menu;
-use crate::ui::main_loop::main_loop;
+use crate::ui::context::*;
 use crate::audio::*;
 
 fn real_main() -> Result<()> {
@@ -52,15 +52,15 @@ fn real_main() -> Result<()> {
         let texture_creator = canvas.texture_creator();
         let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
-        let mut context = crate::ui::context::Context {
+        let context = crate::ui::context::AppContext {
             sdl_context: &sdl_context,
-            canvas: &mut canvas,
+            canvas: RefCell::new(&mut canvas),
             resource_manager: &mut resource_manager,
             audio: &audio,
         };
 
         let mut menu = make_menu(get_messages(), state.clone())?;
-        main_loop(&mut context, &mut menu)?;
+        context.main_loop(&mut menu)?;
     }
 
     state.borrow_mut().save()?;

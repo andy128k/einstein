@@ -2,9 +2,9 @@ use failure::err_msg;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
 use crate::resources::audio::CLICK;
-use crate::audio::Audio;
 
 pub struct AnyKey<A> {
     action: A
@@ -21,10 +21,10 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
         Size::EMPTY
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
-                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::action(self.action.clone()))
             },
             _ => Ok(EventReaction::empty()),

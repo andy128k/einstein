@@ -29,7 +29,7 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
             let game2: Option<SavedGame> = (*game).clone();
             WidgetMapAction::new(
                 DialogButton::new(Size::new(280, 25), bg, &label, None, ()),
-                move |_, _, _| {
+                move |_, _| {
                     if let Some(ref game3) = game2 {
                         Ok(EventReaction::action(DialogResult::Ok(game3.game.clone())))
                     } else {

@@ -6,4 +6,3 @@ pub mod widget;
 pub mod layout;
 pub mod component;
 pub mod context;
-pub mod main_loop;

@@ -6,9 +6,9 @@ use crate::ui::common::Size;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
 use crate::resources::audio::CLICK;
-use crate::audio::Audio;
 
 pub struct Checkbox {
     background: Background,
@@ -31,11 +31,11 @@ impl Widget<bool> for Checkbox {
         Size { width: 20, height: 20 }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<bool> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<bool> {
         let rect = self.get_size().to_rect();
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
-                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
                 self.checked.set(!self.checked.get());
                 Ok(EventReaction::update_and_action(self.checked.get()))
             },

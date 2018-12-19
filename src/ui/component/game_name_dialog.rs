@@ -28,7 +28,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
             let state2 = state.clone();
             WidgetMapAction::new(
                 InputField::new(Size::new(280, 26), name, 20),
-                move |name, _, _| {
+                move |name, _| {
                     *state2.borrow_mut() = name.to_string();
                     Ok(EventReaction::empty())
                 }
@@ -38,7 +38,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
             let state2 = state.clone();
             WidgetMapAction::new(
                 DialogButton::new(Size::new(80, 25), bg, messages.ok, Some(Keycode::Return), ()),
-                move |_, _, _| {
+                move |_, _| {
                     let value: String = state2.borrow().clone();
                     Ok(EventReaction::action(DialogResult::Ok(value)))
                 }

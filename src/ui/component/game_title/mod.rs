@@ -6,10 +6,10 @@ use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::ui::widget::widget::*;
 use crate::ui::component::game::GamePrivate;
 use crate::resources::manager::{ResourceManager, Resource};
-use crate::audio::Audio;
 use crate::util::time::sec_to_str;
 
 const GAME_TITLE: Resource = resource!("./title.bmp");
@@ -37,7 +37,7 @@ impl Widget<Nothing> for GameTitle {
         Size { width: 783, height: 47 }
     }
 
-    fn on_event(&mut self, event: &Event, _resource_manager: &dyn ResourceManager, _audio: &dyn Audio) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, _context: &dyn Context) -> EventResult<Nothing> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {

@@ -7,12 +7,12 @@ use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::ui::rule::{draw_rule};
 use crate::ui::component::game::{GamePrivate};
 use crate::resources::manager::ResourceManager;
 use crate::resources::thing::EMPTY_TILE;
 use crate::resources::audio::WHIZZ;
-use crate::audio::Audio;
 
 pub struct RuleWidget {
     size: Size,
@@ -45,12 +45,12 @@ impl RuleWidget {
 impl Widget<usize> for RuleWidget {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<usize> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<usize> {
         match *event {
             Event::MouseButtonDown(MouseButton::Right, x, y) => {
                 if self.get_size().to_rect().contains_point((x, y)) {
                     if self.index.map_or(false, |index| self.state.borrow_mut().toggle_rule(index).is_some()) {
-                        audio.play(&*resource_manager.chunk(&WHIZZ)).map_err(err_msg)?;
+                        context.audio().play(&*context.resource_manager().chunk(&WHIZZ)).map_err(err_msg)?;
                         Ok(EventReaction::update())
                     } else {
                         Ok(EventReaction::empty())

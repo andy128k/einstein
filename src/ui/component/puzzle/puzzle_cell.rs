@@ -7,11 +7,11 @@ use crate::ui::common::{Rect, Size};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::ui::component::game::GamePrivate;
 use crate::resources::manager::ResourceManager;
 use crate::resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
 use crate::resources::audio::LASER;
-use crate::audio::Audio;
 
 const PUZZLE_SIZE: u8 = 6;
 
@@ -56,7 +56,7 @@ impl PuzzleCell {
         }
     }
 
-    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventReaction<PuzzleAction> {
+    fn on_mouse_button_down(&self, button: MouseButton, x: i32, y: i32, context: &dyn Context) -> EventReaction<PuzzleAction> {
         if self.state.borrow().possibilities.is_defined(self.col, self.row) {
             return EventReaction::empty();
         }
@@ -77,14 +77,14 @@ impl PuzzleCell {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.set(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
-                    audio.play(&*resource_manager.chunk(&LASER)).unwrap();
+                    context.audio().play(&*context.resource_manager().chunk(&LASER)).unwrap();
                 }
             },
             MouseButton::Right => {
                 if self.state.borrow().possibilities.is_possible(self.col, thing) {
                     let p = self.state.borrow().possibilities.exclude(self.col, self.row, thing.value);
                     self.state.borrow_mut().possibilities = p;
-                    audio.play(&*resource_manager.chunk(&LASER)).unwrap();
+                    context.audio().play(&*context.resource_manager().chunk(&LASER)).unwrap();
                 }
             },
             _ => {}
@@ -126,9 +126,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
         Size { width: FIELD_TILE_WIDTH as u32, height: FIELD_TILE_HEIGHT as u32 }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<PuzzleAction> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<PuzzleAction> {
         match *event {
-            Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y, resource_manager, audio)),
+            Event::MouseButtonDown(button, x, y) => Ok(self.on_mouse_button_down(button, x, y, context)),
             Event::MouseMove(x, y) => {
                 if self.on_mouse_move(x, y) {
                     Ok(EventReaction::update())

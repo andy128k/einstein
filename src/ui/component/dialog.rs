@@ -43,7 +43,7 @@ pub fn cond_dialog<I, F, W, A>(condition: &Rc<RefCell<Option<I>>>, factory: F) -
             condition.clone(),
             factory
         ),
-        move |action, _, _| {
+        move |action, _| {
             *condition2.borrow_mut() = None;
             Ok(EventReaction::action(action.clone()))
         }

@@ -5,8 +5,8 @@ use sdl2::mouse::MouseButton;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
-use crate::audio::Audio;
 use crate::resources::audio::CLICK;
 
 pub trait ButtonRenderer {
@@ -36,14 +36,14 @@ impl<R: ButtonRenderer, A> Button<R, A> {
 impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
             Event::KeyDown(key) if Some(key) == self.key => {
-                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_size().to_rect().contains_point((x, y)) => {
-                audio.play(&*resource_manager.chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseMove(x, y) => {

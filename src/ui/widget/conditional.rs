@@ -4,8 +4,8 @@ use crate::cell::RefCell;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
-use crate::audio::Audio;
 
 pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
     wrapped: RefCell<Option<W>>,
@@ -51,10 +51,10 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         }
     }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         self.check();
         match *self.wrapped.borrow_mut() {
-            Some(ref mut widget) => widget.on_event(event, resource_manager, audio),
+            Some(ref mut widget) => widget.on_event(event, context),
             None => Ok(EventReaction::empty())
         }
     }

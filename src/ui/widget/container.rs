@@ -2,8 +2,8 @@ use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
 use crate::ui::brick::*;
+use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
-use crate::audio::Audio;
 
 struct Child<A> {
     left: u32,
@@ -53,11 +53,11 @@ impl<A> Container<A> {
 impl<A> Widget<A> for Container<A> where A: Clone {
     fn get_size(&self) -> Size { self.size }
 
-    fn on_event(&mut self, event: &Event, resource_manager: &dyn ResourceManager, audio: &dyn Audio) -> EventResult<A> {
+    fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         let mut reaction = EventReaction::empty();
         for child in self.children.iter_mut().rev() {
             let event2 = event.relative(child.left as i32, child.top as i32);
-            let child_reaction = child.widget.on_event(&event2, resource_manager, audio)?;
+            let child_reaction = child.widget.on_event(&event2, context)?;
             reaction.add(&child_reaction);
             if reaction.terminated {
                 break;

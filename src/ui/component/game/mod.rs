@@ -214,15 +214,15 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let failure_trigger2 = failure_trigger.clone();
         WidgetMapAction::new(
             new_puzzle_widget(&state),
-            move |puzzle_action, resource_manager, audio| {
+            move |puzzle_action, context| {
                 let score = state2.borrow_mut().stop();
                 match *puzzle_action {
                     PuzzleAction::Victory => {
-                        audio.play(&*resource_manager.chunk(&APPLAUSE)).unwrap();
+                        context.audio().play(&*context.resource_manager().chunk(&APPLAUSE)).unwrap();
                         *victory_trigger2.borrow_mut() = Some(score);
                     },
                     PuzzleAction::Failure => {
-                        audio.play(&*resource_manager.chunk(&GLASS)).unwrap();
+                        context.audio().play(&*context.resource_manager().chunk(&GLASS)).unwrap();
                         *failure_trigger2.borrow_mut() = Some(());
                     }
                 }
@@ -252,7 +252,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let show_help_trigger2 = show_help_trigger.clone();
         WidgetMapAction::new(
             make_game_menu(messages),
-            move |menu_action, _, _| {
+            move |menu_action, _| {
                 match menu_action {
                     MenuAction::Pause => {
                         this_state.borrow_mut().stop();
@@ -294,7 +294,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 game_popup_background(messages, &this_state1)
                     .add(0, 0, new_pause_dialog(messages))
             })
-            .flat_map_action(move |_, _, _| {
+            .flat_map_action(move |_, _| {
                 this_state2.borrow_mut().start();
                 Ok(EventReaction::empty())
             })
@@ -308,7 +308,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 game_popup_background(messages, &this_state1)
                     .add(0, 0, new_help_dialog(messages))
             })
-            .flat_map_action(move |_, _, _| {
+            .flat_map_action(move |_, _| {
                 this_state2.borrow_mut().start();
                 Ok(EventReaction::empty())
             })
@@ -324,14 +324,14 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 game_popup_background(messages, &this_state1)
                     .add(0, 0, new_options_dialog(&storage1.borrow(), messages))
             })
-            .flat_map_action(move |result, _, audio| {
+            .flat_map_action(move |result, context| {
                 this_state2.borrow_mut().start();
                 match *result {
                     DialogResult::Ok(ref options) => {
                         storage2.borrow_mut().fullscreen = options.fullscreen;
                         storage2.borrow_mut().volume = options.volume;
                         // screen->setMode(VideoMode(800, 600, 24, options.fullscreen));
-                        audio.set_volume(options.volume);
+                        context.audio().set_volume(options.volume);
                     },
                     DialogResult::Cancel => {},
                 }
@@ -349,7 +349,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 game_popup_background(messages, &state1)
                     .add(0, 0, new_save_game_dialog(&storage1.borrow().saved_games, messages))
             )
-            .flat_map_action(move |result, _, _| {
+            .flat_map_action(move |result, _| {
                 match *result {
                     DialogResult::Ok((index, ref name)) => {
                         storage2.borrow_mut().saved_games[index] = Some(SavedGame {
@@ -373,7 +373,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 let score = *score;
                 create_message_dialog(MessageType::Neutral, messages.won).map_action(move |_| score)
             })
-            .flat_map_action(move |score, _, _| {
+            .flat_map_action(move |score, _| {
                 if let Some(score) = score.filter(|score| storage2.borrow().scores.is_deserving(*score)) {
                     *save_score_trigger2.borrow_mut() = Some(score);
                 } else {
@@ -397,7 +397,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                 new_player_name_dialog(&last_name, messages)
                     .map_action(move |name| (name.to_string(), score))
             })
-            .flat_map_action(move |(name, score), _, _| {
+            .flat_map_action(move |(name, score), _| {
                 storage2.borrow_mut().last_name = Some(name.to_string());
                 let pos = storage2.borrow_mut().scores.add_score_entry(Score { name: name.to_string(), score: *score });
                 *show_scores_trigger2.borrow_mut() = Some(pos);
@@ -414,7 +414,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
     container.push(0, 0, {
         let state2 = state.clone();
         cond_dialog(&failure_trigger, move |_| new_failure_dialog(messages))
-            .flat_map_action(move |result, _, _| {
+            .flat_map_action(move |result, _| {
                 match *result {
                     FailureChoice::StartNew => {
                         let g = GamePrivate::new().unwrap();
