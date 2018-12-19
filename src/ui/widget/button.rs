@@ -16,17 +16,17 @@ pub trait ButtonRenderer {
 pub struct Button<R: ButtonRenderer, A> {
     size: Size,
     highlighted: Cell<bool>,
-    key: Option<Keycode>,
+    keys: Vec<Keycode>,
     action: A,
     renderer: R,
 }
 
 impl<R: ButtonRenderer, A> Button<R, A> {
-    pub fn new(size: Size, key: Option<Keycode>, action: A, renderer: R) -> Button<R, A> {
+    pub fn new(size: Size, keys: &[Keycode], action: A, renderer: R) -> Button<R, A> {
         Button::<R, A> {
             size,
             highlighted: Cell::new(false),
-            key,
+            keys: keys.to_vec(),
             action,
             renderer,
         }
@@ -38,7 +38,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
 
     fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
-            Event::KeyDown(key) if Some(key) == self.key => {
+            Event::KeyDown(key) if self.keys.contains(&key) => {
                 context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },

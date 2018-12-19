@@ -42,7 +42,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
             grid.build()
         })
         .add(115, 310,
-            DialogButton::new(Size::new(90, 25), bg, messages.ok, Some(Keycode::Escape), ())
+            DialogButton::new(Size::new(90, 25), bg, messages.ok, &[Keycode::Escape, Keycode::Return], ())
         );
 
     dialod_widget(None, container)

@@ -37,7 +37,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
         .add(140, 60, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.ok, Some(Keycode::Return), ()),
+                DialogButton::new(Size::new(80, 25), bg, messages.ok, &[Keycode::Return], ()),
                 move |_, _| {
                     let value: String = state2.borrow().clone();
                     Ok(EventReaction::action(DialogResult::Ok(value)))
@@ -45,7 +45,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
             )
         })
         .add(230, 60,
-            DialogButton::new(Size::new(80, 25), bg, messages.cancel, Some(Keycode::Escape), DialogResult::Cancel)
+            DialogButton::new(Size::new(80, 25), bg, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)
         );
 
     dialod_widget(None, container)

@@ -65,7 +65,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     container.push(65, 220, {
         let state2 = state.clone();
         WidgetMapAction::new(
-            DialogButton::new(Size::new(85, 25), bg, messages.ok, Some(Keycode::Return), ()),
+            DialogButton::new(Size::new(85, 25), bg, messages.ok, &[Keycode::Return], ()),
             move |_, _| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
@@ -74,7 +74,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     });
     container.push(155, 220,
         DialogButton::new(Size::new(85, 25), bg, messages.cancel,
-            Some(Keycode::Escape),
+            &[Keycode::Escape],
             DialogResult::Cancel
         )
     );

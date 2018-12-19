@@ -27,10 +27,10 @@ impl ButtonRenderer for GameButton {
     }
 }
 
-pub fn new_game_button<A>(text: &str, key: Option<Keycode>, action: A) -> Button<GameButton, A> {
+pub fn new_game_button<A>(text: &str, keys: &[Keycode], action: A) -> Button<GameButton, A> {
     Button::<GameButton, A>::new(
         GAME_BUTTON_SIZE,
-        key,
+        keys,
         action,
         GameButton {
             text: text.to_string(),

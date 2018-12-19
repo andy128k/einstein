@@ -23,10 +23,10 @@ impl ButtonRenderer for MenuButton {
     }
 }
 
-pub fn new_menu_button<A>(size: Size, text: &str, key: Option<Keycode>, action: A) -> Button<MenuButton, A> {
+pub fn new_menu_button<A>(size: Size, text: &str, keys: &[Keycode], action: A) -> Button<MenuButton, A> {
     Button::<MenuButton, A>::new(
         size,
-        key,
+        keys,
         action,
         MenuButton {
             size,

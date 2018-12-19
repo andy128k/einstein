@@ -30,7 +30,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
         .add(10, 465, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.prev, None, ()),
+                DialogButton::new(Size::new(80, 25), bg, messages.prev, &[], ()),
                 move |_, _| {
                     state2.borrow_mut().prev();
                     Ok(EventReaction::empty())
@@ -40,7 +40,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
         .add(100, 465, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.next, None, ()),
+                DialogButton::new(Size::new(80, 25), bg, messages.next, &[], ()),
                 move |_, _| {
                     state2.borrow_mut().next();
                     Ok(EventReaction::empty())
@@ -48,7 +48,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
             )
         })
         .add(510, 465,
-            DialogButton::new(Size::new(80, 25), bg, messages.close, Some(Keycode::Escape), ())
+            DialogButton::new(Size::new(80, 25), bg, messages.close, &[Keycode::Escape], ())
         );
 
     dialod_widget(None, container)

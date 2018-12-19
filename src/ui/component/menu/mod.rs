@@ -61,13 +61,13 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
         let show_opts_trigger2 = show_opts_trigger.clone();
         let show_about_trigger2 = show_about_trigger.clone();
         GridBuilder::new(Container::container(Size::new(220, 210), None, None), 1, 7)
-            .add(0, 0, new_menu_button(Size::new(220, 30), messages.new_game, None, MainMenuAction::NewGame))
-            .add(0, 1, new_menu_button(Size::new(220, 30), messages.load_game, None, MainMenuAction::LoadGame))
-            .add(0, 2, new_menu_button(Size::new(220, 30), messages.top_scores, None, MainMenuAction::ShowScores))
-            .add(0, 3, new_menu_button(Size::new(220, 30), messages.rules, None, MainMenuAction::Help))
-            .add(0, 4, new_menu_button(Size::new(220, 30), messages.options, None, MainMenuAction::Options))
-            .add(0, 5, new_menu_button(Size::new(220, 30), messages.about, None, MainMenuAction::About))
-            .add(0, 6, new_menu_button(Size::new(220, 30), messages.exit, Some(Keycode::Escape), MainMenuAction::Exit))
+            .add(0, 0, new_menu_button(Size::new(220, 30), messages.new_game, &[], MainMenuAction::NewGame))
+            .add(0, 1, new_menu_button(Size::new(220, 30), messages.load_game, &[], MainMenuAction::LoadGame))
+            .add(0, 2, new_menu_button(Size::new(220, 30), messages.top_scores, &[], MainMenuAction::ShowScores))
+            .add(0, 3, new_menu_button(Size::new(220, 30), messages.rules, &[], MainMenuAction::Help))
+            .add(0, 4, new_menu_button(Size::new(220, 30), messages.options, &[], MainMenuAction::Options))
+            .add(0, 5, new_menu_button(Size::new(220, 30), messages.about, &[], MainMenuAction::About))
+            .add(0, 6, new_menu_button(Size::new(220, 30), messages.exit, &[Keycode::Escape], MainMenuAction::Exit))
             .build()
             .flat_map_action(move |menu_action, _| {
                 match menu_action {

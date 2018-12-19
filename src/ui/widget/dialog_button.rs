@@ -22,10 +22,10 @@ impl ButtonRenderer for DialogButton {
 }
 
 impl DialogButton {
-    pub fn new<A>(size: Size, background: Background, text: &str, key: Option<Keycode>, action: A) -> Button<DialogButton, A> {
+    pub fn new<A>(size: Size, background: Background, text: &str, keys: &[Keycode], action: A) -> Button<DialogButton, A> {
         Button::<DialogButton, A>::new(
             size,
-            key,
+            keys,
             action,
             DialogButton {
                 size,

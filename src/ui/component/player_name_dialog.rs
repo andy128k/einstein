@@ -35,7 +35,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Container<Stri
         .add(178, 60, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(90, 25), bg, messages.ok, Some(Keycode::Return), ()),
+                DialogButton::new(Size::new(90, 25), bg, messages.ok, &[Keycode::Return], ()),
                 move |_, _| {
                     let result: String = state2.borrow().clone();
                     Ok(EventReaction::action(result))

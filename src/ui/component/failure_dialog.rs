@@ -23,13 +23,13 @@ pub fn new_failure_dialog(messages: &Messages) -> Container<FailureChoice> {
             Label::title(Size::new(300, 100), messages.loose)
         ))
         .add(30, 100,
-            DialogButton::new(Size::new(90, 25), bg, messages.start_new, None, FailureChoice::StartNew)
+            DialogButton::new(Size::new(90, 25), bg, messages.start_new, &[], FailureChoice::StartNew)
         )
         .add(130, 100,
-            DialogButton::new(Size::new(90, 25), bg, messages.try_again, None, FailureChoice::TryAgain)
+            DialogButton::new(Size::new(90, 25), bg, messages.try_again, &[], FailureChoice::TryAgain)
         )
         .add(230, 100,
-            DialogButton::new(Size::new(90, 25), bg, messages.exit, Some(Keycode::Escape), FailureChoice::Cancel)
+            DialogButton::new(Size::new(90, 25), bg, messages.exit, &[Keycode::Escape], FailureChoice::Cancel)
         );
 
     dialod_widget(None, container)

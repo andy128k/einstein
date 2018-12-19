@@ -31,7 +31,7 @@ pub fn create_about_dialog(messages: &Messages) -> Container<()> {
         ))
         .add(140, 240,
             DialogButton::new(Size::new(80, 25), bg, messages.ok,
-                Some(Keycode::Escape), // Return also
+                &[Keycode::Escape, Keycode::Return],
                 ()
             )
         );

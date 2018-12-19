@@ -35,7 +35,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
         container.push(10, 60 + (i as u32) * 30, {
             let ask_name2 = ask_name.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(280, 25), bg, &label, None, ()),
+                DialogButton::new(Size::new(280, 25), bg, &label, &[], ()),
                 move |_, _| {
                     *ask_name2.borrow_mut() = Some((i, default_name.clone()));
                     Ok(EventReaction::empty())
@@ -45,7 +45,7 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
     }
 
     container.push(110, 380,
-        DialogButton::new(Size::new(80, 25), bg, messages.close, Some(Keycode::Escape), DialogResult::Cancel)
+        DialogButton::new(Size::new(80, 25), bg, messages.close, &[Keycode::Escape], DialogResult::Cancel)
     );
 
     container.push(0, 0,

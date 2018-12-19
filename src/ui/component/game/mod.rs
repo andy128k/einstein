@@ -183,12 +183,12 @@ enum MenuAction {
 fn make_game_menu(messages: &'static Messages) -> Container<MenuAction> {
     let container = Container::container(Size::new(308, 70), None, None);
     GridBuilder::new(container, 3, 2)
-        .add(0, 0, new_game_button(messages.pause, None, MenuAction::Pause))
-        .add(1, 0, new_game_button(messages.switch, None, MenuAction::ToggleExcluded))
-        .add(2, 0, new_game_button(messages.exit, Some(Keycode::Escape), MenuAction::Exit))
-        .add(0, 1, new_game_button(messages.save, None, MenuAction::Save))
-        .add(1, 1, new_game_button(messages.options, None, MenuAction::Options))
-        .add(2, 1, new_game_button(messages.help, None, MenuAction::Help))
+        .add(0, 0, new_game_button(messages.pause, &[], MenuAction::Pause))
+        .add(1, 0, new_game_button(messages.switch, &[], MenuAction::ToggleExcluded))
+        .add(2, 0, new_game_button(messages.exit, &[Keycode::Escape], MenuAction::Exit))
+        .add(0, 1, new_game_button(messages.save, &[], MenuAction::Save))
+        .add(1, 1, new_game_button(messages.options, &[], MenuAction::Options))
+        .add(2, 1, new_game_button(messages.help, &[], MenuAction::Help))
         .build()
 }
 
