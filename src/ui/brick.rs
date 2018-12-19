@@ -126,9 +126,8 @@ impl Brick {
             render_text(canvas, rect, &text.text, &font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
         }
         match self.border {
-            Some(Border::Raised) => bevel(canvas, rect, Color::RGB(255, 255, 255), Color::RGB(128, 128, 128))?,
-            Some(Border::Sunken) => bevel(canvas, rect, Color::RGB(128, 128, 128), Color::RGB(255, 255, 255))?,
-            Some(Border::Etched) => etched(canvas, rect, Color::RGB(255, 255, 255), Color::RGB(128, 128, 128))?,
+            Some(Border::Beveled(color1, color2)) => bevel(canvas, rect, color1, color2)?,
+            Some(Border::Etched(color1, color2)) => etched(canvas, rect, color1, color2)?,
             None => {},
         }
         for child in &self.children {

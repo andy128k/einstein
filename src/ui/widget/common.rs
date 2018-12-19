@@ -1,26 +1,17 @@
 use sdl2::pixels::Color;
 use crate::ui::common::Rect;
 use crate::resources::manager::Resource;
-use crate::resources::background::{BLUE_PATTERN, GREEN_PATTERN, MARBLE_PATTERN, RED_PATTERN};
 
 #[derive(Clone, Copy)]
 pub enum Border {
-    Raised,
-    Sunken,
-    Etched,
+    Beveled(Color, Color),
+    Etched(Color, Color),
 }
 
 #[derive(Clone, Copy)]
 pub enum Background {
     Color(Color),
     Image(&'static Resource, bool, Option<Rect>),
-}
-
-impl Background {
-    pub const BLUE_PATTERN: Self = Background::Image(&BLUE_PATTERN, false, None);
-    pub const GREEN_PATTERN: Self = Background::Image(&GREEN_PATTERN, false, None);
-    pub const WHITE_PATTERN: Self = Background::Image(&MARBLE_PATTERN, false, None);
-    pub const RED_PATTERN: Self = Background::Image(&RED_PATTERN, false, None);
 }
 
 fn gamma(v: u8, k: f64) -> u8 {

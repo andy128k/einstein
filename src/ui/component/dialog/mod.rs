@@ -1,10 +1,19 @@
+pub mod theme;
+pub mod button;
+pub mod checkbox;
+pub mod slider;
+
 use std::rc::Rc;
 use crate::cell::RefCell;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::Background;
+use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::container::Container;
 use crate::ui::widget::conditional::ConditionalWidget;
+pub use self::theme::*;
+pub use self::button::*;
+pub use self::checkbox::*;
+pub use self::slider::*;
 
 #[derive(Clone)]
 pub enum DialogResult<T> {
@@ -19,6 +28,12 @@ impl<T> DialogResult<T> {
             DialogResult::Cancel => DialogResult::Cancel,
         }
     }
+}
+
+pub fn dialog_container<T>(size: Size, theme: DialogTheme) -> Container<T> {
+    let (color1, color2) = theme.colors3d();
+    let border = Border::Beveled(color1, color2);
+    Container::container(size, theme.background(false), border)
 }
 
 pub fn dialod_widget<B: Into<Option<Background>>, A, W: Widget<A> + 'static>(background: B, widget: W) -> Container<A> {

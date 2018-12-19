@@ -1,9 +1,7 @@
 use std::cell::Cell;
 use failure::err_msg;
 use sdl2::mouse::MouseButton;
-use sdl2::pixels::Color;
 use crate::ui::common::Size;
-use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
 use crate::ui::context::Context;
@@ -11,17 +9,17 @@ use crate::resources::manager::ResourceManager;
 use crate::resources::audio::CLICK;
 
 pub struct Checkbox {
-    background: Background,
     checked: Cell<bool>,
     mouse_inside: Cell<bool>,
+    draw: Box<Fn(Size, bool, bool, &dyn ResourceManager) -> Brick>,
 }
 
 impl Checkbox {
-    pub fn new(background: Background, checked: bool) -> Self {
+    pub fn new(checked: bool, draw: impl Fn(Size, bool, bool, &dyn ResourceManager) -> Brick + 'static) -> Self {
         Self{
-            background,
             checked: Cell::new(checked),
             mouse_inside: Cell::new(false),
+            draw: Box::new(draw),
         }
     }
 }
@@ -52,13 +50,7 @@ impl Widget<bool> for Checkbox {
         }
     }
 
-    fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        let mut brick = Brick::new(self.get_size().width, self.get_size().height)
-            .background(if self.mouse_inside.get() { self.background.highlighted() } else { self.background })
-            .border(Border::Etched);
-        if self.checked.get() {
-            brick = brick.text(Text::new("X").color(Color::RGB(255, 255, 255)).shadow());
-        }
-        brick
+    fn draw(&self, resource_manager: &dyn ResourceManager) -> Brick {
+        (self.draw)(self.get_size(), self.mouse_inside.get(), self.checked.get(), resource_manager)
     }
 }

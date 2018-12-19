@@ -4,12 +4,8 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
-use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::container::Container;
-use crate::ui::widget::checkbox::*;
-use crate::ui::widget::slider::*;
 use crate::ui::component::dialog::*;
 use crate::resources::messages::Messages;
 use crate::storage::Storage;
@@ -22,7 +18,7 @@ pub struct Options {
 }
 
 pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<DialogResult<Options>> {
-    let bg = Background::BLUE_PATTERN;
+    let theme = DialogTheme::Blue;
 
     let state = Rc::new(RefCell::new(Options {
         fullscreen: storage.fullscreen,
@@ -30,7 +26,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
         volume_float: storage.volume as f32 / 100_f32,
     }));
 
-    let mut container = Container::<DialogResult<Options>>::container(Size::new(300, 260), bg, Border::Raised);
+    let mut container = dialog_container(Size::new(300, 260), theme);
 
     container.push(0, 5, WidgetMapAction::no_action(
         Label::title(Size::new(300, 40), messages.options)
@@ -38,7 +34,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     container.push(15, 90, {
         let state2 = state.clone();
         WidgetMapAction::new(
-            Checkbox::new(bg, state.borrow().fullscreen),
+            dialog_checkbox(theme, state.borrow().fullscreen),
             move |value, _| {
                 state2.borrow_mut().fullscreen = *value;
                 Ok(EventReaction::empty())
@@ -54,7 +50,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     container.push(110, 162, {
         let state2 = state.clone();
         WidgetMapAction::new(
-            Slider::new(Size::new(160, 16), bg, state.borrow().volume_float),
+            dialog_slider(theme, Size::new(160, 16), state.borrow().volume_float),
             move |value, _| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;
@@ -65,7 +61,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     container.push(65, 220, {
         let state2 = state.clone();
         WidgetMapAction::new(
-            DialogButton::new(Size::new(85, 25), bg, messages.ok, &[Keycode::Return], ()),
+            DialogButton::new(Size::new(85, 25), theme, messages.ok, &[Keycode::Return], ()),
             move |_, _| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
@@ -73,7 +69,7 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
         )
     });
     container.push(155, 220,
-        DialogButton::new(Size::new(85, 25), bg, messages.cancel,
+        DialogButton::new(Size::new(85, 25), theme, messages.cancel,
             &[Keycode::Escape],
             DialogResult::Cancel
         )

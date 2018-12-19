@@ -1,12 +1,10 @@
 use sdl2::keyboard::Keycode;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
-use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::label::Label;
 use crate::ui::widget::page_view::*;
 use crate::ui::widget::container::Container;
-use crate::ui::component::dialog::dialod_widget;
+use crate::ui::component::dialog::*;
 use crate::resources::rules::get_rules;
 use crate::resources::messages::Messages;
 
@@ -18,9 +16,9 @@ const CLIENT_HEIGHT: u32 = 390;
 pub fn new_help_dialog(messages: &Messages) -> Container<()> {
     let state = PageViewState::new(get_rules());
 
-    let bg = Background::BLUE_PATTERN;
+    let theme = DialogTheme::Blue;
 
-    let container = Container::<()>::container(Size::new(WIDTH, HEIGHT), bg, Border::Raised)
+    let container = dialog_container(Size::new(WIDTH, HEIGHT), theme)
         .add(150, 10, WidgetMapAction::no_action(
             Label::title(Size::new(300, 40), messages.rules)
         ))
@@ -30,7 +28,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
         .add(10, 465, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.prev, &[], ()),
+                DialogButton::new(Size::new(80, 25), theme, messages.prev, &[], ()),
                 move |_, _| {
                     state2.borrow_mut().prev();
                     Ok(EventReaction::empty())
@@ -40,7 +38,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
         .add(100, 465, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.next, &[], ()),
+                DialogButton::new(Size::new(80, 25), theme, messages.next, &[], ()),
                 move |_, _| {
                     state2.borrow_mut().next();
                     Ok(EventReaction::empty())
@@ -48,7 +46,7 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
             )
         })
         .add(510, 465,
-            DialogButton::new(Size::new(80, 25), bg, messages.close, &[Keycode::Escape], ())
+            DialogButton::new(Size::new(80, 25), theme, messages.close, &[Keycode::Escape], ())
         );
 
     dialod_widget(None, container)

@@ -135,7 +135,7 @@ impl Widget<String> for InputField {
         let font_size = FontSize::TEXT;
 
         let mut brick = Brick::new(self.get_size().width, self.get_size().height)
-            .border(Border::Sunken)
+            .border(Border::Beveled(Color::RGB(128, 128, 128), Color::RGB(255, 255, 255)))
             .text(Text::new(&self.text.borrow()).font_size(font_size).color(Color::RGB(255, 255, 0)).shadow().halign(HorizontalAlign::Left));
 
         if self.cursor_visible.get() {

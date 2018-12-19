@@ -2,20 +2,18 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
-use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::container::Container;
 use crate::ui::layout::grid::GridBuilder;
-use crate::ui::component::dialog::dialod_widget;
+use crate::ui::component::dialog::*;
 use crate::resources::messages::Messages;
 use crate::storage::{Scores};
 use crate::util::time::sec_to_str;
 
 pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: Option<usize>) -> Container<()> {
-    let bg = Background::BLUE_PATTERN;
+    let theme = DialogTheme::Blue;
 
-    let container = Container::<()>::container(Size::new(320, 350), bg, Border::Raised)
+    let container = dialog_container(Size::new(320, 350), theme)
         .add(10, 10,
             Label::title(Size::new(300, 40), messages.top_scores).no_action()
         )
@@ -42,7 +40,7 @@ pub fn create_topscores_dialog(scores: &Scores, messages: &Messages, highlight: 
             grid.build()
         })
         .add(115, 310,
-            DialogButton::new(Size::new(90, 25), bg, messages.ok, &[Keycode::Escape, Keycode::Return], ())
+            DialogButton::new(Size::new(90, 25), theme, messages.ok, &[Keycode::Escape, Keycode::Return], ())
         );
 
     dialod_widget(None, container)

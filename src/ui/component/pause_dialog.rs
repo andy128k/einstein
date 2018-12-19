@@ -1,17 +1,16 @@
 use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
 use crate::ui::widget::container::Container;
 use crate::ui::widget::any_key::*;
-use crate::ui::component::dialog::dialod_widget;
+use crate::ui::component::dialog::*;
 use crate::resources::messages::Messages;
 
 pub fn new_pause_dialog(messages: &Messages) -> Container<()> {
     let size = Size::new(240, 50);
 
-    let container = Container::<()>::container(size, Background::GREEN_PATTERN, Border::Raised)
+    let container = dialog_container(size, DialogTheme::Green)
         .add(0, 0, WidgetMapAction::no_action(
             Label::new(size, messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center)
         ))

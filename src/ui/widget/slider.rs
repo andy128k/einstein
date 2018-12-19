@@ -1,7 +1,6 @@
 use std::cell::Cell;
 use sdl2::mouse::MouseButton;
 use crate::ui::common::{Rect, Size};
-use crate::ui::widget::common::*;
 use crate::ui::brick::*;
 use crate::ui::widget::widget::*;
 use crate::ui::context::Context;
@@ -9,20 +8,20 @@ use crate::resources::manager::ResourceManager;
 
 pub struct Slider {
     size: Size,
-    background: Background,
     value: Cell<f32>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
+    draw: Box<Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick>,
 }
 
 impl Slider {
-    pub fn new(size: Size, background: Background, value: f32) -> Self {
+    pub fn new(size: Size, value: f32, draw: impl Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick + 'static) -> Self {
         Self {
             size,
-            background,
             value: Cell::new(value),
             highlight: Cell::new(false),
             dragging: Cell::new(None),
+            draw: Box::new(draw),
         }
     }
 
@@ -116,16 +115,7 @@ impl Widget<f32> for Slider {
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let x = self.value_to_x(self.value.get()) as u32;
-
-        let scale = Brick::new(self.size.width, 4)
-            .border(Border::Sunken);
-
-        let slider = Brick::new(self.size.height, self.size.height)
-            .background(if self.highlight.get() { self.background.highlighted() } else { self.background })
-            .border(Border::Etched);
-
-        Brick::new(self.size.width, self.size.height)
-            .add(0, (self.size.height - 4) / 2, scale)
-            .add(x, 0, slider)
+        let slider_rect = Rect::new(x as i32, 0, self.size.height, self.size.height);
+        (self.draw)(self.get_size(), slider_rect, self.highlight.get(), _resource_manager)
     }
 }

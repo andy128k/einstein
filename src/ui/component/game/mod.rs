@@ -13,7 +13,7 @@ use crate::ui::widget::common::*;
 use crate::ui::widget::game_button::{new_game_button};
 use crate::ui::widget::container::Container;
 use crate::ui::layout::grid::GridBuilder;
-use crate::ui::component::dialog::{DialogResult, cond_dialog};
+use crate::ui::component::dialog::{DialogResult, cond_dialog, DialogTheme};
 use crate::ui::component::puzzle::puzzle::new_puzzle_widget;
 use crate::ui::component::puzzle::puzzle_cell::PuzzleAction;
 use crate::ui::component::rules_grid::{create_horizontal_rules, create_vertical_rules};
@@ -23,7 +23,7 @@ use crate::ui::component::save_dialog::{new_save_game_dialog};
 use crate::ui::component::options_dialog::{new_options_dialog};
 use crate::ui::component::pause_dialog::new_pause_dialog;
 use crate::ui::component::failure_dialog::{new_failure_dialog, FailureChoice};
-use crate::ui::component::message_dialog::{create_message_dialog, MessageType};
+use crate::ui::component::message_dialog::{create_message_dialog};
 use crate::ui::component::player_name_dialog::new_player_name_dialog;
 use crate::ui::component::topscores_dialog::create_topscores_dialog;
 use crate::resources::manager::Resource;
@@ -371,7 +371,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         cond_dialog(&victory_trigger,
             move |score| {
                 let score = *score;
-                create_message_dialog(MessageType::Neutral, messages.won).map_action(move |_| score)
+                create_message_dialog(DialogTheme::White, messages.won).map_action(move |_| score)
             })
             .flat_map_action(move |score, _| {
                 if let Some(score) = score.filter(|score| storage2.borrow().scores.is_deserving(*score)) {

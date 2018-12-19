@@ -4,21 +4,19 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
-use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::input_field::*;
 use crate::ui::widget::container::Container;
-use crate::ui::component::dialog::dialod_widget;
+use crate::ui::component::dialog::*;
 use crate::resources::messages::Messages;
 
 pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Container<String> {
-    let bg = Background::BLUE_PATTERN;
+    let theme = DialogTheme::Blue;
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(name.to_string()));
 
-    let container = Container::<String>::container(Size::new(460, 100), bg, Border::Raised)
+    let container = dialog_container(Size::new(460, 100), theme)
         .add(10, 20, WidgetMapAction::no_action(
             Label::new(Size::new(150, 26), messages.enter_name, yellow, HorizontalAlign::Left)
         ))
@@ -35,7 +33,7 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Container<Stri
         .add(178, 60, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(90, 25), bg, messages.ok, &[Keycode::Return], ()),
+                DialogButton::new(Size::new(90, 25), theme, messages.ok, &[Keycode::Return], ()),
                 move |_, _| {
                     let result: String = state2.borrow().clone();
                     Ok(EventReaction::action(result))

@@ -4,23 +4,21 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
-use crate::ui::widget::common::{Background, Border};
 use crate::ui::widget::label::*;
-use crate::ui::widget::dialog_button::*;
 use crate::ui::widget::input_field::*;
 use crate::ui::widget::container::Container;
-use crate::ui::component::dialog::{DialogResult, dialod_widget};
+use crate::ui::component::dialog::*;
 use crate::resources::messages::Messages;
 
 pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<String>> {
-    let bg = Background::BLUE_PATTERN;
+    let theme = DialogTheme::Blue;
     let yellow = Color::RGB(255, 255, 0);
 
     let state = Rc::new(RefCell::new(
         name.to_string()
     ));
 
-    let container = Container::<DialogResult<String>>::container(Size::new(460, 100), bg, Border::Raised)
+    let container = dialog_container(Size::new(460, 100), theme)
         .add(10, 20, WidgetMapAction::no_action(
             Label::new(Size::new(150, 26), messages.enter_game, yellow, HorizontalAlign::Left)
         ))
@@ -37,7 +35,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
         .add(140, 60, {
             let state2 = state.clone();
             WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), bg, messages.ok, &[Keycode::Return], ()),
+                DialogButton::new(Size::new(80, 25), theme, messages.ok, &[Keycode::Return], ()),
                 move |_, _| {
                     let value: String = state2.borrow().clone();
                     Ok(EventReaction::action(DialogResult::Ok(value)))
@@ -45,7 +43,7 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
             )
         })
         .add(230, 60,
-            DialogButton::new(Size::new(80, 25), bg, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)
+            DialogButton::new(Size::new(80, 25), theme, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)
         );
 
     dialod_widget(None, container)
