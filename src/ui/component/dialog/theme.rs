@@ -31,10 +31,10 @@ impl DialogTheme {
 
     pub fn colors3d(&self) -> (Color, Color) {
         match self {
-            DialogTheme::Blue => (Color::RGB(185, 220, 255), Color::RGB(90, 125, 165)),
-            DialogTheme::Green => (Color::RGB(136, 160, 140), Color::RGB(30, 55, 35)),
-            DialogTheme::White => (Color::RGB(255, 255, 255), Color::RGB(128, 128, 128)),
-            DialogTheme::Red => (Color::RGB(255, 255, 255), Color::RGB(128, 128, 128)),
+            DialogTheme::Blue => (Color::RGB(200, 235, 255), Color::RGB(50, 50, 70)),
+            DialogTheme::Green => (Color::RGB(136, 160, 140), Color::RGB(50, 70, 50)),
+            DialogTheme::White => (Color::RGB(255, 255, 255), Color::RGB(70, 70, 70)),
+            DialogTheme::Red => (Color::RGB(200, 160, 160), Color::RGB(70, 50, 50)),
         }
     }
 }

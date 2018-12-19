@@ -154,21 +154,10 @@ fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect
 
     for j in 0..ch {
         for i in 0..cw {
-            let r = Rect::new(rect.left() + ((i * tile_width) as i32), rect.top() + ((j * tile_height) as i32), tile_width, tile_height);
-
-            let clip = Rect::new(
-                    r.left(),
-                    r.top(),
-                    src_rect.width(),
-                    src_rect.height()
-                )
-                .intersection(&r)
-                .unwrap()
-                .intersection(&rect)
-                .unwrap();
-
+            let dst = Rect::new(rect.left() + ((i * tile_width) as i32), rect.top() + ((j * tile_height) as i32), tile_width, tile_height);
+            let clip = dst.intersection(&rect).unwrap();
             canvas.set_clip_rect(Some(rect_to_rect2(clip)));
-            canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(clip))).map_err(::failure::err_msg)?;
+            canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(dst))).map_err(::failure::err_msg)?;
             canvas.set_clip_rect(None);
         }
     }
