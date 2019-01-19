@@ -1,9 +1,9 @@
 use std::time::{Instant, Duration};
-use std::rc::Rc;
 use std::cell::{Cell};
 use crate::cell::RefCell;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+use ropey::Rope;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
@@ -14,7 +14,7 @@ use crate::resources::manager::ResourceManager;
 pub struct InputField {
     size: Size,
     max_len: usize,
-    text: Rc<RefCell<String>>,
+    text: RefCell<Rope>,
     cursor_pos: Cell<usize>,
     last_cursor: Cell<Instant>,
     cursor_visible: Cell<bool>,
@@ -22,11 +22,13 @@ pub struct InputField {
 
 impl InputField {
     pub fn new(size: Size, text: &str, max_len: usize) -> Self {
+        let text = Rope::from(text);
+        let text_len = text.len_chars();
         Self {
             size,
             max_len,
-            text: Rc::new(RefCell::new(text.to_string())),
-            cursor_pos: Cell::new(text.chars().count()),
+            text: RefCell::new(text),
+            cursor_pos: Cell::new(text_len),
             last_cursor: Cell::new(Instant::now()),
             cursor_visible: Cell::new(true),
         }
@@ -40,17 +42,16 @@ impl InputField {
 
     fn on_key_down(&self, key: Keycode) -> EventReaction<String> {
         let cursor_pos = self.cursor_pos.get();
-        let text_len = self.text.borrow().chars().count();
+        let text_len = self.text.borrow().len_chars();
         match key {
             Keycode::Backspace => {
                 if cursor_pos > 0 {
-                    let t = delete_char(&*self.text.borrow(), cursor_pos - 1);
-                    *self.text.borrow_mut() = t;
+                    self.text.borrow_mut().remove(cursor_pos - 1 .. cursor_pos);
                     self.move_cursor(cursor_pos - 1);
                 } else {
                     self.move_cursor(cursor_pos);
                 }
-                EventReaction::update_and_action(self.text.borrow().clone())
+                EventReaction::update_and_action(self.text.borrow().to_string())
             },
             Keycode::Left => {
                 if cursor_pos > 0 {
@@ -78,11 +79,10 @@ impl InputField {
             },
             Keycode::Delete => {
                 if cursor_pos < text_len {
-                    let t = delete_char(&*self.text.borrow(), cursor_pos);
-                    *self.text.borrow_mut() = t;
+                    self.text.borrow_mut().remove(cursor_pos .. cursor_pos + 1);
                 }
                 self.move_cursor(cursor_pos);
-                EventReaction::update_and_action(self.text.borrow().clone())
+                EventReaction::update_and_action(self.text.borrow().to_string())
             },
             _ => EventReaction::empty(),
         }
@@ -91,17 +91,16 @@ impl InputField {
     fn on_text_input(&self, text: &str) -> EventReaction<String> {
         for ch in text.chars() {
             let cursor_pos = self.cursor_pos.get();
-            let text_len = self.text.borrow().chars().count();
+            let text_len = self.text.borrow().len_chars();
             if text_len < self.max_len {
-                let t = insert_char(&*self.text.borrow(), cursor_pos, ch);
-                *self.text.borrow_mut() = t;
+                self.text.borrow_mut().insert_char(cursor_pos, ch);
                 self.move_cursor(cursor_pos + 1);
             } else {
                 self.move_cursor(cursor_pos);
             }
         }
         if !text.is_empty() {
-            EventReaction::update_and_action(self.text.borrow().clone())
+            EventReaction::update_and_action(self.text.borrow().to_string())
         } else {
             EventReaction::empty()
         }
@@ -153,19 +152,6 @@ impl Widget<String> for InputField {
     }
 }
 
-fn insert_char(text: &str, index: usize, ich: char) -> String {
-    let mut result: String = text.chars().take(index).collect();
-    result.push(ich);
-    result.extend(text.chars().skip(index));
-    result
-}
-
-fn delete_char(text: &str, index: usize) -> String {
-    let mut result: String = text.chars().take(index).collect();
-    result.extend(text.chars().skip(index + 1));
-    result
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -179,19 +165,6 @@ mod test {
         fn resource_manager(&self) -> &dyn ResourceManager { unreachable!() }
         fn audio(&self) -> &dyn Audio { unreachable!() }
         fn main_loop(&self, _widget: &mut dyn Widget<MainLoopQuit>) -> Result<()> { unreachable!() }
-    }
-
-    #[test]
-    fn test_insert() {
-        assert_eq!(insert_char("", 0, 'A'), "A");
-        assert_eq!(insert_char("Bb", 1, 'o'), "Bob");
-    }
-
-    #[test]
-    fn test_delete() {
-        assert_eq!(delete_char("", 0), "");
-        assert_eq!(delete_char("A", 0), "");
-        assert_eq!(delete_char("Latte", 2), "Late");
     }
 
     #[test]
