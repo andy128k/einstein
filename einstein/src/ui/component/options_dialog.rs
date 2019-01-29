@@ -33,13 +33,11 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     );
     container.push(15, 90, {
         let state2 = state.clone();
-        WidgetMapAction::new(
-            dialog_checkbox(theme, state.borrow().fullscreen),
-            move |value, _| {
+        dialog_checkbox(theme, state.borrow().fullscreen)
+            .flat_map_action(move |value, _| {
                 state2.borrow_mut().fullscreen = *value;
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
     container.push(50, 90,
         Label::new(Size::new(300, 20), messages.fullscreen, Color::RGB(255, 255, 255), HorizontalAlign::Left).no_action()
@@ -49,24 +47,20 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
     );
     container.push(110, 162, {
         let state2 = state.clone();
-        WidgetMapAction::new(
-            dialog_slider(theme, Size::new(160, 16), state.borrow().volume_float),
-            move |value, _| {
+        dialog_slider(theme, Size::new(160, 16), state.borrow().volume_float)
+            .flat_map_action(move |value, _| {
                 state2.borrow_mut().volume = (*value * 100f32) as u32;
                 state2.borrow_mut().volume_float = *value;
                 Ok(EventReaction::empty())
-            }
-        )
+            })
     });
     container.push(65, 220, {
         let state2 = state.clone();
-        WidgetMapAction::new(
-            DialogButton::new(Size::new(85, 25), theme, messages.ok, &[Keycode::Return], ()),
-            move |_, _| {
+        DialogButton::new(Size::new(85, 25), theme, messages.ok, &[Keycode::Return], ())
+            .flat_map_action(move |_, _| {
                 let s: Options = state2.borrow().clone();
                 Ok(EventReaction::action(DialogResult::Ok(s)))
-            }
-        )
+            })
     });
     container.push(155, 220,
         DialogButton::new(Size::new(85, 25), theme, messages.cancel,

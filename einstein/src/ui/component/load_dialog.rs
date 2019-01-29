@@ -25,16 +25,14 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
 
         container.push(10, 60 + (i as u32) * 30, {
             let game2: Option<SavedGame> = (*game).clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(280, 25), theme, &label, &[], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(280, 25), theme, &label, &[], ())
+                .flat_map_action(move |_, _| {
                     if let Some(ref game3) = game2 {
                         Ok(EventReaction::action(DialogResult::Ok(game3.game.clone())))
                     } else {
                         Ok(EventReaction::empty())
                     }
-                }
-            )
+                })
         });
     }
 

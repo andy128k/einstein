@@ -53,14 +53,11 @@ pub fn cond_dialog<I, F, W, A>(condition: &Rc<RefCell<Option<I>>>, factory: F) -
         A: Clone,
 {
     let condition2 = condition.clone();
-    WidgetMapAction::new(
-        ConditionalWidget::new(
-            condition.clone(),
-            factory
-        ),
-        move |action, _| {
-            *condition2.borrow_mut() = None;
-            Ok(EventReaction::action(action.clone()))
-        }
-    )
+    ConditionalWidget::new(
+        condition.clone(),
+        factory
+    ).flat_map_action(move |action, _| {
+        *condition2.borrow_mut() = None;
+        Ok(EventReaction::action(action.clone()))
+    })
 }

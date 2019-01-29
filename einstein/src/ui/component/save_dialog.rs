@@ -32,13 +32,11 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
 
         container.push(10, 60 + (i as u32) * 30, {
             let ask_name2 = ask_name.clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(280, 25), theme, &label, &[], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(280, 25), theme, &label, &[], ())
+                .flat_map_action(move |_, _| {
                     *ask_name2.borrow_mut() = Some((i, default_name.clone()));
                     Ok(EventReaction::empty())
-                }
-            )
+                })
         });
     }
 

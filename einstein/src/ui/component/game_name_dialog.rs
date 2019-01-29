@@ -24,23 +24,19 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
         )
         .add(170, 20, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                InputField::new(Size::new(280, 26), name, 20),
-                move |name, _| {
+            InputField::new(Size::new(280, 26), name, 20)
+                .flat_map_action(move |name, _| {
                     *state2.borrow_mut() = name.to_string();
                     Ok(EventReaction::empty())
-                }
-            )
+                })
         })
         .add(140, 60, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), theme, messages.ok, &[Keycode::Return], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(80, 25), theme, messages.ok, &[Keycode::Return], ())
+                .flat_map_action(move |_, _| {
                     let value: String = state2.borrow().clone();
                     Ok(EventReaction::action(DialogResult::Ok(value)))
-                }
-            )
+                })
         })
         .add(230, 60,
             DialogButton::new(Size::new(80, 25), theme, messages.cancel, &[Keycode::Escape], DialogResult::Cancel)

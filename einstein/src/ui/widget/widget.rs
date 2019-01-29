@@ -116,14 +116,6 @@ pub struct WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     convert: Box<dyn Fn(&AF, &dyn Context) -> Result<EventReaction<AT>>>,
 }
 
-impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
-    pub fn new<F>(wrapped: WF, convert: F) -> Self
-        where F: Fn(&AF, &dyn Context) -> Result<EventReaction<AT>> + 'static
-    {
-        Self { wrapped, convert: Box::new(convert) }
-    }
-}
-
 impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     fn get_size(&self) -> Size {
         self.wrapped.get_size()
@@ -164,7 +156,7 @@ impl<A, AnyWidget, AT, F> WidgetMapActionExt<A, WidgetMapAction<A, Self, AT>, AT
         F: Fn(&A) -> AT + 'static,
 {
     fn map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction::new(self, move |a, _| Ok(EventReaction::action(convert(a))))
+        WidgetMapAction { wrapped: self, convert: Box::new(move |a, _| Ok(EventReaction::action(convert(a)))) }
     }
 }
 
@@ -182,7 +174,7 @@ impl<A, AnyWidget, AT, F> WidgetFlatMapActionExt<A, WidgetMapAction<A, Self, AT>
         F: Fn(&A, &dyn Context) -> Result<EventReaction<AT>> + 'static,
 {
     fn flat_map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction::new(self, convert)
+        WidgetMapAction { wrapped: self, convert: Box::new(convert) }
     }
 }
 

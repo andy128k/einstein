@@ -27,23 +27,19 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
         )
         .add(10, 465, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), theme, messages.prev, &[], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(80, 25), theme, messages.prev, &[], ())
+                .flat_map_action(move |_, _| {
                     state2.borrow_mut().prev();
                     Ok(EventReaction::empty())
-                }
-            )
+                })
         })
         .add(100, 465, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(80, 25), theme, messages.next, &[], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(80, 25), theme, messages.next, &[], ())
+                .flat_map_action(move |_, _| {
                     state2.borrow_mut().next();
                     Ok(EventReaction::empty())
-                }
-            )
+                })
         })
         .add(510, 465,
             DialogButton::new(Size::new(80, 25), theme, messages.close, &[Keycode::Escape], ())

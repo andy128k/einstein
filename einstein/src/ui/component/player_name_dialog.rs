@@ -22,23 +22,19 @@ pub fn new_player_name_dialog(name: &str, messages: &Messages) -> Container<Stri
         )
         .add(170, 20, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                InputField::new(Size::new(280, 26), name, 20),
-                move |name, _| {
+            InputField::new(Size::new(280, 26), name, 20)
+                .flat_map_action(move |name, _| {
                     *state2.borrow_mut() = name.to_string();
                     Ok(EventReaction::empty())
-                }
-            )
+                })
         })
         .add(178, 60, {
             let state2 = state.clone();
-            WidgetMapAction::new(
-                DialogButton::new(Size::new(90, 25), theme, messages.ok, &[Keycode::Return], ()),
-                move |_, _| {
+            DialogButton::new(Size::new(90, 25), theme, messages.ok, &[Keycode::Return], ())
+                .flat_map_action(move |_, _| {
                     let result: String = state2.borrow().clone();
                     Ok(EventReaction::action(result))
-                }
-            )
+                })
         });
 
     dialog_widget(None, container)

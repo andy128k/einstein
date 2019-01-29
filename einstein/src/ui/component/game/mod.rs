@@ -212,9 +212,8 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let state2 = state.clone();
         let victory_trigger2 = victory_trigger.clone();
         let failure_trigger2 = failure_trigger.clone();
-        WidgetMapAction::new(
-            new_puzzle_widget(&state),
-            move |puzzle_action, context| {
+        new_puzzle_widget(&state)
+            .flat_map_action(move |puzzle_action, context| {
                 let score = state2.borrow_mut().stop();
                 match *puzzle_action {
                     PuzzleAction::Victory => {
@@ -227,8 +226,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                     }
                 }
                 Ok(EventReaction::update())
-            }
-        )
+            })
     });
 
     container.push(348, 68,
@@ -250,9 +248,8 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         let save_game_trigger2 = save_game_trigger.clone();
         let show_opts_trigger2 = show_opts_trigger.clone();
         let show_help_trigger2 = show_help_trigger.clone();
-        WidgetMapAction::new(
-            make_game_menu(messages),
-            move |menu_action, _| {
+        make_game_menu(messages)
+            .flat_map_action(move |menu_action, _| {
                 match menu_action {
                     MenuAction::Pause => {
                         this_state.borrow_mut().stop();
@@ -282,8 +279,7 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
                         Ok(EventReaction::empty())
                     },
                 }
-            }
-        )
+            })
     });
 
     container.push(0, 0, {
