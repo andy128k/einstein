@@ -165,9 +165,9 @@ impl GamePrivate {
 
 fn game_popup_background<A: 'static>(messages: &'static Messages, state: &Rc<RefCell<GamePrivate>>) -> Container<A> {
     Container::screen_modal(Background::Image(&RAIN, false, None))
-        .add(8, 10, WidgetMapAction::no_action(
-            GameTitle::new(messages.einstein_puzzle, state.clone())
-        ))
+        .add(8, 10,
+            GameTitle::new(messages.einstein_puzzle, state.clone()).no_action()
+        )
 }
 
 #[derive(Clone)]
@@ -204,9 +204,9 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
 
     let mut container = Container::<()>::screen_modal(Background::Image(&RAIN, false, None));
 
-    container.push(8, 10, WidgetMapAction::no_action(
-        GameTitle::new(messages.einstein_puzzle, state.clone())
-    ));
+    container.push(8, 10,
+        GameTitle::new(messages.einstein_puzzle, state.clone()).no_action()
+    );
 
     container.push(12, 68, {
         let state2 = state.clone();
@@ -231,18 +231,18 @@ pub fn new_game_widget(storage: Rc<RefCell<Storage>>, state: Rc<RefCell<GamePriv
         )
     });
 
-    container.push(348, 68, WidgetMapAction::no_action(
+    container.push(348, 68,
         create_horizontal_rules(
             Size::new(800 - 348 - 12, 412),
             state.clone()
-        )
-    ));
-    container.push(12, 495, WidgetMapAction::no_action(
+        ).no_action()
+    );
+    container.push(12, 495,
         create_vertical_rules(
             Size::new(800 - 12 * 2, 48 * 2),
             state.clone()
-        )
-    ));
+        ).no_action()
+    );
 
     container.push(12, 400, {
         let this_state = state.clone();

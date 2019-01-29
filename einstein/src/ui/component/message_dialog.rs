@@ -9,9 +9,9 @@ pub fn create_message_dialog(theme: DialogTheme, message: &str) -> Container<()>
     let size = Size::new(500, 400);
 
     let container = dialog_container(size, theme)
-        .add(0, 0, WidgetMapAction::no_action(
-            Label::new(size, message, theme.text_color(), HorizontalAlign::Center)
-        ))
+        .add(0, 0,
+            Label::new(size, message, theme.text_color(), HorizontalAlign::Center).no_action()
+        )
         .add(0, 0,
             AnyKey::new(())
         );

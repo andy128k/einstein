@@ -122,10 +122,6 @@ impl<AF, WF, AT> WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
     {
         Self { wrapped, convert: Box::new(convert) }
     }
-
-    pub fn no_action(wrapped: WF) -> Self {
-        Self { wrapped, convert: Box::new(|_, _| Ok(EventReaction::empty())) }
-    }
 }
 
 impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
@@ -199,6 +195,6 @@ impl<A, AnyWidget, AT> WidgetNoActionExt<WidgetMapAction<A, Self, AT>, AT> for A
         AnyWidget: Widget<A>,
 {
     fn no_action(self) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction::no_action(self)
+        WidgetMapAction { wrapped: self, convert: Box::new(|_, _| Ok(EventReaction::empty())) }
     }
 }

@@ -13,9 +13,9 @@ pub fn new_load_game_dialog(saved_games: &[Option<SavedGame>], messages: &Messag
 
     let mut container = dialog_container(Size::new(300, 420), theme);
 
-    container.push(0, 5, WidgetMapAction::no_action(
-        Label::title(Size::new(300, 40), messages.load_game)
-    ));
+    container.push(0, 5,
+        Label::title(Size::new(300, 40), messages.load_game).no_action()
+    );
 
     for (i, game) in saved_games.iter().enumerate() {
         let label: String = match *game {

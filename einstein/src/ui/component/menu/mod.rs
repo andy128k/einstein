@@ -45,13 +45,13 @@ pub fn make_menu(messages: &'static Messages, storage: Rc<RefCell<Storage>>) -> 
 
     let mut container = Container::<MainLoopQuit>::modal(Size::new(800, 600), Background::Image(&MENU_BG, false, None));
 
-    container.push(0, 30, WidgetMapAction::no_action(
-        Label::title(Size::new(800, 30), messages.einstein_flowix)
-    ));
+    container.push(0, 30,
+        Label::title(Size::new(800, 30), messages.einstein_flowix).no_action()
+    );
 
-    container.push(0, 60, WidgetMapAction::no_action(
-        Label::new(Size::new(800, 30), "http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center)
-    ));
+    container.push(0, 60,
+        Label::new(Size::new(800, 30), "http://games.flowix.com", Color::RGB(255, 255, 0), HorizontalAlign::Center).no_action()
+    );
 
     container.push(550, 340, {
         let new_game_trigger2 = new_game_trigger.clone();

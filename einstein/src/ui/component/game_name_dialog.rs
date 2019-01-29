@@ -19,9 +19,9 @@ pub fn new_game_name(name: &str, messages: &Messages) -> Container<DialogResult<
     ));
 
     let container = dialog_container(Size::new(460, 100), theme)
-        .add(10, 20, WidgetMapAction::no_action(
-            Label::new(Size::new(150, 26), messages.enter_game, yellow, HorizontalAlign::Left)
-        ))
+        .add(10, 20,
+            Label::new(Size::new(150, 26), messages.enter_game, yellow, HorizontalAlign::Left).no_action()
+        )
         .add(170, 20, {
             let state2 = state.clone();
             WidgetMapAction::new(

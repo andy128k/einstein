@@ -19,12 +19,12 @@ pub fn new_help_dialog(messages: &Messages) -> Container<()> {
     let theme = DialogTheme::Blue;
 
     let container = dialog_container(Size::new(WIDTH, HEIGHT), theme)
-        .add(150, 10, WidgetMapAction::no_action(
-            Label::title(Size::new(300, 40), messages.rules)
-        ))
-        .add(15, 50, WidgetMapAction::no_action(
-            PageView::new(Size::new(CLIENT_WIDTH, CLIENT_HEIGHT), &state)
-        ))
+        .add(150, 10,
+            Label::title(Size::new(300, 40), messages.rules).no_action()
+        )
+        .add(15, 50,
+            PageView::new(Size::new(CLIENT_WIDTH, CLIENT_HEIGHT), &state).no_action()
+        )
         .add(10, 465, {
             let state2 = state.clone();
             WidgetMapAction::new(

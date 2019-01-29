@@ -28,9 +28,9 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
 
     let mut container = dialog_container(Size::new(300, 260), theme);
 
-    container.push(0, 5, WidgetMapAction::no_action(
-        Label::title(Size::new(300, 40), messages.options)
-    ));
+    container.push(0, 5,
+        Label::title(Size::new(300, 40), messages.options).no_action()
+    );
     container.push(15, 90, {
         let state2 = state.clone();
         WidgetMapAction::new(
@@ -41,12 +41,12 @@ pub fn new_options_dialog(storage: &Storage, messages: &Messages) -> Container<D
             }
         )
     });
-    container.push(50, 90, WidgetMapAction::no_action(
-        Label::new(Size::new(300, 20), messages.fullscreen, Color::RGB(255, 255, 255), HorizontalAlign::Left)
-    ));
-    container.push(15, 160, WidgetMapAction::no_action(
-        Label::new(Size::new(300, 20), messages.volume, Color::RGB(255, 255, 255), HorizontalAlign::Left)
-    ));
+    container.push(50, 90,
+        Label::new(Size::new(300, 20), messages.fullscreen, Color::RGB(255, 255, 255), HorizontalAlign::Left).no_action()
+    );
+    container.push(15, 160,
+        Label::new(Size::new(300, 20), messages.volume, Color::RGB(255, 255, 255), HorizontalAlign::Left).no_action()
+    );
     container.push(110, 162, {
         let state2 = state.clone();
         WidgetMapAction::new(

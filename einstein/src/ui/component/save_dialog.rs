@@ -15,9 +15,9 @@ pub fn new_save_game_dialog(saved_games: &[Option<SavedGame>], messages: &'stati
 
     let mut container = dialog_container(Size::new(300, 420), theme);
 
-    container.push(0, 5, WidgetMapAction::no_action(
-        Label::title(Size::new(300, 40), messages.save_game)
-    ));
+    container.push(0, 5,
+        Label::title(Size::new(300, 40), messages.save_game).no_action()
+    );
 
     let ask_name: Rc<RefCell<Option<(usize, String)>>> = Rc::new(RefCell::new(None));
 

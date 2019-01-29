@@ -17,9 +17,9 @@ pub fn new_failure_dialog(messages: &Messages) -> Container<FailureChoice> {
     let theme = DialogTheme::Red;
 
     let container = dialog_container(Size::new(360, 140), theme)
-        .add(30, 10, WidgetMapAction::no_action(
-            Label::title(Size::new(300, 100), messages.loose)
-        ))
+        .add(30, 10,
+            Label::title(Size::new(300, 100), messages.loose).no_action()
+        )
         .add(30, 100,
             DialogButton::new(Size::new(90, 25), theme, messages.start_new, &[], FailureChoice::StartNew)
         )

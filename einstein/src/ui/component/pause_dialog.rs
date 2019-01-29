@@ -11,9 +11,9 @@ pub fn new_pause_dialog(messages: &Messages) -> Container<()> {
     let size = Size::new(240, 50);
 
     let container = dialog_container(size, DialogTheme::Green)
-        .add(0, 0, WidgetMapAction::no_action(
-            Label::new(size, messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center)
-        ))
+        .add(0, 0,
+            Label::new(size, messages.paused, Color::RGB(255, 255, 0), HorizontalAlign::Center).no_action()
+        )
         .add(0, 0,
             AnyKey::new(())
         );
