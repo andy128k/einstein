@@ -3,8 +3,13 @@ use crate::ui::common::Rect;
 use crate::resources::manager::Resource;
 
 pub const LARGE_THINGS_ATLAS: Resource = resource!("./large.bmp");
+pub const LARGE_THINGS_ATLAS_HIGHLIGHTED: Resource = resource!("./large-h.bmp");
+
 pub const SMALL_THINGS_ATLAS: Resource = resource!("./small.bmp");
+pub const SMALL_THINGS_ATLAS_HIGHLIGHTED: Resource = resource!("./small-h.bmp");
+
 pub const EMPTY_TILE: Resource = resource!("./tile.bmp");
+pub const EMPTY_TILE_HIGHLIGHTED: Resource = resource!("./tile-h.bmp");
 
 const LARGE_TILE_WIDTH: i32 = 48;
 const LARGE_TILE_HEIGHT: i32 = 48;

@@ -24,8 +24,14 @@ macro_rules! resource {
     };
 }
 
+fn load_image(data: &[u8]) -> Result<Surface, failure::Error> {
+    let mut rw = RWops::from_bytes(data).map_err(failure::err_msg)?;
+    let surface = Surface::load_bmp_rw(&mut rw).map_err(failure::err_msg)?;
+    Ok(surface)
+}
+
 pub trait ResourceManager {
-    fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture>;
+    fn image(&self, resource: &'static Resource) -> Ref<Texture>;
     fn font(&self, point_size: u16) -> Ref<Font>;
     fn chunk(&self, resource: &'static Resource) -> Ref<Chunk>;
 }
@@ -52,41 +58,17 @@ impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
             phantom_data: PhantomData,
         }
     }
-
-    fn load_image(&self, data: &[u8]) -> Result<Texture<'r>, ::failure::Error> {
-        let mut rw = RWops::from_bytes(data).map_err(::failure::err_msg)?;
-        let surface = Surface::load_bmp_rw(&mut rw).map_err(::failure::err_msg)?;
-        let texture = self.texture_creator.create_texture_from_surface(surface)?;
-        Ok(texture)
-    }
-
-    fn image_normal(&self, name: &'static str, data: &[u8]) -> Ref<Texture<'r>> {
-        let key = name.to_owned();
-        if self.images.borrow().get(&key).is_none() {
-            let mut img = self.load_image(data).unwrap();
-            img.set_color_mod(230, 230, 230); // TODO: remove this hack
-            self.images.borrow_mut().insert(key.clone(), img);
-        }
-        Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
-    }
-
-    fn image_highlighted(&self, name: &'static str, data: &[u8]) -> Ref<Texture> {
-        let key = format!("{}_HIGHLIGHTED", name);
-        if self.images.borrow().get(&key).is_none() {
-            let img = self.load_image(data).unwrap();
-            self.images.borrow_mut().insert(key.clone(), img);
-        }
-        Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
-    }
 }
 
 impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
-    fn image(&self, resource: &'static Resource, highlighted: bool) -> Ref<Texture> {
-        if highlighted {
-            self.image_highlighted(resource.name, resource.data)
-        } else {
-            self.image_normal(resource.name, resource.data)
+    fn image(&self, resource: &'static Resource) -> Ref<Texture> {
+        let key = resource.name.to_owned();
+        if self.images.borrow().get(&key).is_none() {
+            let surface = load_image(resource.data).unwrap();
+            let texture = self.texture_creator.create_texture_from_surface(surface).unwrap();
+            self.images.borrow_mut().insert(key.clone(), texture);
         }
+        Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
 
     fn font(&self, point_size: u16) -> Ref<Font> {

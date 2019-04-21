@@ -11,27 +11,7 @@ pub enum Border {
 #[derive(Clone, Copy)]
 pub enum Background {
     Color(Color),
-    Image(&'static Resource, bool, Option<Rect>),
-}
-
-fn gamma(v: u8, k: f64) -> u8 {
-    (255.0 * (v as f64 / 255.0).powf(1.0 / k)).round().min(255.0) as u8
-}
-
-const GAMMA_K: f64 = 1.5;
-
-impl Background {
-    pub fn highlighted(self) -> Self {
-        match self {
-            Background::Color(Color { r, g, b, a }) => Background::Color(Color {
-                r: gamma(r, GAMMA_K),
-                g: gamma(g, GAMMA_K),
-                b: gamma(b, GAMMA_K),
-                a: a,
-            }),
-            Background::Image(resource, _, rect) => Background::Image(resource, true, rect),
-        }
-    }
+    Image(&'static Resource, Option<Rect>),
 }
 
 #[derive(Clone, Copy)]

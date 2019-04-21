@@ -111,8 +111,8 @@ impl Brick {
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(::failure::err_msg)?;
             },
-            Some(Background::Image(resource, highlight, s_rect)) => {
-                let image = resource_manager.image(&resource, highlight);
+            Some(Background::Image(resource, s_rect)) => {
+                let image = resource_manager.image(&resource);
                 let src_rect = s_rect.unwrap_or_else(|| {
                     let q = image.query();
                     Rect::new(0, 0, q.width, q.height)

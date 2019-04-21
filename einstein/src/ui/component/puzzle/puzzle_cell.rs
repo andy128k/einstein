@@ -10,7 +10,15 @@ use crate::ui::brick::*;
 use crate::ui::context::Context;
 use crate::ui::component::game::GamePrivate;
 use crate::resources::manager::ResourceManager;
-use crate::resources::thing::{get_thing_rect, get_small_thing_rect, LARGE_THINGS_ATLAS, SMALL_THINGS_ATLAS, EMPTY_TILE};
+use crate::resources::thing::{
+    get_thing_rect,
+    get_small_thing_rect,
+    LARGE_THINGS_ATLAS,
+    LARGE_THINGS_ATLAS_HIGHLIGHTED,
+    SMALL_THINGS_ATLAS,
+    SMALL_THINGS_ATLAS_HIGHLIGHTED,
+    EMPTY_TILE,
+};
 use crate::resources::audio::LASER;
 
 const PUZZLE_SIZE: u8 = 6;
@@ -151,9 +159,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
             let highlight = self.highlighted.get() == Some(None);
 
             let rect = get_thing_rect(thing);
-            brick = brick.background(Background::Image(&LARGE_THINGS_ATLAS, highlight, Some(rect)));
+            brick = brick.background(Background::Image(if highlight { &LARGE_THINGS_ATLAS_HIGHLIGHTED } else { &LARGE_THINGS_ATLAS }, Some(rect)));
         } else {
-            brick = brick.background(Background::Image(&EMPTY_TILE, false, None));
+            brick = brick.background(Background::Image(&EMPTY_TILE, None));
 
             for i in 0..PUZZLE_SIZE {
                 let choice_rect = local_choice_cell_rect(i);
@@ -166,7 +174,7 @@ impl Widget<PuzzleAction> for PuzzleCell {
                         choice_rect.left() as u32,
                         choice_rect.top() as u32,
                         Brick::new(choice_rect.width(), choice_rect.height())
-                            .background(Background::Image(&SMALL_THINGS_ATLAS, highlight, Some(rect)))
+                            .background(Background::Image(if highlight { &SMALL_THINGS_ATLAS_HIGHLIGHTED } else { &SMALL_THINGS_ATLAS }, Some(rect)))
                     );
                 }
             }

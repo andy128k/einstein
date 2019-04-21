@@ -11,40 +11,52 @@ use crate::ui::context::Context;
 use crate::ui::component::game::{GamePrivate};
 use crate::resources::manager::{ResourceManager, Resource};
 use crate::resources::audio::WHIZZ;
-use crate::resources::thing::{get_thing_rect, LARGE_THINGS_ATLAS, EMPTY_TILE};
+use crate::resources::thing::{
+    get_thing_rect,
+    LARGE_THINGS_ATLAS,
+    LARGE_THINGS_ATLAS_HIGHLIGHTED,
+    EMPTY_TILE,
+    EMPTY_TILE_HIGHLIGHTED,
+};
 use crate::rules::{Rule, Thing};
 
 pub const TILE_WIDTH: u32 = 48;
 pub const TILE_HEIGHT: u32 = 48;
 
 const HINT_NEAR_ICON: Resource = resource!("./hint-near.bmp");
+const HINT_NEAR_ICON_HIGHLIGHTED: Resource = resource!("./hint-near-h.bmp");
+
 const HINT_SIDE_ICON: Resource = resource!("./hint-side.bmp");
+const HINT_SIDE_ICON_HIGHLIGHTED: Resource = resource!("./hint-side-h.bmp");
+
 const HINT_BETWEEN_ICON: Resource = resource!("./betwarr.bmp");
+const HINT_BETWEEN_ICON_HIGHLIGHTED: Resource = resource!("./betwarr-h.bmp");
 
 fn draw_thing(thing: Thing, highlighted: bool) -> Brick {
     Brick::new(TILE_WIDTH, TILE_HEIGHT)
-        .background(Background::Image(&LARGE_THINGS_ATLAS, highlighted, Some(get_thing_rect(thing))))
+        .background(Background::Image(if highlighted { &LARGE_THINGS_ATLAS_HIGHLIGHTED } else { &LARGE_THINGS_ATLAS }, Some(get_thing_rect(thing))))
 }
 
-pub fn draw_rule(rule: &Rule, highlighted: bool) -> Brick {
+fn draw_rule(rule: &Rule, highlighted: bool) -> Brick {
+    let bg = Background::Image(if highlighted { &EMPTY_TILE_HIGHLIGHTED } else { &EMPTY_TILE }, None);
     match *rule {
         Rule::Near(thing1, thing2) => {
             Brick::new(TILE_WIDTH * 3, TILE_HEIGHT)
-                .background(Background::Image(&EMPTY_TILE, highlighted, None))
+                .background(bg)
                 .add(0, 0, draw_thing(thing1, highlighted))
-                .add(TILE_WIDTH, 0, Brick::new(TILE_WIDTH, TILE_HEIGHT).background(Background::Image(&HINT_NEAR_ICON, highlighted, None)))
+                .add(TILE_WIDTH, 0, Brick::new(TILE_WIDTH, TILE_HEIGHT).background(Background::Image(if highlighted { &HINT_NEAR_ICON_HIGHLIGHTED } else { &HINT_NEAR_ICON }, None)))
                 .add(TILE_WIDTH * 2, 0, draw_thing(thing2, highlighted))
         },
         Rule::Direction(thing1, thing2) => {
             Brick::new(TILE_WIDTH * 3, TILE_HEIGHT)
-                .background(Background::Image(&EMPTY_TILE, highlighted, None))
+                .background(bg)
                 .add(0, 0, draw_thing(thing1, highlighted))
                 .add(TILE_WIDTH * 2, 0, draw_thing(thing2, highlighted))
-                .add(TILE_WIDTH, 0, Brick::new(TILE_WIDTH, TILE_HEIGHT).background(Background::Image(&HINT_SIDE_ICON, highlighted, None)))
+                .add(TILE_WIDTH, 0, Brick::new(TILE_WIDTH, TILE_HEIGHT).background(Background::Image(if highlighted { &HINT_SIDE_ICON_HIGHLIGHTED } else { &HINT_SIDE_ICON }, None)))
         },
         Rule::Under(thing1, thing2) => {
             Brick::new(TILE_WIDTH, TILE_HEIGHT * 2)
-                .background(Background::Image(&EMPTY_TILE, highlighted, None))
+                .background(bg)
                 .add(0, 0, draw_thing(thing1, highlighted))
                 .add(0, TILE_HEIGHT, draw_thing(thing2, highlighted))
         },
@@ -53,7 +65,7 @@ pub fn draw_rule(rule: &Rule, highlighted: bool) -> Brick {
                 .add(0, 0, draw_thing(thing1, highlighted))
                 .add(TILE_WIDTH, 0, draw_thing(thing2, highlighted))
                 .add(TILE_WIDTH * 2, 0, draw_thing(thing3, highlighted))
-                .add((3 * TILE_WIDTH - 70) / 2, 0, Brick::new(70, 15).background(Background::Image(&HINT_BETWEEN_ICON, highlighted, None)))
+                .add((3 * TILE_WIDTH - 70) / 2, 0, Brick::new(70, 15).background(Background::Image(if highlighted { &HINT_BETWEEN_ICON_HIGHLIGHTED } else { &HINT_BETWEEN_ICON }, None)))
         },
         _ => {
             Brick::new(0, 0)
@@ -128,7 +140,7 @@ impl Widget<usize> for RuleWidget {
             draw_rule(&rule, self.highlighted.get())
         } else {
             Brick::new(self.size.width, self.size.height)
-                .background(Background::Image(&EMPTY_TILE, self.highlighted.get(), None))
+                .background(Background::Image(if self.highlighted.get() { &EMPTY_TILE_HIGHLIGHTED } else { &EMPTY_TILE }, None))
         }
     }
 }
