@@ -192,7 +192,7 @@ fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
 
     let texture_creator = canvas.texture_creator();
     if shadow {
-        let shadow_surface = font.render(text).blended(Color::RGBA(1, 1, 1, 1))?;
+        let shadow_surface = font.render(text).blended(Color::RGBA(0, 0, 0, 0))?;
         let shadow_texture = texture_creator.create_texture_from_surface(shadow_surface)?;
         let TextureQuery { width, height, .. } = shadow_texture.query();
         canvas.copy(&shadow_texture, None, rect_to_rect2(Rect::new(x + 1, y + 1, width, height))).map_err(::failure::err_msg)?;
