@@ -16,7 +16,7 @@ serde_json = "1.0.11"
 regex = "*"
 lazy_static = "*"
 debug-cell = "0.1.0"
-dirs = "1.0.4"
+dirs = "2"
 ropey = "1.0.0"
 
 [target.'cfg(windows)'.dependencies]
