@@ -11,7 +11,7 @@ use crate::resources::audio::CLICK;
 pub struct Checkbox {
     checked: Cell<bool>,
     mouse_inside: Cell<bool>,
-    draw: Box<Fn(Size, bool, bool, &dyn ResourceManager) -> Brick>,
+    draw: Box<dyn Fn(Size, bool, bool, &dyn ResourceManager) -> Brick>,
 }
 
 impl Checkbox {

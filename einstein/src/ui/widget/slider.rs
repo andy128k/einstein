@@ -11,7 +11,7 @@ pub struct Slider {
     value: Cell<f32>,
     highlight: Cell<bool>,
     dragging: Cell<Option<i32>>,
-    draw: Box<Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick>,
+    draw: Box<dyn Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick>,
 }
 
 impl Slider {
