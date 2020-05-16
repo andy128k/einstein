@@ -47,10 +47,10 @@ impl Slider {
         let rect = self.get_size().to_rect();
         let slider_x = self.value_to_x(self.value.get());
         Rect::new(
-            rect.left() + slider_x as i32,
-            rect.top(),
-            rect.height(),
-            rect.height(),
+            rect.left + slider_x as i32,
+            rect.top,
+            rect.height,
+            rect.height,
         )
     }
 

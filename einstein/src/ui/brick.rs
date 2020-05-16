@@ -174,8 +174,8 @@ impl Brick {
     }
 }
 
-fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
-    ::sdl2::rect::Rect::new(rect.0, rect.1, rect.2, rect.3)
+fn rect_to_rect2(rect: Rect) -> sdl2::rect::Rect {
+    sdl2::rect::Rect::new(rect.left, rect.top, rect.width, rect.height)
 }
 
 fn sprite(
@@ -184,17 +184,17 @@ fn sprite(
     src_image: &Texture,
     src_rect: Rect,
 ) -> Result<()> {
-    let tile_width = src_rect.width();
-    let tile_height = src_rect.height();
+    let tile_width = src_rect.width;
+    let tile_height = src_rect.height;
 
-    let cw = (rect.width() + tile_width - 1) / tile_width;
-    let ch = (rect.height() + tile_height - 1) / tile_height;
+    let cw = (rect.width + tile_width - 1) / tile_width;
+    let ch = (rect.height + tile_height - 1) / tile_height;
 
     for j in 0..ch {
         for i in 0..cw {
             let dst = Rect::new(
-                rect.left() + ((i * tile_width) as i32),
-                rect.top() + ((j * tile_height) as i32),
+                rect.left + ((i * tile_width) as i32),
+                rect.top + ((j * tile_height) as i32),
                 tile_width,
                 tile_height,
             );
@@ -233,15 +233,15 @@ fn render_text(
     let (w, h) = font.size_of(text)?;
 
     let x = match horizontal_align {
-        HorizontalAlign::Left => rect.left(),
-        HorizontalAlign::Center => rect.left() + (rect.width().saturating_sub(w) as i32) / 2,
-        HorizontalAlign::Right => rect.left() + (rect.width().saturating_sub(w) as i32),
+        HorizontalAlign::Left => rect.left,
+        HorizontalAlign::Center => rect.left + (rect.width.saturating_sub(w) as i32) / 2,
+        HorizontalAlign::Right => rect.left + (rect.width.saturating_sub(w) as i32),
     };
 
     let y = match vertical_align {
-        VerticalAlign::Top => rect.top(),
-        VerticalAlign::Middle => rect.top() + (rect.height().saturating_sub(h) as i32) / 2,
-        VerticalAlign::Bottom => rect.top() + (rect.height().saturating_sub(h) as i32),
+        VerticalAlign::Top => rect.top,
+        VerticalAlign::Middle => rect.top + (rect.height.saturating_sub(h) as i32) / 2,
+        VerticalAlign::Bottom => rect.top + (rect.height.saturating_sub(h) as i32),
     };
 
     let texture_creator = canvas.texture_creator();
@@ -281,10 +281,10 @@ fn bevel(
     top_left: Color,
     bottom_right: Color,
 ) -> Result<()> {
-    let left = rect.left();
-    let top = rect.top();
-    let width = rect.width();
-    let height = rect.height();
+    let left = rect.left;
+    let top = rect.top;
+    let width = rect.width;
+    let height = rect.height;
     let right = left + (width as i32) - 1;
     let bottom = top + (height as i32) - 1;
 
@@ -313,10 +313,10 @@ fn etched(
     bottom_right: Color,
 ) -> Result<()> {
     let inner_rect = Rect::new(
-        rect.left() + 1,
-        rect.top() + 1,
-        rect.width() - 2,
-        rect.height() - 2,
+        rect.left + 1,
+        rect.top + 1,
+        rect.width.saturating_sub(2),
+        rect.height.saturating_sub(2),
     );
     bevel(canvas, inner_rect, top_left, bottom_right)?;
     bevel(canvas, rect, bottom_right, top_left)?;

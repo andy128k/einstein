@@ -14,13 +14,13 @@ pub fn dialog_slider(theme: DialogTheme, size: Size, value: f32) -> Slider {
 
             let scale = Brick::new(size.width, 4).border(Border::Beveled(color2, color1));
 
-            let slider = Brick::new(slider_rect.width(), slider_rect.height())
+            let slider = Brick::new(slider_rect.width, slider_rect.height)
                 .background(background)
                 .border(Border::Beveled(color1, color2));
 
             Brick::new(size.width, size.height)
                 .add(0, (size.height - 4) / 2, scale)
-                .add(slider_rect.left() as u32, slider_rect.top() as u32, slider)
+                .add(slider_rect.left as u32, slider_rect.top as u32, slider)
         },
     )
 }

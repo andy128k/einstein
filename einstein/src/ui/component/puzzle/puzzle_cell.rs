@@ -232,9 +232,9 @@ impl Widget<PuzzleAction> for PuzzleCell {
 
                     let rect = get_small_thing_rect(thing);
                     brick.push(
-                        choice_rect.left() as u32,
-                        choice_rect.top() as u32,
-                        Brick::new(choice_rect.width(), choice_rect.height()).background(
+                        choice_rect.left as u32,
+                        choice_rect.top as u32,
+                        Brick::new(choice_rect.width, choice_rect.height).background(
                             Background::Image(
                                 if highlight {
                                     &SMALL_THINGS_ATLAS_HIGHLIGHTED
