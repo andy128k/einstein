@@ -1,10 +1,10 @@
-use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
+use crate::resources::manager::{Resource, ResourceManager};
+use crate::ui::brick::*;
 use crate::ui::common::Size;
 use crate::ui::widget::button::*;
 use crate::ui::widget::common::*;
-use crate::ui::brick::*;
-use crate::resources::manager::{ResourceManager, Resource};
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
 
 const BUTTON_BG_BYTES: Resource = resource!("./btn.bmp");
 const BUTTON_BG_HIGHLIGHTED_BYTES: Resource = resource!("./btn-highlighted.bmp");
@@ -23,7 +23,12 @@ impl ButtonRenderer for GameButton {
         };
         Brick::new(GAME_BUTTON_SIZE.width, GAME_BUTTON_SIZE.height)
             .background(image)
-            .text(Text::new(&self.text).font_size(FontSize::BUTTON).color(Color::RGB(255, 255, 0)).shadow())
+            .text(
+                Text::new(&self.text)
+                    .font_size(FontSize::BUTTON)
+                    .color(Color::RGB(255, 255, 0))
+                    .shadow(),
+            )
     }
 }
 
@@ -34,6 +39,6 @@ pub fn new_game_button<A>(text: &str, keys: &[Keycode], action: A) -> Button<Gam
         action,
         GameButton {
             text: text.to_string(),
-        }
+        },
     )
 }

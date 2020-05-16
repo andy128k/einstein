@@ -12,7 +12,10 @@ pub fn converge<T: Clone + PartialEq, F: Fn(T) -> T>(initial: T, step: F) -> T {
     }
 }
 
-pub fn converge_result<T: Clone + PartialEq, F: Fn(T) -> Result<T>>(initial: T, step: F) -> Result<T> {
+pub fn converge_result<T: Clone + PartialEq, F: Fn(T) -> Result<T>>(
+    initial: T,
+    step: F,
+) -> Result<T> {
     let mut previous = initial;
     loop {
         let next = step(previous.clone())?;

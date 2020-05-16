@@ -1,6 +1,6 @@
 mod base;
-mod rules_en;
 mod rules_de;
+mod rules_en;
 mod rules_ru;
 
 pub use self::base::TextItem;

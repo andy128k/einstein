@@ -1,5 +1,5 @@
-use std::ops::Drop;
 use sdl2::mixer;
+use std::ops::Drop;
 
 pub trait Audio {
     fn set_volume(&self, volume: u32);
@@ -21,7 +21,8 @@ impl SdlAudio {
 
 impl Audio for SdlAudio {
     fn set_volume(&self, volume: u32) {
-        self.channel.set_volume((volume as i32) * mixer::MAX_VOLUME / 100);
+        self.channel
+            .set_volume((volume as i32) * mixer::MAX_VOLUME / 100);
     }
 
     fn play(&self, chunk: &mixer::Chunk) -> Result<(), String> {

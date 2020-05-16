@@ -1,3 +1,3 @@
-pub mod retry;
 pub mod group_by_weight;
+pub mod retry;
 pub mod time;

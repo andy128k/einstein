@@ -1,13 +1,13 @@
 use crate::error::format_err;
-use crate::ui::common::Size;
-use crate::ui::widget::widget::*;
-use crate::ui::brick::*;
-use crate::ui::context::Context;
-use crate::resources::manager::ResourceManager;
 use crate::resources::audio::CLICK;
+use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::Size;
+use crate::ui::context::Context;
+use crate::ui::widget::widget::*;
 
 pub struct AnyKey<A> {
-    action: A
+    action: A,
 }
 
 impl<A> AnyKey<A> {
@@ -16,7 +16,10 @@ impl<A> AnyKey<A> {
     }
 }
 
-impl<A> Widget<A> for AnyKey<A> where A: Clone {
+impl<A> Widget<A> for AnyKey<A>
+where
+    A: Clone,
+{
     fn get_size(&self) -> Size {
         Size::EMPTY
     }
@@ -29,7 +32,7 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
                     .play(&*context.resource_manager().chunk(&CLICK))
                     .map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::action(self.action.clone()))
-            },
+            }
             _ => Ok(EventReaction::empty()),
         }
     }

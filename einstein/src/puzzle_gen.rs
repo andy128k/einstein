@@ -1,8 +1,8 @@
-use rand::Rng;
-use crate::rules::*;
-use crate::error::*;
 use crate::converge::converge_result;
+use crate::error::*;
+use crate::rules::*;
 use crate::util::retry::{retry, retry_result};
+use rand::Rng;
 
 fn can_solve(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<bool> {
     let pos = converge_result(Possibilities::new(), |mut pos| {
@@ -45,11 +45,9 @@ pub fn generate_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>)> 
         let mut vertical = 0;
         for rule in rules {
             match rule {
-                Rule::Near(..) |
-                Rule::Between(..) |
-                Rule::Direction(..) => horizontal += 1,
+                Rule::Near(..) | Rule::Between(..) | Rule::Direction(..) => horizontal += 1,
                 Rule::Under(..) => vertical += 1,
-                Rule::Open(..) => {},
+                Rule::Open(..) => {}
             }
         }
 
@@ -63,14 +61,14 @@ pub fn generate_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>)> 
             let reduced_rules = remove_rules(&puzzle, &rules)?;
             Ok((puzzle, reduced_rules))
         },
-        |(_puzzle, rules)| fits_into_ui(rules)
+        |(_puzzle, rules)| fits_into_ui(rules),
     )
 }
 
 #[cfg(test)]
 mod tests {
-    use rand::thread_rng;
     use super::*;
+    use rand::thread_rng;
 
     #[test]
     fn test_eq_generate_puzzle() {

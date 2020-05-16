@@ -1,27 +1,27 @@
-mod cell;
-mod error;
 mod algebra;
-mod util;
-mod locale;
+mod cell;
 mod converge;
-mod rules;
+mod error;
+mod locale;
 mod puzzle_gen;
+mod rules;
+mod util;
 #[macro_use]
 mod resources;
-mod ui;
-mod storage;
 mod audio;
+mod storage;
+mod ui;
 
-use std::process::exit;
-use std::rc::Rc;
+use crate::audio::*;
 use crate::cell::RefCell;
-use dirs::home_dir;
-use std::fs::create_dir_all;
 use crate::error::*;
 use crate::resources::messages::get_messages;
 use crate::ui::component::menu::make_menu;
 use crate::ui::context::*;
-use crate::audio::*;
+use dirs::home_dir;
+use std::fs::create_dir_all;
+use std::process::exit;
+use std::rc::Rc;
 
 fn real_main() -> Result<()> {
     let home = home_dir().ok_or_else(|| format_err!("Home directory is not detected."))?;
@@ -49,7 +49,8 @@ fn real_main() -> Result<()> {
 
     {
         let texture_creator = canvas.texture_creator();
-        let mut resource_manager = resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
+        let mut resource_manager =
+            resources::manager::ResourceManagerImpl::new(&texture_creator, &ttf);
 
         let context = crate::ui::context::AppContext {
             sdl_context: &sdl_context,

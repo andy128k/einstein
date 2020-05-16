@@ -38,4 +38,3 @@ pub const MESSAGES: Messages<'static> = Messages {
     enable_sound: "Audio aktivieren",
     volume: "Lautstärke:",
 };
-

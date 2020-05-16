@@ -1,11 +1,11 @@
+use crate::error::*;
+use crate::resources::manager::{Resource, ResourceManager};
+use crate::util::group_by_weight::group_by_weight;
 use itertools::join;
-use regex::Regex;
 use lazy_static::lazy_static;
+use regex::Regex;
 use sdl2::render::TextureQuery;
 use sdl2::ttf::Font;
-use crate::util::group_by_weight::group_by_weight;
-use crate::resources::manager::{ResourceManager, Resource};
-use crate::error::*;
 
 pub type Page = Vec<PageItem>;
 
@@ -17,15 +17,15 @@ pub enum PageItem {
 impl PageItem {
     fn get_height(&self) -> u16 {
         match *self {
-            PageItem::Text(_, _, _, _, h) |
-            PageItem::Image(_, _, _, _, h) => h
+            PageItem::Text(_, _, _, _, h) | PageItem::Image(_, _, _, _, h) => h,
         }
     }
 
     fn set_y(mut self, new_y: u16) -> Self {
         match self {
-            PageItem::Text(_, _, ref mut y, _, _) |
-            PageItem::Image(_, _, ref mut y, _, _) => *y = new_y
+            PageItem::Text(_, _, ref mut y, _, _) | PageItem::Image(_, _, ref mut y, _, _) => {
+                *y = new_y
+            }
         }
         self
     }
@@ -64,18 +64,14 @@ impl PagesBuilder {
             page_width,
             page_height,
             pages: vec![Page::new()],
-            y: 0
+            y: 0,
         }
     }
 
     fn add_item(&mut self, span: u16, item: PageItem) {
         let height = item.get_height();
 
-        let y = if self.y == 0 {
-            0
-        } else {
-            self.y + span
-        };
+        let y = if self.y == 0 { 0 } else { self.y + span };
 
         if y + height > self.page_height {
             let mut page = Page::new();
@@ -93,17 +89,27 @@ impl PagesBuilder {
         let mut span = 16;
         for line in lines {
             let (width, height) = font.size_of(&line)?;
-            self.add_item(span, PageItem::Text(line, 0, 0, width as u16, height as u16));
+            self.add_item(
+                span,
+                PageItem::Text(line, 0, 0, width as u16, height as u16),
+            );
             span = 4;
         }
         Ok(())
     }
 
-    pub fn add_image(&mut self, image: &'static Resource, resource_manager: &dyn ResourceManager) -> Result<()> {
+    pub fn add_image(
+        &mut self,
+        image: &'static Resource,
+        resource_manager: &dyn ResourceManager,
+    ) -> Result<()> {
         let img = resource_manager.image(image);
         let TextureQuery { width, height, .. } = img.query();
         let x = (self.page_width - width as u16) / 2;
-        self.add_item(16, PageItem::Image(image, x, 0, width as u16, height as u16));
+        self.add_item(
+            16,
+            PageItem::Image(image, x, 0, width as u16, height as u16),
+        );
         Ok(())
     }
 

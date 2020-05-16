@@ -1,10 +1,10 @@
-use std::fmt;
-use itertools::all;
-use rand::Rng;
-use rand::seq::SliceRandom;
-use serde::{Serialize, Deserialize};
 use crate::converge::converge;
 use crate::util::retry::retry;
+use itertools::all;
+use rand::seq::SliceRandom;
+use rand::Rng;
+use serde::{Deserialize, Serialize};
+use std::fmt;
 
 fn only<T>(values: &[T]) -> Option<&T> {
     if values.len() == 1 {
@@ -14,13 +14,15 @@ fn only<T>(values: &[T]) -> Option<&T> {
     }
 }
 
-
 pub const PUZZLE_SIZE: usize = 6;
 
 pub type Value = u8;
 
 #[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize)]
-pub struct Thing { pub row: u8, pub value: Value }
+pub struct Thing {
+    pub row: u8,
+    pub value: Value,
+}
 
 impl fmt::Display for Thing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -31,11 +33,10 @@ impl fmt::Display for Thing {
             3 => write!(f, "{}", ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value as usize]),
             4 => write!(f, "{}", ["α", "β", "γ", "δ", "ε", "ζ"][self.value as usize]),
             5 => write!(f, "{}", ["+", "-", "÷", "*", "=", "√"][self.value as usize]),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }
-
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
@@ -53,10 +54,12 @@ impl SolvedPuzzle {
     }
 
     pub fn get(&self, row: u8, col: u8) -> Thing {
-        Thing { row, value: self.0[row as usize][col as usize] }
+        Thing {
+            row,
+            value: self.0[row as usize][col as usize],
+        }
     }
 }
-
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct ValueSet([bool; PUZZLE_SIZE]);
@@ -168,7 +171,10 @@ impl PossibilitiesRow {
     }
 
     fn check_singles(&self) -> Self {
-        converge(*self, |p| p.check_single_value_in_a_cell().check_single_value_in_a_row())
+        converge(*self, |p| {
+            p.check_single_value_in_a_cell()
+                .check_single_value_in_a_row()
+        })
     }
 
     pub fn is_solved(&self) -> bool {
@@ -230,7 +236,7 @@ pub enum Rule {
     Direction(Thing, Thing),
     Open(u8, Thing), // column
     Under(Thing, Thing),
-    Between(Thing, Thing, Thing)
+    Between(Thing, Thing, Thing),
 }
 
 fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
@@ -270,7 +276,10 @@ fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
     let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row2 = retry(move || rng.gen_range(0, PUZZLE_SIZE as u8), |row2| row1 != *row2);
+    let row2 = retry(
+        move || rng.gen_range(0, PUZZLE_SIZE as u8),
+        |row2| row1 != *row2,
+    );
 
     let thing1 = puzzle.get(row1, col);
     let thing2 = puzzle.get(row2, col);
@@ -302,7 +311,7 @@ pub fn generate_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
         5 | 6 => generate_under_rule(rng, puzzle),
         7 | 8 | 9 | 10 => generate_direction_rule(rng, puzzle),
         11 | 12 | 13 => generate_between_rule(rng, puzzle),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
 
@@ -310,10 +319,14 @@ impl fmt::Display for Rule {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Rule::Near(thing1, thing2) => write!(f, "{} is near to {}", thing1, thing2),
-            Rule::Direction(thing1, thing2) => write!(f, "{} is from the left of {}", thing1, thing2),
+            Rule::Direction(thing1, thing2) => {
+                write!(f, "{} is from the left of {}", thing1, thing2)
+            }
             Rule::Open(col, thing) => write!(f, "{} is at column {}", thing, col + 1),
             Rule::Under(thing1, thing2) => write!(f, "{} is the same column as {}", thing1, thing2),
-            Rule::Between(thing1, thing2, thing3) => write!(f, "{} is between {} and {}", thing2, thing1, thing3)
+            Rule::Between(thing1, thing2, thing3) => {
+                write!(f, "{} is between {} and {}", thing2, thing1, thing3)
+            }
         }
     }
 }
@@ -321,7 +334,12 @@ impl fmt::Display for Rule {
 pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
     match *rule {
         Rule::Near(thing1, thing2) => {
-            fn is_applicable_to_col(pos: &Possibilities, col: u8, thing: Thing, neighbour: Thing) -> bool {
+            fn is_applicable_to_col(
+                pos: &Possibilities,
+                col: u8,
+                thing: Thing,
+                neighbour: Thing,
+            ) -> bool {
                 let has_left = if col == 0 {
                     false
                 } else {
@@ -333,7 +351,7 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 } else {
                     pos.is_possible(col + 1, neighbour)
                 };
-                
+
                 !has_right && !has_left && pos.is_possible(col, thing)
             }
             converge(*pos, |mut pos| {
@@ -347,7 +365,7 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 }
                 pos
             })
-        },
+        }
         Rule::Direction(thing1, thing2) => {
             let mut new_pos = *pos;
             for col in 0..PUZZLE_SIZE {
@@ -367,10 +385,8 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 }
             }
             new_pos
-        },
-        Rule::Open(col, thing) => {
-            pos.set(col, thing.row, thing.value)
-        },
+        }
+        Rule::Open(col, thing) => pos.set(col, thing.row, thing.value),
         Rule::Under(thing1, thing2) => {
             let mut new_pos = *pos;
             for col in 0..PUZZLE_SIZE {
@@ -382,27 +398,43 @@ pub fn apply(pos: &Possibilities, rule: &Rule) -> Possibilities {
                 }
             }
             new_pos
-        },
+        }
         Rule::Between(thing1, thing2, thing3) => {
-            fn check_middle_thing(pos: &Possibilities, col: u8, thing1: Thing, thing2: Thing, thing3: Thing) -> bool {
-                col > 0 && col < PUZZLE_SIZE as u8 - 1 &&
-                pos.is_possible(col as u8, thing2) && (
-                    (pos.is_possible(col as u8 - 1, thing1) && pos.is_possible(col as u8 + 1, thing3)) ||
-                    (pos.is_possible(col as u8 - 1, thing3) && pos.is_possible(col as u8 + 1, thing1))
-                )
+            fn check_middle_thing(
+                pos: &Possibilities,
+                col: u8,
+                thing1: Thing,
+                thing2: Thing,
+                thing3: Thing,
+            ) -> bool {
+                col > 0
+                    && col < PUZZLE_SIZE as u8 - 1
+                    && pos.is_possible(col as u8, thing2)
+                    && ((pos.is_possible(col as u8 - 1, thing1)
+                        && pos.is_possible(col as u8 + 1, thing3))
+                        || (pos.is_possible(col as u8 - 1, thing3)
+                            && pos.is_possible(col as u8 + 1, thing1)))
             }
 
-            fn check_side_thing(pos: &Possibilities, col: u8, thing1: Thing, thing2: Thing, thing3: Thing) -> bool {
+            fn check_side_thing(
+                pos: &Possibilities,
+                col: u8,
+                thing1: Thing,
+                thing2: Thing,
+                thing3: Thing,
+            ) -> bool {
                 if pos.is_possible(col as u8, thing3) {
                     let left_possible = if col < 2 {
                         false
                     } else {
-                        pos.is_possible(col as u8 - 1, thing2) && pos.is_possible(col as u8 - 2, thing1)
+                        pos.is_possible(col as u8 - 1, thing2)
+                            && pos.is_possible(col as u8 - 2, thing1)
                     };
                     let right_possible = if col >= PUZZLE_SIZE as u8 - 2 {
                         false
                     } else {
-                        pos.is_possible(col as u8 + 1, thing2) && pos.is_possible(col as u8 + 2, thing1)
+                        pos.is_possible(col as u8 + 1, thing2)
+                            && pos.is_possible(col as u8 + 2, thing1)
                     };
                     left_possible || right_possible
                 } else {

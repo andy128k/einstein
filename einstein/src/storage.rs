@@ -1,11 +1,11 @@
-use std::path::{Path, PathBuf};
-use std::io::{Read, Write};
-use std::fs::{File, create_dir_all};
-use dirs::home_dir;
-use serde::{Serialize, Deserialize};
-use serde_json;
 use crate::error::*;
 use crate::ui::component::game::GamePrivate;
+use dirs::home_dir;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::fs::{create_dir_all, File};
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
 
 fn read_file(filename: &Path) -> Result<Vec<u8>> {
     let mut file = File::open(filename)?;
@@ -50,14 +50,17 @@ impl Scores {
 
     pub fn is_deserving(&self, challenger: u32) -> bool {
         self.0.len() < MAX_SCORES
-        ||
-        self.0.last().map(|last| challenger < last.score).unwrap_or(false)
+            || self
+                .0
+                .last()
+                .map(|last| challenger < last.score)
+                .unwrap_or(false)
     }
 
     pub fn add_score_entry(&mut self, entry: Score) -> Option<usize> {
         if self.0.is_empty() {
             self.0.push(entry);
-            return Some(0)
+            return Some(0);
         }
         let index = self.0.iter().position(|ref e| e.score > entry.score);
         match index {
@@ -65,8 +68,8 @@ impl Scores {
                 self.0.insert(index, entry);
                 self.0.truncate(MAX_SCORES);
                 Some(index)
-            },
-            _ => None
+            }
+            _ => None,
         }
     }
 }

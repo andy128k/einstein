@@ -1,10 +1,10 @@
-use std::cell::Cell;
-use sdl2::mouse::MouseButton;
-use crate::ui::common::{Rect, Size};
-use crate::ui::brick::*;
-use crate::ui::widget::widget::*;
-use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::{Rect, Size};
+use crate::ui::context::Context;
+use crate::ui::widget::widget::*;
+use sdl2::mouse::MouseButton;
+use std::cell::Cell;
 
 pub struct Slider {
     size: Size,
@@ -15,7 +15,11 @@ pub struct Slider {
 }
 
 impl Slider {
-    pub fn new(size: Size, value: f32, draw: impl Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick + 'static) -> Self {
+    pub fn new(
+        size: Size,
+        value: f32,
+        draw: impl Fn(Size, Rect, bool, &dyn ResourceManager) -> Brick + 'static,
+    ) -> Self {
         Self {
             size,
             value: Cell::new(value),
@@ -42,7 +46,12 @@ impl Slider {
     fn get_slider_rect(&self) -> Rect {
         let rect = self.get_size().to_rect();
         let slider_x = self.value_to_x(self.value.get());
-        Rect::new(rect.left() + slider_x as i32, rect.top(), rect.height(), rect.height())
+        Rect::new(
+            rect.left() + slider_x as i32,
+            rect.top(),
+            rect.height(),
+            rect.height(),
+        )
     }
 
     fn drag_start(&self, x: i32, _y: i32) {
@@ -94,21 +103,23 @@ impl Widget<f32> for Slider {
 
     fn on_event(&mut self, event: &Event, _context: &dyn Context) -> EventResult<f32> {
         match *event {
-            Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_slider_rect().contains_point((x, y)) => {
+            Event::MouseButtonDown(MouseButton::Left, x, y)
+                if self.get_slider_rect().contains_point((x, y)) =>
+            {
                 self.drag_start(x, y);
                 Ok(EventReaction::empty())
-            },
+            }
             Event::MouseButtonUp(..) => {
                 self.drag_stop();
                 Ok(EventReaction::update_and_action(self.value.get()))
-            },
+            }
             Event::MouseMove(x, y) => {
                 if self.on_mouse_move(x, y) {
                     Ok(EventReaction::update())
                 } else {
                     Ok(EventReaction::empty())
                 }
-            },
+            }
             _ => Ok(EventReaction::empty()),
         }
     }
@@ -116,6 +127,11 @@ impl Widget<f32> for Slider {
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
         let x = self.value_to_x(self.value.get()) as u32;
         let slider_rect = Rect::new(x as i32, 0, self.size.height, self.size.height);
-        (self.draw)(self.get_size(), slider_rect, self.highlight.get(), _resource_manager)
+        (self.draw)(
+            self.get_size(),
+            slider_rect,
+            self.highlight.get(),
+            _resource_manager,
+        )
     }
 }

@@ -1,6 +1,6 @@
-use sdl2::pixels::Color;
-use crate::ui::common::Rect;
 use crate::resources::manager::Resource;
+use crate::ui::common::Rect;
+use sdl2::pixels::Color;
 
 #[derive(Clone, Copy)]
 pub enum Border {

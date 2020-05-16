@@ -1,9 +1,9 @@
-use sdl2::pixels::Color;
-use crate::ui::common::{Size, HorizontalAlign, VerticalAlign};
-use crate::ui::widget::common::*;
-use crate::ui::brick::*;
-use crate::ui::widget::widget::*;
 use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::{HorizontalAlign, Size, VerticalAlign};
+use crate::ui::widget::common::*;
+use crate::ui::widget::widget::*;
+use sdl2::pixels::Color;
 
 pub struct Label {
     size: Size,
@@ -39,15 +39,18 @@ impl Label {
 }
 
 impl Widget<Nothing> for Label {
-    fn get_size(&self) -> Size { self.size }
+    fn get_size(&self) -> Size {
+        self.size
+    }
 
     fn draw(&self, _resource_manager: &dyn ResourceManager) -> Brick {
-        Brick::new(self.get_size().width, self.get_size().height)
-            .text(Text::new(&self.text)
+        Brick::new(self.get_size().width, self.get_size().height).text(
+            Text::new(&self.text)
                 .font_size(self.font_size)
                 .color(self.color)
                 .shadow()
                 .halign(self.horizontal_align)
-                .valign(self.vertical_align))
+                .valign(self.vertical_align),
+        )
     }
 }

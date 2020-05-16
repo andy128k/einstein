@@ -1,6 +1,6 @@
 pub mod manager;
-pub mod background;
 pub mod audio;
-pub mod thing;
+pub mod background;
 pub mod messages;
 pub mod rules;
+pub mod thing;

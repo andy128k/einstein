@@ -1,28 +1,35 @@
+use crate::cell::RefCell;
+use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::Size;
+use crate::ui::context::Context;
+use crate::ui::widget::widget::*;
 use std::marker::PhantomData;
 use std::rc::Rc;
-use crate::cell::RefCell;
-use crate::ui::common::Size;
-use crate::ui::widget::widget::*;
-use crate::ui::brick::*;
-use crate::ui::context::Context;
-use crate::resources::manager::ResourceManager;
 
-pub struct ConditionalWidget<A, W, I> where W: Widget<A> {
+pub struct ConditionalWidget<A, W, I>
+where
+    W: Widget<A>,
+{
     wrapped: RefCell<Option<W>>,
     factory: Box<dyn Fn(&I) -> W>,
     condition: Rc<RefCell<Option<I>>>,
     phantom: PhantomData<A>,
 }
 
-impl<A, W, I> ConditionalWidget<A, W, I> where W: Widget<A> {
+impl<A, W, I> ConditionalWidget<A, W, I>
+where
+    W: Widget<A>,
+{
     pub fn new<F>(condition: Rc<RefCell<Option<I>>>, f: F) -> Self
-        where F: Fn(&I) -> W + 'static
+    where
+        F: Fn(&I) -> W + 'static,
     {
         Self {
             wrapped: RefCell::new(None),
             factory: Box::new(f),
             condition,
-            phantom: PhantomData
+            phantom: PhantomData,
         }
     }
 
@@ -42,7 +49,10 @@ impl<A, W, I> ConditionalWidget<A, W, I> where W: Widget<A> {
     }
 }
 
-impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
+impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I>
+where
+    W: Widget<A>,
+{
     fn get_size(&self) -> Size {
         self.check();
         match *self.wrapped.borrow() {
@@ -55,7 +65,7 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         self.check();
         match *self.wrapped.borrow_mut() {
             Some(ref mut widget) => widget.on_event(event, context),
-            None => Ok(EventReaction::empty())
+            None => Ok(EventReaction::empty()),
         }
     }
 
@@ -63,7 +73,7 @@ impl<A, W, I> Widget<A> for ConditionalWidget<A, W, I> where W: Widget<A> {
         self.check();
         match *self.wrapped.borrow() {
             Some(ref widget) => widget.draw(resource_manager),
-            None => Brick::new(0, 0)
+            None => Brick::new(0, 0),
         }
     }
 }

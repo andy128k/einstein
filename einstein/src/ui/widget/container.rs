@@ -1,9 +1,9 @@
-use crate::ui::common::Size;
-use crate::ui::widget::widget::*;
-use crate::ui::widget::common::*;
-use crate::ui::brick::*;
-use crate::ui::context::Context;
 use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::Size;
+use crate::ui::context::Context;
+use crate::ui::widget::common::*;
+use crate::ui::widget::widget::*;
 
 struct Child<A> {
     left: u32,
@@ -20,16 +20,38 @@ pub struct Container<A> {
 }
 
 impl<A> Container<A> {
-    pub fn container(size: Size, background: impl Into<Option<Background>>, border: impl Into<Option<Border>>) -> Self {
-        Container { size, background: background.into(), border: border.into(), children: Vec::new(), modal: false }
+    pub fn container(
+        size: Size,
+        background: impl Into<Option<Background>>,
+        border: impl Into<Option<Border>>,
+    ) -> Self {
+        Container {
+            size,
+            background: background.into(),
+            border: border.into(),
+            children: Vec::new(),
+            modal: false,
+        }
     }
 
     pub fn modal(size: Size, background: impl Into<Option<Background>>) -> Self {
-        Container { size, background: background.into(), border: None, children: Vec::new(), modal: true }
+        Container {
+            size,
+            background: background.into(),
+            border: None,
+            children: Vec::new(),
+            modal: true,
+        }
     }
 
     pub fn screen_modal(background: impl Into<Option<Background>>) -> Self {
-        Container { size: Size::new(800, 600), background: background.into(), border: None, children: Vec::new(), modal: true }
+        Container {
+            size: Size::new(800, 600),
+            background: background.into(),
+            border: None,
+            children: Vec::new(),
+            modal: true,
+        }
     }
 
     pub fn add<W: Widget<A> + 'static>(mut self, left: u32, top: u32, child: W) -> Self {
@@ -50,8 +72,13 @@ impl<A> Container<A> {
     }
 }
 
-impl<A> Widget<A> for Container<A> where A: Clone {
-    fn get_size(&self) -> Size { self.size }
+impl<A> Widget<A> for Container<A>
+where
+    A: Clone,
+{
+    fn get_size(&self) -> Size {
+        self.size
+    }
 
     fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         let mut reaction = EventReaction::empty();

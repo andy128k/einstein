@@ -1,11 +1,11 @@
+use crate::error::{format_err, Result};
+use crate::resources::manager::ResourceManager;
+use crate::ui::common::{HorizontalAlign, Rect, VerticalAlign};
+use crate::ui::widget::common::*;
 use sdl2::pixels::Color;
 use sdl2::render::{Canvas, Texture, TextureQuery};
-use sdl2::video::Window;
 use sdl2::ttf::Font;
-use crate::error::{Result, format_err};
-use crate::ui::widget::common::*;
-use crate::ui::common::{Rect, HorizontalAlign, VerticalAlign};
-use crate::resources::manager::ResourceManager;
+use sdl2::video::Window;
 
 pub struct Text {
     text: String,
@@ -97,21 +97,37 @@ impl Brick {
     }
 
     pub fn add(mut self, left: u32, top: u32, child: Self) -> Self {
-        self.children.push(Child { left, top, brick: child });
+        self.children.push(Child {
+            left,
+            top,
+            brick: child,
+        });
         self
     }
 
     pub fn push(&mut self, left: u32, top: u32, child: Self) {
-        self.children.push(Child { left, top, brick: child });
+        self.children.push(Child {
+            left,
+            top,
+            brick: child,
+        });
     }
 
-    pub fn draw(&self, canvas: &mut Canvas<Window>, left: u32, top: u32, resource_manager: &dyn ResourceManager) -> Result<()> {
+    pub fn draw(
+        &self,
+        canvas: &mut Canvas<Window>,
+        left: u32,
+        top: u32,
+        resource_manager: &dyn ResourceManager,
+    ) -> Result<()> {
         let rect = Rect::new(left as i32, top as i32, self.width, self.height);
         match self.background {
             Some(Background::Color(color)) => {
                 canvas.set_draw_color(color);
-                canvas.fill_rect(Some(rect_to_rect2(rect))).map_err(|e| format_err!("{}", e))?;
-            },
+                canvas
+                    .fill_rect(Some(rect_to_rect2(rect)))
+                    .map_err(|e| format_err!("{}", e))?;
+            }
             Some(Background::Image(resource, s_rect)) => {
                 let image = resource_manager.image(&resource);
                 let src_rect = s_rect.unwrap_or_else(|| {
@@ -119,23 +135,39 @@ impl Brick {
                     Rect::new(0, 0, q.width, q.height)
                 });
                 sprite(canvas, rect, &*image, src_rect)?;
-            },
-            None => {},
+            }
+            None => {}
         }
         if let Some(ref text) = self.text {
             let font = resource_manager.font(text.font_size.0);
-            render_text(canvas, rect, &text.text, &font, text.color, text.shadow, text.horizontal_align, text.vertical_align)?;
+            render_text(
+                canvas,
+                rect,
+                &text.text,
+                &font,
+                text.color,
+                text.shadow,
+                text.horizontal_align,
+                text.vertical_align,
+            )?;
         }
         match self.border {
             Some(Border::Beveled(color1, color2)) => bevel(canvas, rect, color1, color2)?,
             Some(Border::Etched(color1, color2)) => etched(canvas, rect, color1, color2)?,
-            None => {},
+            None => {}
         }
         for child in &self.children {
-            let r = Rect::new((left + child.left) as i32, (top + child.top) as i32, child.brick.width, child.brick.height);
+            let r = Rect::new(
+                (left + child.left) as i32,
+                (top + child.top) as i32,
+                child.brick.width,
+                child.brick.height,
+            );
             let child_rect = r.intersection(&rect).unwrap_or_default();
             canvas.set_clip_rect(Some(rect_to_rect2(child_rect)));
-            child.brick.draw(canvas, left + child.left, top + child.top, resource_manager)?;
+            child
+                .brick
+                .draw(canvas, left + child.left, top + child.top, resource_manager)?;
             canvas.set_clip_rect(None);
         }
         Ok(())
@@ -146,7 +178,12 @@ fn rect_to_rect2(rect: Rect) -> ::sdl2::rect::Rect {
     ::sdl2::rect::Rect::new(rect.0, rect.1, rect.2, rect.3)
 }
 
-fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect: Rect) -> Result<()> {
+fn sprite(
+    canvas: &mut Canvas<Window>,
+    rect: Rect,
+    src_image: &Texture,
+    src_rect: Rect,
+) -> Result<()> {
     let tile_width = src_rect.width();
     let tile_height = src_rect.height();
 
@@ -155,10 +192,21 @@ fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect
 
     for j in 0..ch {
         for i in 0..cw {
-            let dst = Rect::new(rect.left() + ((i * tile_width) as i32), rect.top() + ((j * tile_height) as i32), tile_width, tile_height);
+            let dst = Rect::new(
+                rect.left() + ((i * tile_width) as i32),
+                rect.top() + ((j * tile_height) as i32),
+                tile_width,
+                tile_height,
+            );
             let clip = dst.intersection(&rect).unwrap();
             canvas.set_clip_rect(Some(rect_to_rect2(clip)));
-            canvas.copy(&src_image, Some(rect_to_rect2(src_rect)), Some(rect_to_rect2(dst))).map_err(|e| format_err!("{}", e))?;
+            canvas
+                .copy(
+                    &src_image,
+                    Some(rect_to_rect2(src_rect)),
+                    Some(rect_to_rect2(dst)),
+                )
+                .map_err(|e| format_err!("{}", e))?;
             canvas.set_clip_rect(None);
         }
     }
@@ -166,11 +214,16 @@ fn sprite(canvas: &mut Canvas<Window>, rect: Rect, src_image: &Texture, src_rect
     Ok(())
 }
 
-fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
+fn render_text(
+    canvas: &mut Canvas<Window>,
+    rect: Rect,
     text: &str,
-    font: &Font, color: Color, shadow: bool,
-    horizontal_align: HorizontalAlign, vertical_align: VerticalAlign) -> Result<()>
-{
+    font: &Font,
+    color: Color,
+    shadow: bool,
+    horizontal_align: HorizontalAlign,
+    vertical_align: VerticalAlign,
+) -> Result<()> {
     if text.is_empty() {
         return Ok(());
     }
@@ -182,13 +235,13 @@ fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
     let x = match horizontal_align {
         HorizontalAlign::Left => rect.left(),
         HorizontalAlign::Center => rect.left() + (rect.width().saturating_sub(w) as i32) / 2,
-        HorizontalAlign::Right => rect.left() + (rect.width().saturating_sub(w) as i32)
+        HorizontalAlign::Right => rect.left() + (rect.width().saturating_sub(w) as i32),
     };
 
     let y = match vertical_align {
         VerticalAlign::Top => rect.top(),
         VerticalAlign::Middle => rect.top() + (rect.height().saturating_sub(h) as i32) / 2,
-        VerticalAlign::Bottom => rect.top() + (rect.height().saturating_sub(h) as i32)
+        VerticalAlign::Bottom => rect.top() + (rect.height().saturating_sub(h) as i32),
     };
 
     let texture_creator = canvas.texture_creator();
@@ -196,13 +249,25 @@ fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
         let shadow_surface = font.render(text).blended(Color::RGBA(0, 0, 0, 0))?;
         let shadow_texture = texture_creator.create_texture_from_surface(shadow_surface)?;
         let TextureQuery { width, height, .. } = shadow_texture.query();
-        canvas.copy(&shadow_texture, None, rect_to_rect2(Rect::new(x + 1, y + 1, width, height))).map_err(|e| format_err!("{}", e))?;
+        canvas
+            .copy(
+                &shadow_texture,
+                None,
+                rect_to_rect2(Rect::new(x + 1, y + 1, width, height)),
+            )
+            .map_err(|e| format_err!("{}", e))?;
     }
     {
         let text_surface = font.render(text).blended(color)?;
         let text_texture = texture_creator.create_texture_from_surface(text_surface)?;
         let TextureQuery { width, height, .. } = text_texture.query();
-        canvas.copy(&text_texture, None, rect_to_rect2(Rect::new(x, y, width, height))).map_err(|e| format_err!("{}", e))?;
+        canvas
+            .copy(
+                &text_texture,
+                None,
+                rect_to_rect2(Rect::new(x, y, width, height)),
+            )
+            .map_err(|e| format_err!("{}", e))?;
     }
 
     canvas.set_clip_rect(None);
@@ -210,7 +275,12 @@ fn render_text(canvas: &mut Canvas<Window>, rect: Rect,
     Ok(())
 }
 
-fn bevel(canvas: &mut Canvas<Window>, rect: Rect, top_left: Color, bottom_right: Color) -> Result<()> {
+fn bevel(
+    canvas: &mut Canvas<Window>,
+    rect: Rect,
+    top_left: Color,
+    bottom_right: Color,
+) -> Result<()> {
     let left = rect.left();
     let top = rect.top();
     let width = rect.width();
@@ -219,17 +289,35 @@ fn bevel(canvas: &mut Canvas<Window>, rect: Rect, top_left: Color, bottom_right:
     let bottom = top + (height as i32) - 1;
 
     canvas.set_draw_color(top_left);
-    canvas.draw_line((left, top), (left,  bottom)).map_err(|e| format_err!("{}", e))?;
-    canvas.draw_line((left, top), (right, top)).map_err(|e| format_err!("{}", e))?;
+    canvas
+        .draw_line((left, top), (left, bottom))
+        .map_err(|e| format_err!("{}", e))?;
+    canvas
+        .draw_line((left, top), (right, top))
+        .map_err(|e| format_err!("{}", e))?;
     canvas.set_draw_color(bottom_right);
-    canvas.draw_line((right, top + 1), (right, bottom)).map_err(|e| format_err!("{}", e))?;
-    canvas.draw_line((left + 1, bottom), (right, bottom)).map_err(|e| format_err!("{}", e))?;
+    canvas
+        .draw_line((right, top + 1), (right, bottom))
+        .map_err(|e| format_err!("{}", e))?;
+    canvas
+        .draw_line((left + 1, bottom), (right, bottom))
+        .map_err(|e| format_err!("{}", e))?;
 
     Ok(())
 }
 
-fn etched(canvas: &mut Canvas<Window>, rect: Rect, top_left: Color, bottom_right: Color) -> Result<()> {
-    let inner_rect = Rect::new(rect.left() + 1, rect.top() + 1, rect.width() - 2, rect.height() - 2);
+fn etched(
+    canvas: &mut Canvas<Window>,
+    rect: Rect,
+    top_left: Color,
+    bottom_right: Color,
+) -> Result<()> {
+    let inner_rect = Rect::new(
+        rect.left() + 1,
+        rect.top() + 1,
+        rect.width() - 2,
+        rect.height() - 2,
+    );
     bevel(canvas, inner_rect, top_left, bottom_right)?;
     bevel(canvas, rect, bottom_right, top_left)?;
     Ok(())

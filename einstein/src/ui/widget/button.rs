@@ -1,13 +1,13 @@
-use std::cell::Cell;
+use crate::error::format_err;
+use crate::resources::audio::CLICK;
+use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
+use crate::ui::common::Size;
+use crate::ui::context::Context;
+use crate::ui::widget::widget::*;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
-use crate::error::format_err;
-use crate::ui::common::Size;
-use crate::ui::widget::widget::*;
-use crate::ui::brick::*;
-use crate::ui::context::Context;
-use crate::resources::manager::ResourceManager;
-use crate::resources::audio::CLICK;
+use std::cell::Cell;
 
 pub trait ButtonRenderer {
     fn draw(&self, resource_manager: &dyn ResourceManager, highlighted: bool) -> Brick;
@@ -33,19 +33,32 @@ impl<R: ButtonRenderer, A> Button<R, A> {
     }
 }
 
-impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
-    fn get_size(&self) -> Size { self.size }
+impl<A, R: ButtonRenderer> Widget<A> for Button<R, A>
+where
+    A: Clone,
+{
+    fn get_size(&self) -> Size {
+        self.size
+    }
 
     fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
             Event::KeyDown(key) if self.keys.contains(&key) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(|e| format_err!("{}", e))?;
+                context
+                    .audio()
+                    .play(&*context.resource_manager().chunk(&CLICK))
+                    .map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
-            },
-            Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_size().to_rect().contains_point((x, y)) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(|e| format_err!("{}", e))?;
+            }
+            Event::MouseButtonDown(MouseButton::Left, x, y)
+                if self.get_size().to_rect().contains_point((x, y)) =>
+            {
+                context
+                    .audio()
+                    .play(&*context.resource_manager().chunk(&CLICK))
+                    .map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
-            },
+            }
             Event::MouseMove(x, y) => {
                 let to_highlight = self.get_size().to_rect().contains_point((x, y));
                 if self.highlighted.get() != to_highlight {
@@ -54,7 +67,7 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
                 } else {
                     Ok(EventReaction::empty())
                 }
-            },
+            }
             _ => Ok(EventReaction::empty()),
         }
     }

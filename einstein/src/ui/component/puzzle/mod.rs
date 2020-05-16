@@ -1,2 +1,2 @@
-pub mod puzzle_cell;
 pub mod puzzle;
+pub mod puzzle_cell;

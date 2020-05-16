@@ -1,10 +1,10 @@
-use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
+use crate::resources::manager::ResourceManager;
+use crate::ui::brick::*;
 use crate::ui::common::Size;
 use crate::ui::widget::button::*;
 use crate::ui::widget::common::*;
-use crate::ui::brick::*;
-use crate::resources::manager::ResourceManager;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
 
 pub struct MenuButton {
     size: Size,
@@ -18,12 +18,21 @@ impl ButtonRenderer for MenuButton {
         } else {
             Color::RGB(30, 255, 255)
         };
-        Brick::new(self.size.width, self.size.height)
-            .text(Text::new(&self.text).font_size(FontSize(20)).color(color).shadow())
+        Brick::new(self.size.width, self.size.height).text(
+            Text::new(&self.text)
+                .font_size(FontSize(20))
+                .color(color)
+                .shadow(),
+        )
     }
 }
 
-pub fn new_menu_button<A>(size: Size, text: &str, keys: &[Keycode], action: A) -> Button<MenuButton, A> {
+pub fn new_menu_button<A>(
+    size: Size,
+    text: &str,
+    keys: &[Keycode],
+    action: A,
+) -> Button<MenuButton, A> {
     Button::<MenuButton, A>::new(
         size,
         keys,
@@ -31,6 +40,6 @@ pub fn new_menu_button<A>(size: Size, text: &str, keys: &[Keycode], action: A) -
         MenuButton {
             size,
             text: text.to_string(),
-        }
+        },
     )
 }

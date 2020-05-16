@@ -1,6 +1,6 @@
 mod base;
-mod messages_en;
 mod messages_de;
+mod messages_en;
 mod messages_ru;
 
 pub use self::base::Messages;

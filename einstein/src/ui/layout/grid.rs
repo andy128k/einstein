@@ -1,5 +1,5 @@
-use crate::ui::widget::widget::*;
 use crate::ui::widget::container::Container;
+use crate::ui::widget::widget::*;
 
 pub struct GridBuilder<A> {
     container: Container<A>,
@@ -10,7 +10,12 @@ pub struct GridBuilder<A> {
 
 impl<A: Clone + 'static> GridBuilder<A> {
     pub fn new(container: Container<A>, cols: usize, rows: usize) -> Self {
-        Self { container, cols, rows, children: Vec::new() }
+        Self {
+            container,
+            cols,
+            rows,
+            children: Vec::new(),
+        }
     }
 
     pub fn add(mut self, col: usize, row: usize, widget: impl Widget<A> + 'static) -> Self {
@@ -30,18 +35,32 @@ impl<A: Clone + 'static> GridBuilder<A> {
         }
         let max_width: u32 = widths.iter().sum();
         let max_height: u32 = heights.iter().sum();
-        let gap_x: u32 = if self.cols > 1 { (self.container.get_size().width - max_width) / ((self.cols - 1) as u32) } else { 0 };
-        let gap_y: u32 = if self.rows > 1 { (self.container.get_size().height - max_height) / ((self.rows - 1) as u32) } else { 0 };
-        let xs = widths.iter().scan(0, |state, w| {
-            let x = *state;
-            *state += w + gap_x;
-            Some(x)
-        }).collect::<Vec<u32>>();
-        let ys = heights.iter().scan(0, |state, h| {
-            let y = *state;
-            *state += h + gap_y;
-            Some(y)
-        }).collect::<Vec<u32>>();
+        let gap_x: u32 = if self.cols > 1 {
+            (self.container.get_size().width - max_width) / ((self.cols - 1) as u32)
+        } else {
+            0
+        };
+        let gap_y: u32 = if self.rows > 1 {
+            (self.container.get_size().height - max_height) / ((self.rows - 1) as u32)
+        } else {
+            0
+        };
+        let xs = widths
+            .iter()
+            .scan(0, |state, w| {
+                let x = *state;
+                *state += w + gap_x;
+                Some(x)
+            })
+            .collect::<Vec<u32>>();
+        let ys = heights
+            .iter()
+            .scan(0, |state, h| {
+                let y = *state;
+                *state += h + gap_y;
+                Some(y)
+            })
+            .collect::<Vec<u32>>();
 
         for (col, row, child) in self.children.drain(0..) {
             let size = child.get_size();

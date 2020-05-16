@@ -1,11 +1,11 @@
-use sdl2::keyboard::Keycode;
-use sdl2::mouse::MouseButton;
+pub use crate::algebra::*;
 use crate::error::*;
+use crate::resources::manager::ResourceManager;
+use crate::ui::brick::Brick;
 use crate::ui::common::Size;
 use crate::ui::context::Context;
-use crate::ui::brick::Brick;
-use crate::resources::manager::ResourceManager;
-pub use crate::algebra::*;
+use sdl2::keyboard::Keycode;
+use sdl2::mouse::MouseButton;
 
 pub enum Event {
     Tick,
@@ -40,7 +40,7 @@ impl<A> EventReaction<A> {
         Self {
             update: false,
             action: None,
-            terminated: false
+            terminated: false,
         }
     }
 
@@ -48,7 +48,7 @@ impl<A> EventReaction<A> {
         Self {
             update: true,
             action: None,
-            terminated: false
+            terminated: false,
         }
     }
 
@@ -56,7 +56,7 @@ impl<A> EventReaction<A> {
         Self {
             update: true,
             action: Some(action),
-            terminated: false
+            terminated: false,
         }
     }
 
@@ -64,12 +64,15 @@ impl<A> EventReaction<A> {
         Self {
             update: false,
             action: Some(action),
-            terminated: false
+            terminated: false,
         }
     }
 }
 
-impl<A> EventReaction<A> where A: Clone {
+impl<A> EventReaction<A>
+where
+    A: Clone,
+{
     pub fn add(&mut self, reaction2: &EventReaction<A>) {
         if !self.terminated {
             self.terminated |= reaction2.terminated;
@@ -111,12 +114,18 @@ impl<A> Widget<A> for WidgetPtr<A> {
     }
 }
 
-pub struct WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
+pub struct WidgetMapAction<AF, WF, AT>
+where
+    WF: Widget<AF>,
+{
     wrapped: WF,
     convert: Box<dyn Fn(&AF, &dyn Context) -> Result<EventReaction<AT>>>,
 }
 
-impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT> where WF: Widget<AF> {
+impl<AF, WF, AT> Widget<AT> for WidgetMapAction<AF, WF, AT>
+where
+    WF: Widget<AF>,
+{
     fn get_size(&self) -> Size {
         self.wrapped.get_size()
     }
@@ -151,12 +160,15 @@ where
 }
 
 impl<A, AnyWidget, AT, F> WidgetMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F> for AnyWidget
-    where
-        AnyWidget: Widget<A>,
-        F: Fn(&A) -> AT + 'static,
+where
+    AnyWidget: Widget<A>,
+    F: Fn(&A) -> AT + 'static,
 {
     fn map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction { wrapped: self, convert: Box::new(move |a, _| Ok(EventReaction::action(convert(a)))) }
+        WidgetMapAction {
+            wrapped: self,
+            convert: Box::new(move |a, _| Ok(EventReaction::action(convert(a)))),
+        }
     }
 }
 
@@ -168,25 +180,35 @@ where
     fn flat_map_action(self, convert: F) -> WT;
 }
 
-impl<A, AnyWidget, AT, F> WidgetFlatMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F> for AnyWidget
-    where
-        AnyWidget: Widget<A>,
-        F: Fn(&A, &dyn Context) -> Result<EventReaction<AT>> + 'static,
+impl<A, AnyWidget, AT, F> WidgetFlatMapActionExt<A, WidgetMapAction<A, Self, AT>, AT, F>
+    for AnyWidget
+where
+    AnyWidget: Widget<A>,
+    F: Fn(&A, &dyn Context) -> Result<EventReaction<AT>> + 'static,
 {
     fn flat_map_action(self, convert: F) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction { wrapped: self, convert: Box::new(convert) }
+        WidgetMapAction {
+            wrapped: self,
+            convert: Box::new(convert),
+        }
     }
 }
 
-pub trait WidgetNoActionExt<W, A> where W: Widget<A> {
+pub trait WidgetNoActionExt<W, A>
+where
+    W: Widget<A>,
+{
     fn no_action(self) -> W;
 }
 
 impl<A, AnyWidget, AT> WidgetNoActionExt<WidgetMapAction<A, Self, AT>, AT> for AnyWidget
-    where
-        AnyWidget: Widget<A>,
+where
+    AnyWidget: Widget<A>,
 {
     fn no_action(self) -> WidgetMapAction<A, Self, AT> {
-        WidgetMapAction { wrapped: self, convert: Box::new(|_, _| Ok(EventReaction::empty())) }
+        WidgetMapAction {
+            wrapped: self,
+            convert: Box::new(|_, _| Ok(EventReaction::empty())),
+        }
     }
 }

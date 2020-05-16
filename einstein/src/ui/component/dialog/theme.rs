@@ -1,15 +1,9 @@
-use sdl2::pixels::Color;
-use crate::ui::widget::common::Background;
 use crate::resources::background::{
-    BLUE_PATTERN,
-    BLUE_PATTERN_HIGHLIGHTED,
-    GREEN_PATTERN,
-    GREEN_PATTERN_HIGHLIGHTED,
-    MARBLE_PATTERN,
-    MARBLE_PATTERN_HIGHLIGHTED,
-    RED_PATTERN,
-    RED_PATTERN_HIGHLIGHTED,
+    BLUE_PATTERN, BLUE_PATTERN_HIGHLIGHTED, GREEN_PATTERN, GREEN_PATTERN_HIGHLIGHTED,
+    MARBLE_PATTERN, MARBLE_PATTERN_HIGHLIGHTED, RED_PATTERN, RED_PATTERN_HIGHLIGHTED,
 };
+use crate::ui::widget::common::Background;
+use sdl2::pixels::Color;
 
 #[derive(Clone, Copy)]
 pub enum DialogTheme {

@@ -1,14 +1,14 @@
 #![macro_use]
 
+use crate::error::{format_err, Result};
+use sdl2::mixer::{Chunk, LoaderRWops};
+use sdl2::render::{Texture, TextureCreator};
+use sdl2::rwops::RWops;
+use sdl2::surface::Surface;
+use sdl2::ttf::{Font, Sdl2TtfContext};
+use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::marker::PhantomData;
-use std::cell::{RefCell, Ref};
-use sdl2::surface::Surface;
-use sdl2::render::{TextureCreator, Texture};
-use sdl2::rwops::RWops;
-use sdl2::ttf::{Font, Sdl2TtfContext};
-use sdl2::mixer::{Chunk, LoaderRWops};
-use crate::error::{Result, format_err};
 
 pub struct Resource {
     pub name: &'static str,
@@ -39,7 +39,10 @@ pub trait ResourceManager {
 
 const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
 
-pub struct ResourceManagerImpl<'r, C> where C: 'r{
+pub struct ResourceManagerImpl<'r, C>
+where
+    C: 'r,
+{
     images: RefCell<HashMap<String, Texture<'r>>>,
     fonts: RefCell<HashMap<u16, Font<'r, 'r>>>,
     chunks: RefCell<HashMap<String, Chunk>>,
@@ -48,7 +51,10 @@ pub struct ResourceManagerImpl<'r, C> where C: 'r{
     phantom_data: PhantomData<&'r str>,
 }
 
-impl<'r, C> ResourceManagerImpl<'r, C> where C: 'r {
+impl<'r, C> ResourceManagerImpl<'r, C>
+where
+    C: 'r,
+{
     pub fn new(texture_creator: &'r TextureCreator<C>, ttf_context: &'r Sdl2TtfContext) -> Self {
         ResourceManagerImpl {
             images: RefCell::new(HashMap::new()),
@@ -66,7 +72,10 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
         let key = resource.name.to_owned();
         if self.images.borrow().get(&key).is_none() {
             let surface = load_image(resource.data).unwrap();
-            let texture = self.texture_creator.create_texture_from_surface(surface).unwrap();
+            let texture = self
+                .texture_creator
+                .create_texture_from_surface(surface)
+                .unwrap();
             self.images.borrow_mut().insert(key.clone(), texture);
         }
         Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
@@ -75,7 +84,10 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
     fn font(&self, point_size: u16) -> Ref<Font> {
         if self.fonts.borrow().get(&point_size).is_none() {
             let ops = RWops::from_bytes(FONT_DUMP).unwrap();
-            let font = self.ttf_context.load_font_from_rwops(ops, point_size).unwrap();
+            let font = self
+                .ttf_context
+                .load_font_from_rwops(ops, point_size)
+                .unwrap();
             self.fonts.borrow_mut().insert(point_size, font);
         }
         Ref::map(self.fonts.borrow(), |r| r.get(&point_size).unwrap())
@@ -83,8 +95,13 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
 
     fn chunk(&self, resource: &'static Resource) -> Ref<Chunk> {
         if self.chunks.borrow().get(resource.name).is_none() {
-            let chunk = RWops::from_bytes(resource.data).unwrap().load_wav().unwrap();
-            self.chunks.borrow_mut().insert(resource.name.to_owned(), chunk);
+            let chunk = RWops::from_bytes(resource.data)
+                .unwrap()
+                .load_wav()
+                .unwrap();
+            self.chunks
+                .borrow_mut()
+                .insert(resource.name.to_owned(), chunk);
         }
         Ref::map(self.chunks.borrow(), |r| r.get(resource.name).unwrap())
     }

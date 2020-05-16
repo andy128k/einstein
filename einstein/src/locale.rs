@@ -1,7 +1,7 @@
-use std::ffi::{CStr, CString};
+use lazy_static::lazy_static;
 use libc::{setlocale, LC_ALL};
 use regex::Regex;
-use lazy_static::lazy_static;
+use std::ffi::{CStr, CString};
 
 lazy_static! {
     static ref LANGUAGE: Option<String> = detect_language();
@@ -14,10 +14,7 @@ fn safe_setlocale_lc_all() -> Option<String> {
         if locale.is_null() {
             None
         } else {
-            CStr::from_ptr(locale)
-                .to_str()
-                .map(|s| s.to_string())
-                .ok()
+            CStr::from_ptr(locale).to_str().map(|s| s.to_string()).ok()
         }
     }
 }
@@ -42,7 +39,14 @@ fn detect_language() -> Option<String> {
     safe_setlocale_lc_all()?;
 
     let mut buf: [WCHAR; 100] = [0; 100];
-    let len = unsafe { GetLocaleInfoW(LOCALE_USER_DEFAULT, /*LOCALE_SABBREVLANGNAME*/3, buf.as_mut_ptr(), 99) };
+    let len = unsafe {
+        GetLocaleInfoW(
+            LOCALE_USER_DEFAULT,
+            /*LOCALE_SABBREVLANGNAME*/ 3,
+            buf.as_mut_ptr(),
+            99,
+        )
+    };
     if len <= 0 {
         return None;
     }
@@ -53,7 +57,9 @@ fn detect_language() -> Option<String> {
        ISO Standard 639 and adding a third letter, as appropriate,
        to indicate the sublanguage.
     */
-    String::from_utf16(&buf[0..2]).map(|s| s.to_lowercase()).ok()
+    String::from_utf16(&buf[0..2])
+        .map(|s| s.to_lowercase())
+        .ok()
 }
 
 pub fn get_language() -> Option<String> {

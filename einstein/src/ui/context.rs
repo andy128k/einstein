@@ -1,15 +1,15 @@
-use std::thread::sleep;
-use std::time::Duration;
+use crate::audio::Audio;
 use crate::cell::RefCell;
-use sdl2::Sdl;
+use crate::error::format_err;
+use crate::error::*;
+use crate::resources::manager::ResourceManager;
+use crate::ui::widget::widget::{Event as WidgetEvent, EventReaction, Widget};
 use sdl2::event::Event;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use crate::error::format_err;
-use crate::resources::manager::ResourceManager;
-use crate::audio::Audio;
-use crate::error::*;
-use crate::ui::widget::widget::{Widget, Event as WidgetEvent, EventReaction};
+use sdl2::Sdl;
+use std::thread::sleep;
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct MainLoopQuit;
@@ -42,20 +42,33 @@ impl Context for AppContext<'_> {
         b.draw(&mut *self.canvas.borrow_mut(), 0, 0, self.resource_manager)?;
         self.canvas.borrow_mut().present();
 
-        let mut event_pump = self.sdl_context.event_pump().map_err(|e| format_err!("{}", e))?;
+        let mut event_pump = self
+            .sdl_context
+            .event_pump()
+            .map_err(|e| format_err!("{}", e))?;
         loop {
             sleep(Duration::from_millis(5));
             widget.on_event(&WidgetEvent::Tick, self)?; // TODO: add timer
 
             for event in event_pump.poll_iter() {
                 let reaction = match event {
-                    Event::KeyDown { keycode: Some(key), .. } => widget.on_event(&WidgetEvent::KeyDown(key), self)?,
-                    Event::TextInput { text, .. } => widget.on_event(&WidgetEvent::TextInput(text), self)?,
-                    Event::MouseMotion { x, y, .. } => widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32), self)?,
-                    Event::MouseButtonDown { mouse_btn, x, y, .. } => widget.on_event(&WidgetEvent::MouseButtonDown(mouse_btn, x, y), self)?,
-                    Event::MouseButtonUp { mouse_btn, x, y, .. } => widget.on_event(&WidgetEvent::MouseButtonUp(mouse_btn, x, y), self)?,
+                    Event::KeyDown {
+                        keycode: Some(key), ..
+                    } => widget.on_event(&WidgetEvent::KeyDown(key), self)?,
+                    Event::TextInput { text, .. } => {
+                        widget.on_event(&WidgetEvent::TextInput(text), self)?
+                    }
+                    Event::MouseMotion { x, y, .. } => {
+                        widget.on_event(&WidgetEvent::MouseMove(x as i32, y as i32), self)?
+                    }
+                    Event::MouseButtonDown {
+                        mouse_btn, x, y, ..
+                    } => widget.on_event(&WidgetEvent::MouseButtonDown(mouse_btn, x, y), self)?,
+                    Event::MouseButtonUp {
+                        mouse_btn, x, y, ..
+                    } => widget.on_event(&WidgetEvent::MouseButtonUp(mouse_btn, x, y), self)?,
                     Event::Quit { .. } => return Ok(()),
-                    _ => EventReaction::empty()
+                    _ => EventReaction::empty(),
                 };
                 if reaction.update {
                     let b = widget.draw(self.resource_manager);
