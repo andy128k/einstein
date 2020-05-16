@@ -8,6 +8,7 @@ use sdl2::render::{TextureCreator, Texture};
 use sdl2::rwops::RWops;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 use sdl2::mixer::{Chunk, LoaderRWops};
+use crate::error::{Result, format_err};
 
 pub struct Resource {
     pub name: &'static str,
@@ -24,9 +25,9 @@ macro_rules! resource {
     };
 }
 
-fn load_image(data: &[u8]) -> Result<Surface, failure::Error> {
-    let mut rw = RWops::from_bytes(data).map_err(failure::err_msg)?;
-    let surface = Surface::load_bmp_rw(&mut rw).map_err(failure::err_msg)?;
+fn load_image(data: &[u8]) -> Result<Surface> {
+    let mut rw = RWops::from_bytes(data).map_err(|e| format_err!("{}", e))?;
+    let surface = Surface::load_bmp_rw(&mut rw).map_err(|e| format_err!("{}", e))?;
     Ok(surface)
 }
 

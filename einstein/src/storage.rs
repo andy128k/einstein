@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 use std::io::{Read, Write};
 use std::fs::{File, create_dir_all};
 use dirs::home_dir;
-use failure::err_msg;
 use serde::{Serialize, Deserialize};
 use serde_json;
 use crate::error::*;
@@ -22,7 +21,7 @@ fn write_file(filename: &Path, buf: &[u8]) -> Result<()> {
 }
 
 fn app_dir() -> Result<PathBuf> {
-    let home = home_dir().ok_or_else(|| err_msg("Home directory is not detected."))?;
+    let home = home_dir().ok_or_else(|| format_err!("Home directory is not detected."))?;
     let dir = home.join(".einstein");
     Ok(dir)
 }

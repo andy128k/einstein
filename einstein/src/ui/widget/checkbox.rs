@@ -1,6 +1,6 @@
 use std::cell::Cell;
-use failure::err_msg;
 use sdl2::mouse::MouseButton;
+use crate::error::format_err;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
@@ -33,7 +33,7 @@ impl Widget<bool> for Checkbox {
         let rect = self.get_size().to_rect();
         match *event {
             Event::MouseButtonDown(MouseButton::Left, x, y) if rect.contains_point((x, y)) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(|e| format_err!("{}", e))?;
                 self.checked.set(!self.checked.get());
                 Ok(EventReaction::update_and_action(self.checked.get()))
             },

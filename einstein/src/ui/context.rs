@@ -5,7 +5,7 @@ use sdl2::Sdl;
 use sdl2::event::Event;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use failure::err_msg;
+use crate::error::format_err;
 use crate::resources::manager::ResourceManager;
 use crate::audio::Audio;
 use crate::error::*;
@@ -42,7 +42,7 @@ impl Context for AppContext<'_> {
         b.draw(&mut *self.canvas.borrow_mut(), 0, 0, self.resource_manager)?;
         self.canvas.borrow_mut().present();
 
-        let mut event_pump = self.sdl_context.event_pump().map_err(err_msg)?;
+        let mut event_pump = self.sdl_context.event_pump().map_err(|e| format_err!("{}", e))?;
         loop {
             sleep(Duration::from_millis(5));
             widget.on_event(&WidgetEvent::Tick, self)?; // TODO: add timer

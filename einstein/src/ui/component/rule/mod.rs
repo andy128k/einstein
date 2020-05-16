@@ -1,8 +1,8 @@
 use std::rc::Rc;
 use std::cell::Cell;
 use crate::cell::RefCell;
-use failure::err_msg;
 use sdl2::mouse::MouseButton;
+use crate::error::format_err;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
@@ -109,7 +109,7 @@ impl Widget<usize> for RuleWidget {
             Event::MouseButtonDown(MouseButton::Right, x, y) => {
                 if self.get_size().to_rect().contains_point((x, y)) {
                     if self.index.map_or(false, |index| self.state.borrow_mut().toggle_rule(index).is_some()) {
-                        context.audio().play(&*context.resource_manager().chunk(&WHIZZ)).map_err(err_msg)?;
+                        context.audio().play(&*context.resource_manager().chunk(&WHIZZ)).map_err(|e| format_err!("{}", e))?;
                         Ok(EventReaction::update())
                     } else {
                         Ok(EventReaction::empty())

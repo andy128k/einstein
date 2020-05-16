@@ -1,7 +1,7 @@
 use std::cell::Cell;
-use failure::err_msg;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
+use crate::error::format_err;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
@@ -39,11 +39,11 @@ impl<A, R: ButtonRenderer> Widget<A> for Button<R, A> where A: Clone {
     fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
             Event::KeyDown(key) if self.keys.contains(&key) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseButtonDown(MouseButton::Left, x, y) if self.get_size().to_rect().contains_point((x, y)) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
+                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::update_and_action(self.action.clone()))
             },
             Event::MouseMove(x, y) => {

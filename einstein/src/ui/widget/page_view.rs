@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use crate::cell::RefCell;
 use sdl2::pixels::Color;
+use crate::error::Result;
 use crate::ui::common::{Size, HorizontalAlign};
 use crate::ui::widget::widget::*;
 use crate::ui::widget::common::*;
@@ -36,7 +37,7 @@ impl PageViewState {
         }
     }
 
-    fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &dyn ResourceManager) -> Result<(), ::failure::Error> {
+    fn make_pages(&mut self, page_width: u32, page_height: u32, resource_manager: &dyn ResourceManager) -> Result<()> {
         if self.pages.is_empty() {
             let mut pages = PagesBuilder::new(page_width as u16, page_height as u16);
             for text_item in self.text {

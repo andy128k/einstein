@@ -1,4 +1,4 @@
-use failure::err_msg;
+use crate::error::format_err;
 use crate::ui::common::Size;
 use crate::ui::widget::widget::*;
 use crate::ui::brick::*;
@@ -24,7 +24,10 @@ impl<A> Widget<A> for AnyKey<A> where A: Clone {
     fn on_event(&mut self, event: &Event, context: &dyn Context) -> EventResult<A> {
         match *event {
             Event::KeyDown(..) | Event::MouseButtonDown(..) => {
-                context.audio().play(&*context.resource_manager().chunk(&CLICK)).map_err(err_msg)?;
+                context
+                    .audio()
+                    .play(&*context.resource_manager().chunk(&CLICK))
+                    .map_err(|e| format_err!("{}", e))?;
                 Ok(EventReaction::action(self.action.clone()))
             },
             _ => Ok(EventReaction::empty()),
