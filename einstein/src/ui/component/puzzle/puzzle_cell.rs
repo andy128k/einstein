@@ -5,7 +5,7 @@ use crate::resources::thing::{
     get_small_thing_rect, get_thing_rect, EMPTY_TILE, LARGE_THINGS_ATLAS,
     LARGE_THINGS_ATLAS_HIGHLIGHTED, SMALL_THINGS_ATLAS, SMALL_THINGS_ATLAS_HIGHLIGHTED,
 };
-use crate::rules::Thing;
+use crate::rules::{Kind, Value, Thing};
 use crate::ui::brick::*;
 use crate::ui::common::{Rect, Size};
 use crate::ui::component::game::GamePrivate;
@@ -16,12 +16,10 @@ use sdl2::mouse::MouseButton;
 use std::cell::Cell;
 use std::rc::Rc;
 
-const PUZZLE_SIZE: u8 = 6;
-
 const FIELD_TILE_WIDTH: u32 = 48;
 const FIELD_TILE_HEIGHT: u32 = 48;
 
-fn local_choice_cell_rect(value: u8) -> Rect {
+fn local_choice_cell_rect(Value(value): Value) -> Rect {
     let x: i32 = ((value % 3) as i32) * ((FIELD_TILE_WIDTH / 3) as i32);
     let y: i32 =
         ((value / 3) as i32) * ((FIELD_TILE_HEIGHT / 3) as i32) + ((FIELD_TILE_HEIGHT / 6) as i32);
@@ -33,10 +31,10 @@ fn local_choice_cell_rect(value: u8) -> Rect {
     )
 }
 
-fn local_find_choice(x: i32, y: i32) -> Option<u8> {
-    for i in 0..PUZZLE_SIZE {
-        if local_choice_cell_rect(i).contains_point((x, y)) {
-            return Some(i);
+fn local_find_choice(x: i32, y: i32) -> Option<Value> {
+    for value in &Value::values() {
+        if local_choice_cell_rect(*value).contains_point((x, y)) {
+            return Some(*value);
         }
     }
     None
@@ -50,13 +48,13 @@ pub enum PuzzleAction {
 
 pub struct PuzzleCell {
     state: Rc<RefCell<GamePrivate>>,
-    row: u8,
+    row: Kind,
     col: u8,
-    highlighted: Cell<Option<Option<u8>>>,
+    highlighted: Cell<Option<Option<Value>>>,
 }
 
 impl PuzzleCell {
-    pub fn new(state: &Rc<RefCell<GamePrivate>>, row: u8, col: u8) -> Self {
+    pub fn new(state: &Rc<RefCell<GamePrivate>>, row: Kind, col: u8) -> Self {
         Self {
             state: state.clone(),
             row,
@@ -219,16 +217,16 @@ impl Widget<PuzzleAction> for PuzzleCell {
         } else {
             brick = brick.background(Background::Image(&EMPTY_TILE, None));
 
-            for i in 0..PUZZLE_SIZE {
-                let choice_rect = local_choice_cell_rect(i);
-                let thing = Thing { row, value: i };
+            for i in &Value::values() {
+                let choice_rect = local_choice_cell_rect(*i);
+                let thing = Thing { row, value: *i };
                 if self
                     .state
                     .borrow()
                     .possibilities
                     .is_possible(col as u8, thing)
                 {
-                    let highlight = self.highlighted.get() == Some(Some(i));
+                    let highlight = self.highlighted.get() == Some(Some(*i));
 
                     let rect = get_small_thing_rect(thing);
                     brick.push(

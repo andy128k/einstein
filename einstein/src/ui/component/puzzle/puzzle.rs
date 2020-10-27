@@ -1,5 +1,5 @@
 use crate::cell::RefCell;
-use crate::rules::PUZZLE_SIZE;
+use crate::rules::{Kind, Value, PUZZLE_SIZE};
 use crate::ui::common::Size;
 use crate::ui::component::game::GamePrivate;
 use crate::ui::component::puzzle::puzzle_cell::{PuzzleAction, PuzzleCell};
@@ -14,10 +14,10 @@ pub fn new_puzzle_widget(state: &Rc<RefCell<GamePrivate>>) -> Container<PuzzleAc
     let container = Container::container(Size::new(WIDTH, HEIGHT), None, None);
     let mut grid = GridBuilder::new(container, PUZZLE_SIZE, PUZZLE_SIZE);
 
-    for row in 0..PUZZLE_SIZE {
-        for col in 0..PUZZLE_SIZE {
-            let cell = PuzzleCell::new(state, row as u8, col as u8);
-            grid = grid.add(col, row, cell);
+    for (row_index, row) in Kind::values().iter().enumerate() {
+        for col in 0..Value::COUNT {
+            let cell = PuzzleCell::new(state, *row, col as u8);
+            grid = grid.add(col as usize, row_index, cell);
         }
     }
 

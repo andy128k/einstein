@@ -18,8 +18,8 @@ const SMALL_TILE_HEIGHT: i32 = 16;
 
 pub fn get_thing_rect(thing: Thing) -> Rect {
     Rect::new(
-        thing.value as i32 * LARGE_TILE_WIDTH,
-        thing.row as i32 * LARGE_TILE_HEIGHT,
+        thing.value.0 as i32 * LARGE_TILE_WIDTH,
+        thing.row.0 as i32 * LARGE_TILE_HEIGHT,
         LARGE_TILE_WIDTH as u32,
         LARGE_TILE_HEIGHT as u32,
     )
@@ -27,8 +27,8 @@ pub fn get_thing_rect(thing: Thing) -> Rect {
 
 pub fn get_small_thing_rect(thing: Thing) -> Rect {
     Rect::new(
-        thing.value as i32 * SMALL_TILE_WIDTH,
-        thing.row as i32 * SMALL_TILE_HEIGHT,
+        thing.value.0 as i32 * SMALL_TILE_WIDTH,
+        thing.row.0 as i32 * SMALL_TILE_HEIGHT,
         SMALL_TILE_WIDTH as u32,
         SMALL_TILE_HEIGHT as u32,
     )

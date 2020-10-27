@@ -16,47 +16,81 @@ fn only<T>(values: &[T]) -> Option<&T> {
 
 pub const PUZZLE_SIZE: usize = 6;
 
-pub type Value = u8;
+#[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize, Hash)]
+pub struct Kind(pub u8);
+
+impl Kind {
+    pub const COUNT: u8 = PUZZLE_SIZE as u8;
+
+    pub fn values() -> [Self; PUZZLE_SIZE] {
+        let mut arr = [Self(0); PUZZLE_SIZE];
+        for i in 0..PUZZLE_SIZE {
+            arr[i] = Self(i as u8)
+        }
+        arr
+    }
+
+    fn random(rng: &mut impl Rng) -> Self {
+        Self(rng.gen_range(0, PUZZLE_SIZE as u8))
+    }
+}
+
+#[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize, Hash)]
+pub struct Value(pub u8);
+
+impl Value {
+    pub const COUNT: u8 = PUZZLE_SIZE as u8;
+
+    pub fn values() -> [Self; PUZZLE_SIZE] {
+        let mut arr = [Self(0); PUZZLE_SIZE];
+        for i in 0..PUZZLE_SIZE {
+            arr[i] = Self(i as u8)
+        }
+        arr
+    }
+
+    fn random(rng: &mut impl Rng) -> Self {
+        Self(rng.gen_range(0, PUZZLE_SIZE as u8))
+    }
+}
 
 #[derive(PartialEq, Eq, Clone, Debug, Copy, Serialize, Deserialize)]
 pub struct Thing {
-    pub row: u8,
+    pub row: Kind,
     pub value: Value,
 }
 
 impl fmt::Display for Thing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.row {
-            0 => write!(f, "{}", self.value),
-            1 => write!(f, "{}", ["A", "B", "C", "D", "E", "F"][self.value as usize]),
-            2 => write!(f, "{}", ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ"][self.value as usize]),
-            3 => write!(f, "{}", ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value as usize]),
-            4 => write!(f, "{}", ["α", "β", "γ", "δ", "ε", "ζ"][self.value as usize]),
-            5 => write!(f, "{}", ["+", "-", "÷", "*", "=", "√"][self.value as usize]),
+        match self.row.0 {
+            0 => write!(f, "{}", self.value.0),
+            1 => write!(f, "{}", ["A", "B", "C", "D", "E", "F"][self.value.0 as usize]),
+            2 => write!(f, "{}", ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ"][self.value.0 as usize]),
+            3 => write!(f, "{}", ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value.0 as usize]),
+            4 => write!(f, "{}", ["α", "β", "γ", "δ", "ε", "ζ"][self.value.0 as usize]),
+            5 => write!(f, "{}", ["+", "-", "÷", "*", "=", "√"][self.value.0 as usize]),
             _ => unreachable!(),
         }
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
+pub struct SolvedPuzzle( [[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
 
 impl SolvedPuzzle {
     pub fn random(rng: &mut impl Rng) -> Self {
-        let mut values = [[0u8; PUZZLE_SIZE]; PUZZLE_SIZE];
-        for r in 0..PUZZLE_SIZE {
-            for c in 0..PUZZLE_SIZE {
-                values[r][c] = c as u8;
-            }
-            values[r].shuffle(rng);
+        let mut values = [[Value(0u8); PUZZLE_SIZE]; PUZZLE_SIZE];
+        for (kind_index, _kind) in Kind::values().iter().enumerate() {
+            values[kind_index] = Value::values();
+            values[kind_index].shuffle(rng);
         }
         SolvedPuzzle(values)
     }
 
-    pub fn get(&self, row: u8, col: u8) -> Thing {
+    pub fn get(&self, row: Kind, col: u8) -> Thing {
         Thing {
             row,
-            value: self.0[row as usize][col as usize],
+            value: self.0[row.0 as usize][col as usize],
         }
     }
 }
@@ -96,23 +130,23 @@ impl ValueSet {
                 if result.is_some() {
                     return None;
                 }
-                result = Some(value as Value);
+                result = Some(Value(value as u8));
             }
         }
         result
     }
 
     pub fn contains(&self, value: Value) -> bool {
-        self.0[value as usize]
+        self.0[value.0 as usize]
     }
 
     pub fn add(&mut self, value: Value) {
-        self.0[value as usize] = true;
+        self.0[value.0 as usize] = true;
     }
 
     pub fn remove(&mut self, value: Value) -> bool {
-        let present = self.0[value as usize];
-        self.0[value as usize] = false;
+        let present = self.0[value.0 as usize];
+        self.0[value.0 as usize] = false;
         present
     }
 }
@@ -162,9 +196,9 @@ impl PossibilitiesRow {
     fn check_single_value_in_a_row(&self) -> Self {
         let mut new_row = *self;
         // check for single element without exclusive cell
-        for el in 0..PUZZLE_SIZE {
-            if let Some(col) = only(&new_row.value_in_columns(el as Value)) {
-                new_row.0[*col as usize] = ValueSet::single(el as Value);
+        for value in &Value::values() {
+            if let Some(col) = only(&new_row.value_in_columns(*value)) {
+                new_row.0[*col as usize] = ValueSet::single(*value);
             }
         }
         new_row
@@ -190,28 +224,28 @@ impl Possibilities {
         Possibilities([PossibilitiesRow::new(); PUZZLE_SIZE])
     }
 
-    pub fn exclude(&self, col: u8, row: u8, element: Value) -> Self {
+    pub fn exclude(&self, col: u8, row: Kind, element: Value) -> Self {
         let mut new = self.clone();
-        new.0[row as usize] = new.0[row as usize].exclude(col, element);
+        new.0[row.0 as usize] = new.0[row.0 as usize].exclude(col, element);
         new
     }
 
-    pub fn set(&self, col: u8, row: u8, element: Value) -> Self {
+    pub fn set(&self, col: u8, row: Kind, element: Value) -> Self {
         let mut new = self.clone();
-        new.0[row as usize] = new.0[row as usize].set(col, element);
+        new.0[row.0 as usize] = new.0[row.0 as usize].set(col, element);
         new
     }
 
     pub fn is_possible(&self, col: u8, thing: Thing) -> bool {
-        self.0[thing.row as usize].0[col as usize].contains(thing.value)
+        self.0[thing.row.0 as usize].0[col as usize].contains(thing.value)
     }
 
-    pub fn is_defined(&self, col: u8, row: u8) -> bool {
-        self.0[row as usize].0[col as usize].size() == 1
+    pub fn is_defined(&self, col: u8, row: Kind) -> bool {
+        self.0[row.0 as usize].0[col as usize].size() == 1
     }
 
-    pub fn get_defined(&self, col: u8, row: u8) -> Option<Value> {
-        self.0[row as usize].0[col as usize].get_single()
+    pub fn get_defined(&self, col: u8, row: Kind) -> Option<Value> {
+        self.0[row.0 as usize].0[col as usize].get_single()
     }
 
     pub fn is_solved(&self) -> bool {
@@ -240,8 +274,8 @@ pub enum Rule {
 }
 
 fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row1 = Kind::random(rng);
+    let row2 = Kind::random(rng);
     let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
 
     let thing1 = puzzle.get(row1, first_col);
@@ -255,8 +289,8 @@ fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 }
 
 fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row1 = Kind::random(rng);
+    let row2 = Kind::random(rng);
     let col1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
     let col2: u8 = rng.gen_range(col1 + 1, PUZZLE_SIZE as u8);
 
@@ -266,7 +300,7 @@ fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 }
 
 fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let row: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row = Kind::random(rng);
     let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
 
     let thing = puzzle.get(row, col);
@@ -275,9 +309,9 @@ fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row1 = Kind::random(rng);
     let row2 = retry(
-        move || rng.gen_range(0, PUZZLE_SIZE as u8),
+        move || Kind::random(rng),
         |row2| row1 != *row2,
     );
 
@@ -288,9 +322,9 @@ fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 }
 
 fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let row1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row2: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
-    let row3: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let row1 = Kind::random(rng);
+    let row2 = Kind::random(rng);
+    let row3 = Kind::random(rng);
     let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 2);
 
     let thing1 = puzzle.get(row1, first_col);
@@ -466,8 +500,8 @@ mod tests {
 
     #[test]
     fn test_eq_possibilities() {
-        let p1 = Possibilities::new().exclude(0, 0, 0);
-        let p2 = Possibilities::new().exclude(0, 0, 0);
+        let p1 = Possibilities::new().exclude(0, Kind(0), Value(0));
+        let p2 = Possibilities::new().exclude(0, Kind(0), Value(0));
         assert_eq!(p1, p2);
     }
 }
