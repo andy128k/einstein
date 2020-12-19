@@ -31,7 +31,7 @@ impl Kind {
     }
 
     fn random(rng: &mut impl Rng) -> Self {
-        Self(rng.gen_range(0, PUZZLE_SIZE as u8))
+        Self(rng.gen_range(0..(PUZZLE_SIZE as u8)))
     }
 }
 
@@ -50,7 +50,7 @@ impl Value {
     }
 
     fn random(rng: &mut impl Rng) -> Self {
-        Self(rng.gen_range(0, PUZZLE_SIZE as u8))
+        Self(rng.gen_range(0..(PUZZLE_SIZE as u8)))
     }
 }
 
@@ -64,18 +64,38 @@ impl fmt::Display for Thing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.row.0 {
             0 => write!(f, "{}", self.value.0),
-            1 => write!(f, "{}", ["A", "B", "C", "D", "E", "F"][self.value.0 as usize]),
-            2 => write!(f, "{}", ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ"][self.value.0 as usize]),
-            3 => write!(f, "{}", ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value.0 as usize]),
-            4 => write!(f, "{}", ["α", "β", "γ", "δ", "ε", "ζ"][self.value.0 as usize]),
-            5 => write!(f, "{}", ["+", "-", "÷", "*", "=", "√"][self.value.0 as usize]),
+            1 => write!(
+                f,
+                "{}",
+                ["A", "B", "C", "D", "E", "F"][self.value.0 as usize]
+            ),
+            2 => write!(
+                f,
+                "{}",
+                ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ"][self.value.0 as usize]
+            ),
+            3 => write!(
+                f,
+                "{}",
+                ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][self.value.0 as usize]
+            ),
+            4 => write!(
+                f,
+                "{}",
+                ["α", "β", "γ", "δ", "ε", "ζ"][self.value.0 as usize]
+            ),
+            5 => write!(
+                f,
+                "{}",
+                ["+", "-", "÷", "*", "=", "√"][self.value.0 as usize]
+            ),
             _ => unreachable!(),
         }
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SolvedPuzzle( [[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
+pub struct SolvedPuzzle([[Value; PUZZLE_SIZE]; PUZZLE_SIZE]);
 
 impl SolvedPuzzle {
     pub fn random(rng: &mut impl Rng) -> Self {
@@ -276,7 +296,7 @@ pub enum Rule {
 fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let row1 = Kind::random(rng);
     let row2 = Kind::random(rng);
-    let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
+    let first_col: u8 = rng.gen_range(0..(PUZZLE_SIZE as u8 - 1));
 
     let thing1 = puzzle.get(row1, first_col);
     let thing2 = puzzle.get(row2, first_col + 1);
@@ -291,8 +311,8 @@ fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let row1 = Kind::random(rng);
     let row2 = Kind::random(rng);
-    let col1: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 1);
-    let col2: u8 = rng.gen_range(col1 + 1, PUZZLE_SIZE as u8);
+    let col1: u8 = rng.gen_range(0..(PUZZLE_SIZE as u8 - 1));
+    let col2: u8 = rng.gen_range((col1 + 1)..(PUZZLE_SIZE as u8));
 
     let thing1 = puzzle.get(row1, col1);
     let thing2 = puzzle.get(row2, col2);
@@ -301,19 +321,16 @@ fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let row = Kind::random(rng);
-    let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let col: u8 = rng.gen_range(0..PUZZLE_SIZE as u8);
 
     let thing = puzzle.get(row, col);
     Rule::Open(col, thing)
 }
 
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8);
+    let col: u8 = rng.gen_range(0..PUZZLE_SIZE as u8);
     let row1 = Kind::random(rng);
-    let row2 = retry(
-        move || Kind::random(rng),
-        |row2| row1 != *row2,
-    );
+    let row2 = retry(move || Kind::random(rng), |row2| row1 != *row2);
 
     let thing1 = puzzle.get(row1, col);
     let thing2 = puzzle.get(row2, col);
@@ -325,7 +342,7 @@ fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let row1 = Kind::random(rng);
     let row2 = Kind::random(rng);
     let row3 = Kind::random(rng);
-    let first_col: u8 = rng.gen_range(0, PUZZLE_SIZE as u8 - 2);
+    let first_col: u8 = rng.gen_range(0..(PUZZLE_SIZE as u8 - 2));
 
     let thing1 = puzzle.get(row1, first_col);
     let thing2 = puzzle.get(row2, first_col + 1);
@@ -339,7 +356,7 @@ fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 }
 
 pub fn generate_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    match rng.gen_range(0, 14) {
+    match rng.gen_range(0..14) {
         0 | 1 | 2 | 3 => generate_near_rule(rng, puzzle),
         4 => generate_open_rule(rng, puzzle),
         5 | 6 => generate_under_rule(rng, puzzle),

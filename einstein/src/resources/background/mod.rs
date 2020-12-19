@@ -1,3 +1,4 @@
+use crate::resource;
 use crate::resources::manager::Resource;
 
 pub const BLUE_PATTERN: Resource = resource!("./bluepattern.bmp");

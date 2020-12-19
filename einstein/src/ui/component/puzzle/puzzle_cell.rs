@@ -5,7 +5,7 @@ use crate::resources::thing::{
     get_small_thing_rect, get_thing_rect, EMPTY_TILE, LARGE_THINGS_ATLAS,
     LARGE_THINGS_ATLAS_HIGHLIGHTED, SMALL_THINGS_ATLAS, SMALL_THINGS_ATLAS_HIGHLIGHTED,
 };
-use crate::rules::{Kind, Value, Thing};
+use crate::rules::{Kind, Thing, Value};
 use crate::ui::brick::*;
 use crate::ui::common::{Rect, Size};
 use crate::ui::component::game::GamePrivate;

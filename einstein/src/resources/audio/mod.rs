@@ -1,3 +1,4 @@
+use crate::resource;
 use crate::resources::manager::Resource;
 
 pub const APPLAUSE: Resource = resource!("./applause.wav");
