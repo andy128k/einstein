@@ -150,6 +150,7 @@ dependencies = [
  "anyhow",
  "debug-cell",
  "dirs",
+ "einstein-puzzle",
  "itertools",
  "lazy_static",
  "libc",
@@ -160,6 +161,14 @@ dependencies = [
  "serde",
  "serde_json",
  "winapi",
+]
+
+[[package]]
+name = "einstein-puzzle"
+version = "3.0.0"
+dependencies = [
+ "rand",
+ "serde",
 ]
 
 [[package]]

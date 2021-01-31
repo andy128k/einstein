@@ -6,13 +6,13 @@ use crate::resources::thing::{
     get_thing_rect, EMPTY_TILE, EMPTY_TILE_HIGHLIGHTED, LARGE_THINGS_ATLAS,
     LARGE_THINGS_ATLAS_HIGHLIGHTED,
 };
-use crate::rules::{Rule, Thing};
 use crate::ui::brick::*;
 use crate::ui::common::Size;
 use crate::ui::component::game::GamePrivate;
 use crate::ui::context::Context;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
+use einstein_puzzle::rules::{Rule, Thing};
 use sdl2::mouse::MouseButton;
 use std::cell::Cell;
 use std::rc::Rc;
@@ -123,7 +123,7 @@ impl RuleWidget {
         }
     }
 
-    fn get_rule(&self) -> Option<crate::rules::Rule> {
+    fn get_rule(&self) -> Option<Rule> {
         let index = self.index?;
         let rule = self.state.borrow().rules.get(index)?.clone();
         if self.state.borrow().show_excluded == self.state.borrow().excluded.contains(&index) {

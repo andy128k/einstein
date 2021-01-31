@@ -1,10 +1,7 @@
 mod algebra;
 mod cell;
-mod converge;
 mod error;
 mod locale;
-mod puzzle_gen;
-mod rules;
 mod util;
 #[macro_use]
 mod resources;

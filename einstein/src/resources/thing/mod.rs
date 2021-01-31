@@ -1,6 +1,6 @@
 use crate::resources::manager::Resource;
-use crate::rules::Thing;
 use crate::ui::common::Rect;
+use einstein_puzzle::rules::Thing;
 
 pub const LARGE_THINGS_ATLAS: Resource = resource!("./large.bmp");
 pub const LARGE_THINGS_ATLAS_HIGHLIGHTED: Resource = resource!("./large-h.bmp");

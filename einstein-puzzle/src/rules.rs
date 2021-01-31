@@ -1,8 +1,9 @@
-use crate::converge::converge;
-use crate::util::retry::retry;
-use itertools::all;
-use rand::seq::SliceRandom;
-use rand::Rng;
+use crate::util::{converge::converge, retry::retry};
+use rand::{
+    distributions::{Distribution, WeightedIndex},
+    seq::SliceRandom,
+    Rng,
+};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -63,7 +64,7 @@ pub struct Thing {
 impl fmt::Display for Thing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.row.0 {
-            0 => write!(f, "{}", self.value.0),
+            0 => write!(f, "{}", self.value.0 + 1),
             1 => write!(
                 f,
                 "{}",
@@ -133,6 +134,20 @@ impl ValueSet {
         set
     }
 
+    pub fn iter(&self) -> impl Iterator<Item = Value> {
+        self.0
+            .to_vec()
+            .into_iter()
+            .enumerate()
+            .filter_map(|(index, present)| {
+                if present {
+                    Some(Value(index as u8))
+                } else {
+                    None
+                }
+            })
+    }
+
     pub fn size(&self) -> usize {
         let mut result = 0;
         for v in self.0.iter() {
@@ -145,13 +160,11 @@ impl ValueSet {
 
     pub fn get_single(&self) -> Option<Value> {
         let mut result = None;
-        for (value, present) in self.0.iter().enumerate() {
-            if *present {
-                if result.is_some() {
-                    return None;
-                }
-                result = Some(Value(value as u8));
+        for value in self.iter() {
+            if result.is_some() {
+                return None;
             }
+            result = Some(value);
         }
         result
     }
@@ -232,7 +245,7 @@ impl PossibilitiesRow {
     }
 
     pub fn is_solved(&self) -> bool {
-        all(&self.0, |s| s.size() == 1)
+        self.0.iter().all(|s| s.size() == 1)
     }
 }
 
@@ -256,20 +269,24 @@ impl Possibilities {
         new
     }
 
+    pub fn get_possible(&self, col: u8, row: Kind) -> ValueSet {
+        self.0[row.0 as usize].0[col as usize]
+    }
+
     pub fn is_possible(&self, col: u8, thing: Thing) -> bool {
-        self.0[thing.row.0 as usize].0[col as usize].contains(thing.value)
+        self.get_possible(col, thing.row).contains(thing.value)
     }
 
     pub fn is_defined(&self, col: u8, row: Kind) -> bool {
-        self.0[row.0 as usize].0[col as usize].size() == 1
+        self.get_possible(col, row).size() == 1
     }
 
     pub fn get_defined(&self, col: u8, row: Kind) -> Option<Value> {
-        self.0[row.0 as usize].0[col as usize].get_single()
+        self.get_possible(col, row).get_single()
     }
 
     pub fn is_solved(&self) -> bool {
-        all(&self.0, |s| s.is_solved())
+        self.0.iter().all(|s| s.is_solved())
     }
 
     pub fn is_valid(&self, puzzle: &SolvedPuzzle) -> bool {
@@ -284,7 +301,7 @@ impl Possibilities {
     }
 }
 
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Rule {
     Near(Thing, Thing),
     Direction(Thing, Thing),
@@ -321,14 +338,14 @@ fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let row = Kind::random(rng);
-    let col: u8 = rng.gen_range(0..PUZZLE_SIZE as u8);
+    let col: u8 = rng.gen_range(0..(PUZZLE_SIZE as u8));
 
     let thing = puzzle.get(row, col);
     Rule::Open(col, thing)
 }
 
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    let col: u8 = rng.gen_range(0..PUZZLE_SIZE as u8);
+    let col: u8 = rng.gen_range(0..(PUZZLE_SIZE as u8));
     let row1 = Kind::random(rng);
     let row2 = retry(move || Kind::random(rng), |row2| row1 != *row2);
 
@@ -356,12 +373,14 @@ fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 }
 
 pub fn generate_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
-    match rng.gen_range(0..14) {
-        0 | 1 | 2 | 3 => generate_near_rule(rng, puzzle),
-        4 => generate_open_rule(rng, puzzle),
-        5 | 6 => generate_under_rule(rng, puzzle),
-        7 | 8 | 9 | 10 => generate_direction_rule(rng, puzzle),
-        11 | 12 | 13 => generate_between_rule(rng, puzzle),
+    let weights = [4_u32, 1, 2, 4, 3];
+    let dist = WeightedIndex::new(&weights).unwrap();
+    match dist.sample(rng) {
+        0 => generate_near_rule(rng, puzzle),
+        1 => generate_open_rule(rng, puzzle),
+        2 => generate_under_rule(rng, puzzle),
+        3 => generate_direction_rule(rng, puzzle),
+        4 => generate_between_rule(rng, puzzle),
         _ => unreachable!(),
     }
 }

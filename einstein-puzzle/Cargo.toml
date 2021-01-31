@@ -1,0 +1,9 @@
+[package]
+name = "einstein-puzzle"
+version = "3.0.0"
+authors = ["Andrey Kutejko <andy128k@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = { version = "0.8", features = ["alloc"] }
+serde = { version = "1", features = ["derive"] }

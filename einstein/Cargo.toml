@@ -17,6 +17,7 @@ lazy_static = "1"
 debug-cell = "0.1.0"
 dirs = "3"
 ropey = "1"
+einstein-puzzle = { path = "../einstein-puzzle" }
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["winnls"] }

@@ -1,10 +1,10 @@
 use crate::cell::RefCell;
-use crate::rules::{Kind, Value, PUZZLE_SIZE};
 use crate::ui::common::Size;
 use crate::ui::component::game::GamePrivate;
 use crate::ui::component::puzzle::puzzle_cell::{PuzzleAction, PuzzleCell};
 use crate::ui::layout::grid::GridBuilder;
 use crate::ui::widget::container::Container;
+use einstein_puzzle::rules::{Kind, Value, PUZZLE_SIZE};
 use std::rc::Rc;
 
 const WIDTH: u32 = 308;

@@ -5,13 +5,13 @@ use crate::resources::thing::{
     get_small_thing_rect, get_thing_rect, EMPTY_TILE, LARGE_THINGS_ATLAS,
     LARGE_THINGS_ATLAS_HIGHLIGHTED, SMALL_THINGS_ATLAS, SMALL_THINGS_ATLAS_HIGHLIGHTED,
 };
-use crate::rules::{Kind, Thing, Value};
 use crate::ui::brick::*;
 use crate::ui::common::{Rect, Size};
 use crate::ui::component::game::GamePrivate;
 use crate::ui::context::Context;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
+use einstein_puzzle::rules::{Kind, Thing, Value};
 use sdl2::mouse::MouseButton;
 use std::cell::Cell;
 use std::rc::Rc;
