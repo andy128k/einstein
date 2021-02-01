@@ -1,0 +1,21 @@
+name: Code check
+
+on: [push, pull_request]
+
+jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: clippy
+        override: true
+    - name: Install dependencies
+      run: sudo apt-get install -y --no-install-recommends libsdl2-dev libsdl2-mixer-dev libsdl2-ttf-dev
+
+    - uses: actions-rs/clippy-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --all-targets --all-features
