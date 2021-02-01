@@ -1,4 +1,3 @@
-pub use crate::algebra::*;
 use crate::error::*;
 use crate::resources::manager::ResourceManager;
 use crate::ui::brick::Brick;

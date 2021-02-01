@@ -7,6 +7,7 @@ use crate::ui::context::Context;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
 use crate::util::time::sec_to_str;
+use never::Never;
 use sdl2::pixels::Color;
 use std::cell::Cell;
 use std::rc::Rc;
@@ -32,7 +33,7 @@ impl GameTitle {
     }
 }
 
-impl Widget<Nothing> for GameTitle {
+impl Widget<Never> for GameTitle {
     fn get_size(&self) -> Size {
         Size {
             width: 783,
@@ -40,7 +41,7 @@ impl Widget<Nothing> for GameTitle {
         }
     }
 
-    fn on_event(&mut self, event: &Event, _context: &dyn Context) -> EventResult<Nothing> {
+    fn on_event(&mut self, event: &Event, _context: &dyn Context) -> EventResult<Never> {
         match *event {
             Event::Tick => {
                 if Some(self.state.borrow().get_current_duration()) != self.last_duration.get() {

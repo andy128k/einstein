@@ -3,6 +3,7 @@ use crate::ui::brick::*;
 use crate::ui::common::{HorizontalAlign, Size, VerticalAlign};
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
+use never::Never;
 use sdl2::pixels::Color;
 
 pub struct Label {
@@ -38,7 +39,7 @@ impl Label {
     }
 }
 
-impl Widget<Nothing> for Label {
+impl Widget<Never> for Label {
     fn get_size(&self) -> Size {
         self.size
     }

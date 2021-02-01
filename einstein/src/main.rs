@@ -1,4 +1,3 @@
-mod algebra;
 mod cell;
 mod error;
 mod locale;

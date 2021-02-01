@@ -7,6 +7,7 @@ use crate::ui::common::{HorizontalAlign, Size};
 use crate::ui::page_layout::*;
 use crate::ui::widget::common::*;
 use crate::ui::widget::widget::*;
+use never::Never;
 use sdl2::pixels::Color;
 use std::rc::Rc;
 
@@ -77,7 +78,7 @@ impl PageView {
     }
 }
 
-impl Widget<Nothing> for PageView {
+impl Widget<Never> for PageView {
     fn get_size(&self) -> Size {
         self.size
     }
