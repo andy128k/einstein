@@ -25,12 +25,35 @@ use crate::ui::widget::container::Container;
 use crate::ui::widget::widget::*;
 use einstein_puzzle::puzzle_gen::generate_puzzle;
 use einstein_puzzle::rules::{apply, Possibilities, Rule, SolvedPuzzle};
-use rand::thread_rng;
+use rand::{thread_rng, Rng};
 use sdl2::keyboard::Keycode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::rc::Rc;
 use std::time::{Duration, Instant};
+
+fn generate_fittable_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>)> {
+    fn fits_into_ui(rules: &[Rule]) -> bool {
+        let mut horizontal = 0;
+        let mut vertical = 0;
+        for rule in rules {
+            match rule {
+                Rule::Near(..) | Rule::Between(..) | Rule::Direction(..) => horizontal += 1,
+                Rule::Under(..) => vertical += 1,
+                Rule::Open(..) => {}
+            }
+        }
+
+        horizontal <= 24 && vertical <= 15
+    }
+
+    loop {
+        let (puzzle, rules) = generate_puzzle(rng)?;
+        if fits_into_ui(&rules) {
+            return Ok((puzzle, rules));
+        }
+    }
+}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct GamePrivate {
@@ -57,7 +80,7 @@ const RAIN: Resource = resource!("./rain.bmp");
 impl GamePrivate {
     pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
         let mut rng = thread_rng();
-        let (solved_puzzle, rules) = generate_puzzle(&mut rng)?;
+        let (solved_puzzle, rules) = generate_fittable_puzzle(&mut rng)?;
 
         let mut possibilities = Possibilities::new();
         for rule in &rules {
