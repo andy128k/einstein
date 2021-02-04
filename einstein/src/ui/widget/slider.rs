@@ -66,7 +66,7 @@ impl Slider {
     fn on_mouse_move(&self, x: i32, y: i32) -> bool {
         if let Some(drag_x) = self.dragging.get() {
             let val = self.x_to_value(x - drag_x);
-            if val != self.value.get() {
+            if (val - self.value.get()).abs() > 0.01 {
                 self.value.set(val);
                 true
             } else {

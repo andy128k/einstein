@@ -125,7 +125,7 @@ impl RuleWidget {
 
     fn get_rule(&self) -> Option<Rule> {
         let index = self.index?;
-        let rule = self.state.borrow().rules.get(index)?.clone();
+        let rule = *self.state.borrow().rules.get(index)?;
         if self.state.borrow().show_excluded == self.state.borrow().excluded.contains(&index) {
             Some(rule)
         } else {

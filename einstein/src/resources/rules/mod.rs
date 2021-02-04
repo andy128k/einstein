@@ -7,7 +7,7 @@ pub use self::base::TextItem;
 use crate::locale::get_language;
 
 pub fn get_rules() -> &'static [TextItem<'static>] {
-    match get_language().as_ref().map(String::as_str) {
+    match get_language().as_deref() {
         Some("ru") => &rules_ru::RULES,
         Some("de") => &rules_de::RULES,
         _ => &rules_en::RULES,
