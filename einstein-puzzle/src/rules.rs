@@ -185,20 +185,20 @@ impl ValueSet {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
-pub struct PossibilitiesRow([ValueSet; PUZZLE_SIZE]);
+struct PossibilitiesRow([ValueSet; PUZZLE_SIZE]);
 
 impl PossibilitiesRow {
-    pub fn new() -> Self {
+    fn new() -> Self {
         PossibilitiesRow([ValueSet::full(); PUZZLE_SIZE])
     }
 
-    pub fn exclude(&self, col: u8, element: Value) -> Self {
+    fn exclude(&self, col: u8, element: Value) -> Self {
         let mut new_row = *self;
         new_row.0[col as usize].remove(element);
         new_row.check_singles()
     }
 
-    pub fn set(&self, col: u8, element: Value) -> Self {
+    fn set(&self, col: u8, element: Value) -> Self {
         let mut new_row = *self;
         new_row.0[col as usize] = ValueSet::single(element);
         new_row.check_singles()
@@ -244,7 +244,7 @@ impl PossibilitiesRow {
         })
     }
 
-    pub fn is_solved(&self) -> bool {
+    fn is_solved(&self) -> bool {
         self.0.iter().all(|s| s.size() == 1)
     }
 }
