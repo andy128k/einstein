@@ -52,7 +52,7 @@ impl PageViewState {
             let mut pages = PagesBuilder::new(page_width as u16, page_height as u16);
             for text_item in self.text {
                 match *text_item {
-                    TextItem::Text(ref content) => {
+                    TextItem::Text(content) => {
                         pages.add_text(content, &*resource_manager.font(FontSize::TEXT.0))?
                     }
                     TextItem::Image(ref image) => pages.add_image(image, resource_manager)?,
@@ -110,7 +110,7 @@ impl Widget<Never> for PageView {
                             ),
                         );
                     }
-                    PageItem::Image(ref image, x, y, w, h) => {
+                    PageItem::Image(image, x, y, w, h) => {
                         brick.push(
                             x as u32,
                             y as u32,

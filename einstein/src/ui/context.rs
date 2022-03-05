@@ -39,7 +39,7 @@ impl Context for AppContext<'_> {
         self.canvas.borrow_mut().clear();
 
         let b = widget.draw(self.resource_manager);
-        b.draw(&mut *self.canvas.borrow_mut(), 0, 0, self.resource_manager)?;
+        b.draw(*self.canvas.borrow_mut(), 0, 0, self.resource_manager)?;
         self.canvas.borrow_mut().present();
 
         let mut event_pump = self

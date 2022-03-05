@@ -15,7 +15,7 @@ serde_json = "1"
 regex = "1"
 lazy_static = "1"
 debug-cell = "0.1.0"
-dirs = "3"
+dirs = "4"
 ropey = "1"
 never = "0.1"
 einstein-puzzle = { path = "../einstein-puzzle" }

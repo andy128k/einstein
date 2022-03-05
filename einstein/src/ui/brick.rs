@@ -129,7 +129,7 @@ impl Brick {
                     .map_err(|e| format_err!("{}", e))?;
             }
             Some(Background::Image(resource, s_rect)) => {
-                let image = resource_manager.image(&resource);
+                let image = resource_manager.image(resource);
                 let src_rect = s_rect.unwrap_or_else(|| {
                     let q = image.query();
                     Rect::new(0, 0, q.width, q.height)
@@ -202,7 +202,7 @@ fn sprite(
             canvas.set_clip_rect(Some(rect_to_rect2(clip)));
             canvas
                 .copy(
-                    &src_image,
+                    src_image,
                     Some(rect_to_rect2(src_rect)),
                     Some(rect_to_rect2(dst)),
                 )

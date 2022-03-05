@@ -63,11 +63,11 @@ impl Size {
         Self { width, height }
     }
 
-    pub fn to_rect(&self) -> Rect {
+    pub fn to_rect(self) -> Rect {
         Rect::new(0, 0, self.width, self.height)
     }
 
-    pub fn contains(&self, x: i32, y: i32) -> bool {
+    pub fn contains(self, x: i32, y: i32) -> bool {
         x >= 0 && (x as u32) < self.width && y >= 0 && (y as u32) < self.height
     }
 }
