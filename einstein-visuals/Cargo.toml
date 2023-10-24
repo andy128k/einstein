@@ -1,0 +1,9 @@
+[package]
+name = "einstein-visuals"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+palette = "0.7.3"
+
+einstein-puzzle = { path = "../einstein-puzzle" }

@@ -2,5 +2,6 @@
 resolver = "2"
 members = [
     "einstein-puzzle",
+    "einstein-visuals",
     "einstein",
 ]
