@@ -14,7 +14,7 @@ impl std::fmt::Display for InvalidPuzzle {
 }
 
 fn solve(puzzle: &SolvedPuzzle, rules: &[Rule]) -> Result<Possibilities, InvalidPuzzle> {
-    let possibilities = converge_result(Possibilities::new(), |mut possibilities| {
+    let possibilities = converge_result(Possibilities::new(puzzle.size()), |mut possibilities| {
         for rule in rules {
             possibilities = apply(&possibilities, rule);
             if !possibilities.is_valid(puzzle) {
@@ -53,8 +53,11 @@ fn generate_rules(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Result<Vec<Rule>
     Ok(rules)
 }
 
-pub fn generate_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>), InvalidPuzzle> {
-    let puzzle = SolvedPuzzle::random(rng);
+pub fn generate_puzzle(
+    size: PuzzleSize,
+    rng: &mut impl Rng,
+) -> Result<(SolvedPuzzle, Vec<Rule>), InvalidPuzzle> {
+    let puzzle = SolvedPuzzle::random(size, rng);
     let rules = generate_rules(rng, &puzzle)?;
     let reduced_rules = remove_rules(&puzzle, &rules)?;
     Ok((puzzle, reduced_rules))
@@ -67,8 +70,12 @@ mod tests {
 
     #[test]
     fn test_eq_generate_puzzle() {
+        let size = PuzzleSize {
+            kinds: 6,
+            values: 6,
+        };
         let mut rng = thread_rng();
-        let (_puzzle, rules) = generate_puzzle(&mut rng).unwrap();
+        let (_puzzle, rules) = generate_puzzle(size, &mut rng).unwrap();
         assert!(rules.len() > 0);
     }
 }

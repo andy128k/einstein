@@ -19,27 +19,6 @@ use std::rc::Rc;
 const FIELD_TILE_WIDTH: u32 = 48;
 const FIELD_TILE_HEIGHT: u32 = 48;
 
-fn local_choice_cell_rect(Value(value): Value) -> Rect {
-    let x: i32 = ((value % 3) as i32) * ((FIELD_TILE_WIDTH / 3) as i32);
-    let y: i32 =
-        ((value / 3) as i32) * ((FIELD_TILE_HEIGHT / 3) as i32) + ((FIELD_TILE_HEIGHT / 6) as i32);
-    Rect::new(
-        x,
-        y,
-        (FIELD_TILE_WIDTH / 3) as u32,
-        (FIELD_TILE_HEIGHT / 3) as u32,
-    )
-}
-
-fn local_find_choice(x: i32, y: i32) -> Option<Value> {
-    for value in &Value::values() {
-        if local_choice_cell_rect(*value).contains_point((x, y)) {
-            return Some(*value);
-        }
-    }
-    None
-}
-
 #[derive(Clone)]
 pub enum PuzzleAction {
     Victory,
@@ -63,6 +42,36 @@ impl PuzzleCell {
         }
     }
 
+    fn all_values(&self) -> Vec<Value> {
+        let size = self.state.borrow().solved_puzzle.size();
+        let mut arr = Vec::new();
+        for i in 0..size.values {
+            arr.push(Value(i as u8));
+        }
+        arr
+    }
+
+    fn local_choice_cell_rect(&self, Value(value): Value) -> Rect {
+        let x: i32 = ((value % 3) as i32) * ((FIELD_TILE_WIDTH / 3) as i32);
+        let y: i32 = ((value / 3) as i32) * ((FIELD_TILE_HEIGHT / 3) as i32)
+            + ((FIELD_TILE_HEIGHT / 6) as i32);
+        Rect::new(
+            x,
+            y,
+            (FIELD_TILE_WIDTH / 3) as u32,
+            (FIELD_TILE_HEIGHT / 3) as u32,
+        )
+    }
+
+    fn local_find_choice(&self, x: i32, y: i32) -> Option<Value> {
+        for value in self.all_values() {
+            if self.local_choice_cell_rect(value).contains_point((x, y)) {
+                return Some(value);
+            }
+        }
+        None
+    }
+
     fn on_mouse_button_down(
         &self,
         button: MouseButton,
@@ -84,7 +93,7 @@ impl PuzzleCell {
             return EventReaction::empty();
         }
 
-        let value = match local_find_choice(x, y) {
+        let value = match self.local_find_choice(x, y) {
             Some(v) => v,
             None => return EventReaction::empty(),
         };
@@ -161,7 +170,7 @@ impl PuzzleCell {
                 self.highlighted.set(None);
             }
         } else {
-            match local_find_choice(x, y) {
+            match self.local_find_choice(x, y) {
                 Some(p) => self.highlighted.set(Some(Some(p))),
                 None => self.highlighted.set(None),
             }
@@ -217,16 +226,16 @@ impl Widget<PuzzleAction> for PuzzleCell {
         } else {
             brick = brick.background(Background::Image(&EMPTY_TILE, None));
 
-            for i in &Value::values() {
-                let choice_rect = local_choice_cell_rect(*i);
-                let thing = Thing { row, value: *i };
+            for value in self.all_values() {
+                let choice_rect = self.local_choice_cell_rect(value);
+                let thing = Thing { row, value };
                 if self
                     .state
                     .borrow()
                     .possibilities
                     .is_possible(col as u8, thing)
                 {
-                    let highlight = self.highlighted.get() == Some(Some(*i));
+                    let highlight = self.highlighted.get() == Some(Some(value));
 
                     let rect = get_small_thing_rect(thing);
                     brick.push(

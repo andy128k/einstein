@@ -24,7 +24,7 @@ use crate::ui::widget::common::*;
 use crate::ui::widget::container::Container;
 use crate::ui::widget::widget::*;
 use einstein_puzzle::puzzle_gen::generate_puzzle;
-use einstein_puzzle::rules::{apply, Possibilities, Rule, SolvedPuzzle};
+use einstein_puzzle::rules::{apply, Possibilities, PuzzleSize, Rule, SolvedPuzzle};
 use rand::{thread_rng, Rng};
 use sdl2::keyboard::Keycode;
 use serde::{Deserialize, Serialize};
@@ -32,7 +32,10 @@ use std::collections::HashSet;
 use std::rc::Rc;
 use std::time::{Duration, Instant};
 
-fn generate_fittable_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rule>)> {
+fn generate_fittable_puzzle(
+    size: PuzzleSize,
+    rng: &mut impl Rng,
+) -> Result<(SolvedPuzzle, Vec<Rule>)> {
     fn fits_into_ui(rules: &[Rule]) -> bool {
         let mut horizontal = 0;
         let mut vertical = 0;
@@ -48,7 +51,7 @@ fn generate_fittable_puzzle(rng: &mut impl Rng) -> Result<(SolvedPuzzle, Vec<Rul
     }
 
     loop {
-        let (puzzle, rules) = generate_puzzle(rng)?;
+        let (puzzle, rules) = generate_puzzle(size, rng)?;
         if fits_into_ui(&rules) {
             return Ok((puzzle, rules));
         }
@@ -79,10 +82,14 @@ const RAIN: Resource = resource!("./rain.bmp");
 
 impl GamePrivate {
     pub fn new() -> Result<Rc<RefCell<GamePrivate>>> {
+        let size = PuzzleSize {
+            kinds: 6,
+            values: 6,
+        };
         let mut rng = thread_rng();
-        let (solved_puzzle, rules) = generate_fittable_puzzle(&mut rng)?;
+        let (solved_puzzle, rules) = generate_fittable_puzzle(size, &mut rng)?;
 
-        let mut possibilities = Possibilities::new();
+        let mut possibilities = Possibilities::new(solved_puzzle.size());
         for rule in &rules {
             if let Rule::Open(..) = *rule {
                 possibilities = apply(&possibilities, rule);
@@ -118,7 +125,7 @@ impl GamePrivate {
     }
 
     pub fn restart(&mut self) {
-        let mut possibilities = Possibilities::new();
+        let mut possibilities = Possibilities::new(self.solved_puzzle.size());
         for rule in &self.rules {
             if let Rule::Open(..) = *rule {
                 possibilities = apply(&possibilities, rule);
