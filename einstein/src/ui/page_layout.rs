@@ -1,7 +1,6 @@
 use crate::error::*;
 use crate::resources::manager::{Resource, ResourceManager};
-use crate::util::group_by_weight::group_by_weight;
-use itertools::join;
+use crate::util::group_by_weight::GroupByWeight;
 use lazy_static::lazy_static;
 use regex::Regex;
 use sdl2::render::TextureQuery;
@@ -36,19 +35,21 @@ lazy_static! {
 }
 
 fn wrap_lines(text: &str, page_width: u16, font: &Font) -> Vec<String> {
-    group_by_weight(SPLIT_REGEX.split(text), |words, word| {
-        let line = join(words, " ") + " " + word;
-        match font.size_of(&line) {
-            Ok((width, _)) => (width as u16) < page_width,
-            Err(err) => {
-                eprintln!("ERROR: {}", err);
-                false
+    SPLIT_REGEX
+        .split(text)
+        .group_by_weight(|words, word| {
+            let line = words.join(" ") + " " + word;
+            match font.size_of(&line) {
+                Ok((width, _)) => width < page_width.into(),
+                Err(err) => {
+                    eprintln!("ERROR: {}", err);
+                    false
+                }
             }
-        }
-    })
-    .into_iter()
-    .map(|words| join(words, " "))
-    .collect()
+        })
+        .into_iter()
+        .map(|words| words.join(" "))
+        .collect()
 }
 
 pub struct PagesBuilder {

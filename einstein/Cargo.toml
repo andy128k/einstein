@@ -7,7 +7,6 @@ edition = "2021"
 [dependencies]
 libc = "0.2"
 anyhow = "1"
-itertools = "0.11"
 sdl2 = { version = "*", default-features = false, features = ["ttf", "mixer"] }
 rand = "0.8"
 serde = { version = "1", features = ["derive"] }
