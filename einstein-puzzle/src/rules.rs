@@ -2,9 +2,9 @@ use crate::bitset::BitSet;
 use crate::u4::U4;
 use crate::util::{converge::converge, num_to_str::num_to_str};
 use rand::{
-    distributions::{Distribution, WeightedIndex},
+    distr::{weighted::WeightedIndex, Distribution},
     seq::SliceRandom,
-    Rng,
+    Rng, RngExt,
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -339,8 +339,8 @@ impl Possibilities {
 }
 
 fn gen_two(rng: &mut impl Rng, max: u8) -> (u8, u8) {
-    let v1: u8 = rng.gen_range(0..(max - 1));
-    let v2: u8 = rng.gen_range((v1 + 1)..max);
+    let v1: u8 = rng.random_range(0..(max - 1));
+    let v2: u8 = rng.random_range((v1 + 1)..max);
     (v1, v2)
 }
 
@@ -364,14 +364,14 @@ impl Rule {
 
 fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let size = puzzle.size();
-    let row1 = rng.gen_range(0..size.kinds);
-    let row2 = rng.gen_range(0..size.kinds);
-    let first_col = rng.gen_range(0..(size.values - 1));
+    let row1 = rng.random_range(0..size.kinds);
+    let row2 = rng.random_range(0..size.kinds);
+    let first_col = rng.random_range(0..(size.values - 1));
 
     let thing1 = puzzle.get(Kind(row1), first_col);
     let thing2 = puzzle.get(Kind(row2), first_col + 1);
 
-    if rng.gen() {
+    if rng.random_bool(0.5) {
         Rule::Near(thing1, thing2)
     } else {
         Rule::Near(thing2, thing1)
@@ -380,8 +380,8 @@ fn generate_near_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let size = puzzle.size();
-    let row1 = rng.gen_range(0..size.kinds);
-    let row2 = rng.gen_range(0..size.kinds);
+    let row1 = rng.random_range(0..size.kinds);
+    let row2 = rng.random_range(0..size.kinds);
     let (col1, col2) = gen_two(rng, size.values);
 
     let thing1 = puzzle.get(Kind(row1), col1);
@@ -391,8 +391,8 @@ fn generate_direction_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let size = puzzle.size();
-    let row = rng.gen_range(0..size.kinds);
-    let col = rng.gen_range(0..size.values);
+    let row = rng.random_range(0..size.kinds);
+    let col = rng.random_range(0..size.values);
 
     let thing = puzzle.get(Kind(row), col);
     Rule::Open(col, thing)
@@ -400,7 +400,7 @@ fn generate_open_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let size = puzzle.size();
-    let col: u8 = rng.gen_range(0..size.values);
+    let col: u8 = rng.random_range(0..size.values);
     let (row1, row2) = gen_two(rng, size.kinds);
 
     let thing1 = puzzle.get(Kind(row1), col);
@@ -410,16 +410,16 @@ fn generate_under_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
 
 fn generate_between_rule(rng: &mut impl Rng, puzzle: &SolvedPuzzle) -> Rule {
     let size = puzzle.size();
-    let row1 = rng.gen_range(0..size.kinds);
-    let row2 = rng.gen_range(0..size.kinds);
-    let row3 = rng.gen_range(0..size.kinds);
-    let first_col = rng.gen_range(0..(size.values - 2));
+    let row1 = rng.random_range(0..size.kinds);
+    let row2 = rng.random_range(0..size.kinds);
+    let row3 = rng.random_range(0..size.kinds);
+    let first_col = rng.random_range(0..(size.values - 2));
 
     let thing1 = puzzle.get(Kind(row1), first_col);
     let thing2 = puzzle.get(Kind(row2), first_col + 1);
     let thing3 = puzzle.get(Kind(row3), first_col + 2);
 
-    if rng.gen() {
+    if rng.random_bool(0.5) {
         Rule::Between(thing1, thing2, thing3)
     } else {
         Rule::Between(thing3, thing2, thing1)

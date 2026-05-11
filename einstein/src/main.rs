@@ -38,7 +38,7 @@ fn real_main() -> Result<()> {
     };
     let mut canvas = window.into_canvas().build()?;
 
-    let ttf = sdl2::ttf::init()?;
+    let ttf = sdl2::ttf::init().map_err(|e| format_err!("{}", e))?;
     let audio = SdlAudio::new().map_err(|e| format_err!("{}", e))?;
 
     audio.set_volume(state.borrow().volume);

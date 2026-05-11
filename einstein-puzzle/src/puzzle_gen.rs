@@ -66,7 +66,7 @@ pub fn generate_puzzle(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::thread_rng;
+    use rand::rng;
 
     #[test]
     fn test_eq_generate_puzzle() {
@@ -74,7 +74,7 @@ mod tests {
             kinds: 6,
             values: 6,
         };
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let (_puzzle, rules) = generate_puzzle(size, &mut rng).unwrap();
         assert!(rules.len() > 0);
     }

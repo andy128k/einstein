@@ -25,7 +25,7 @@ use crate::ui::widget::container::Container;
 use crate::ui::widget::widget::*;
 use einstein_puzzle::puzzle_gen::generate_puzzle;
 use einstein_puzzle::rules::{apply, Possibilities, PuzzleSize, Rule, SolvedPuzzle};
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 use sdl2::keyboard::Keycode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -86,7 +86,7 @@ impl GamePrivate {
             kinds: 6,
             values: 6,
         };
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let (solved_puzzle, rules) = generate_fittable_puzzle(size, &mut rng)?;
 
         let mut possibilities = Possibilities::new(solved_puzzle.size());

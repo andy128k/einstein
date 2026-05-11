@@ -1,6 +1,6 @@
 use crate::puzzle_gen::generate_puzzle;
 use crate::rules::{apply, Kind, Possibilities, PuzzleSize, Rule, SolvedPuzzle, Thing, Value};
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -79,6 +79,6 @@ impl Puzzle {
 
 impl std::default::Default for Puzzle {
     fn default() -> Self {
-        Self::new(PuzzleSize::default(), &mut thread_rng())
+        Self::new(PuzzleSize::default(), &mut rng())
     }
 }
