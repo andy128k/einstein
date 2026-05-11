@@ -25,16 +25,16 @@ macro_rules! resource {
     };
 }
 
-fn load_image(data: &[u8]) -> Result<Surface> {
+fn load_image(data: &'_ [u8]) -> Result<Surface<'_>> {
     let mut rw = RWops::from_bytes(data).map_err(|e| format_err!("{}", e))?;
     let surface = Surface::load_bmp_rw(&mut rw).map_err(|e| format_err!("{}", e))?;
     Ok(surface)
 }
 
 pub trait ResourceManager {
-    fn image(&self, resource: &'static Resource) -> Ref<Texture>;
-    fn font(&self, point_size: u16) -> Ref<Font>;
-    fn chunk(&self, resource: &'static Resource) -> Ref<Chunk>;
+    fn image<'a>(&'a self, resource: &'static Resource) -> Ref<'a, Texture<'a>>;
+    fn font<'a>(&'a self, point_size: u16) -> Ref<'a, Font<'a, 'a>>;
+    fn chunk<'a>(&'a self, resource: &'static Resource) -> Ref<'a, Chunk>;
 }
 
 const FONT_DUMP: &[u8] = include_bytes!("./fonts/LiberationSans-Regular.ttf"); // /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
@@ -68,7 +68,7 @@ where
 }
 
 impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
-    fn image(&self, resource: &'static Resource) -> Ref<Texture> {
+    fn image<'a>(&'a self, resource: &'static Resource) -> Ref<'a, Texture<'a>> {
         let key = resource.name.to_owned();
         if self.images.borrow().get(&key).is_none() {
             let surface = load_image(resource.data).unwrap();
@@ -81,7 +81,7 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
         Ref::map(self.images.borrow(), |r| r.get(&key).unwrap())
     }
 
-    fn font(&self, point_size: u16) -> Ref<Font> {
+    fn font<'a>(&'a self, point_size: u16) -> Ref<'a, Font<'a, 'a>> {
         if self.fonts.borrow().get(&point_size).is_none() {
             let ops = RWops::from_bytes(FONT_DUMP).unwrap();
             let font = self
@@ -93,7 +93,7 @@ impl<'r, C> ResourceManager for ResourceManagerImpl<'r, C> {
         Ref::map(self.fonts.borrow(), |r| r.get(&point_size).unwrap())
     }
 
-    fn chunk(&self, resource: &'static Resource) -> Ref<Chunk> {
+    fn chunk<'a>(&'a self, resource: &'static Resource) -> Ref<'a, Chunk> {
         if self.chunks.borrow().get(resource.name).is_none() {
             let chunk = RWops::from_bytes(resource.data)
                 .unwrap()
